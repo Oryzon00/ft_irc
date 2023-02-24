@@ -13,19 +13,17 @@
 #include <unistd.h>
 
 
-int initSocket (unsigned short port)
-{
+int initConnection (unsigned short port) {
 	int opt = 1;
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == -1)
-	{
+	if (sock == -1) {
 		perror("socket()");
-		return (1);
+		return (-1);
 	}
 
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
 		perror("setsockopt");
-		return (1);
+		return (-1);
 	}
 
 	struct sockaddr_in sin;
@@ -33,32 +31,43 @@ int initSocket (unsigned short port)
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
 
-	if (bind (sock, (struct sockaddr  *) &sin, sizeof (sin)) == -1) {
+	if (bind(sock, (struct sockaddr *) &sin, sizeof(sin)) == -1) {
 		perror("bind()");
-		return (1);
+		return (-1);
 	}
 
 	if (listen(sock, 5) == -1) {
 		perror("listen()");
-
-		return (1);
+		return (-1);
 	}
+	return (sock);
+}
+
+int initSocket (int servSock) {
+
 	int csock;
 	struct sockaddr_in csin = {0};
-	socklen_t sinsize = sizeof (csin);
-	csock = accept(sock, (struct sockaddr *)&csin, &sinsize);
-	if (csock == -1)
-	{
+	socklen_t sinsize = sizeof(csin);
+	csock = accept(servSock, (struct sockaddr *) &csin, &sinsize);
+	if (csock == -1) {
 		perror("accept()");
-		return (1);
+		return (-1);
 	}
-	char buff[1024] = {0};
-	recv(csock, buff, 1023, 0);
-	std::string str = buff;
-	std::cout << str << std::endl;
+	return (csock);
+}
 
-	close(csock);
-	close(sock);
+int mirror (int clientSock) {
+	char buff[1024] = {0};
+	if (recv(clientSock, buff, 1023, 0) == 0) {
+		//perror("recv()");
+		return (-1);
+	}
+	if (send(clientSock, buff, strlen(buff), 0) < 0) {
+		perror("send()");
+		return (-1);
+	}
+	//std::string str = buff;
+	//std::cout << str << std::endl;
 	return (0);
 }
 
@@ -67,10 +76,23 @@ int main (int ac, char **av)
 	if (ac == 1)
 		return (1);
 	int port = atoi(av[1]);
-	int clientSocket = initSocket(port);
-	if (clientSocket)
-		std::cout << "Error while connectiong socket" << std::endl;
-	else
-		std::cout << "Client connected to port : " << port << std::endl;
+	int serverSocket = initConnection(port);
+	if (serverSocket < 0) {
+		std::cout << "ERROR SERVER SOCKET CREATION" << std::endl;
+		return (1);
+	}
+	int clientSocket = initSocket(serverSocket);
+	if (clientSocket < 0)
+	{
+		std::cout << "ERROR CLIENT SOCKET CREATION" << std::endl;
+		close(serverSocket);
+		return (1);
+	}
+	while (1) {
+		if (mirror(clientSocket) < 0)
+			break;
+	}
+	close(clientSocket);
+	close(serverSocket);
 	return (0);
 }
