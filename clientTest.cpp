@@ -37,6 +37,16 @@ int initConnection (unsigned short port) {
 	return (sock);
 }
 
+int sendMessage (int servSocket)
+{
+	std::string buff;
+	std::cout << "COMMAND: ";
+	std::getline (std::cin, buff);
+	if (send(servSocket, buff.c_str(), buff.size(), 0) < 0)
+		return (-1);
+	return (0);
+}
+
 int main (int ac, char **av)
 {
 	if (ac == 1)
@@ -48,12 +58,9 @@ int main (int ac, char **av)
 		return (1);
 	}
 	while (1) {
-		char buff[1024] = {0};
-		std::cout << "COMMAND: ";
-		std::cin >> buff;
-		if (send(serverSocket, buff, strlen(buff), 0) < 0)
+		if (sendMessage(serverSocket) < 0)
 			break;
 	}
-	//close(serverSocket);
+	close(serverSocket);
 	return (0);
 }
