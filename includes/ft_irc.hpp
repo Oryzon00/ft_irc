@@ -45,4 +45,19 @@ class ParsingException : public std::exception
 		}
 };
 
+class CustomException : public std::exception
+{
+	std::string	_msg;
+
+	public:
+		CustomException(const std::string msg)	: _msg(msg)	{}
+
+		~CustomException() throw()	{}
+
+		virtual const char*	what(void) const throw()
+		{
+			return _msg.c_str();
+		}
+};
+
 void	parsing(int ac, char **av, t_arg & arg);
