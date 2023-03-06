@@ -7,11 +7,14 @@
 
 #include <netinet/in.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+struct s_client {
+	int sock;
+	char buff[1024] = {0};
+} typedef t_client;
 
 int initConnection (unsigned short port) {
 	int opt = 1;
@@ -66,13 +69,12 @@ int mirror (int clientSock) {
 		perror("send()");
 		return (-1);
 	}
-	//std::string str = buff;
-	//std::cout << str << std::endl;
 	return (0);
 }
 
 int main (int ac, char **av)
 {
+	//t_client clients[5];
 	if (ac == 1)
 		return (1);
 	int port = atoi(av[1]);
