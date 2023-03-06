@@ -1,7 +1,8 @@
 NAME		=	ircserv
 
-SRCS		=	srcs/main.cpp		\
-				srcs/parsing.cpp	\
+SRCS		=	srcs/main.cpp				\
+				srcs/parsing.cpp			\
+				srcs/initServerSocket.cpp	\
 
 INC_DIR		=	includes
 
