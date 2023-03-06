@@ -32,3 +32,5 @@
 *.app
 
 *.pid
+*.vscode*
+*ircserv
