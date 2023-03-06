@@ -4,9 +4,11 @@
 # include <string>
 # include <cctype>
 # include <cstdlib>
+# include <sys/select.h>
 
 # include "CustomException.hpp"
 # include "Server.hpp"
+# include "Client.hpp"
 # include "parsing.hpp"
 
 /* 

@@ -3,6 +3,8 @@ NAME		=	ircserv
 SRCS		=	srcs/main.cpp				\
 				srcs/parsing.cpp			\
 				srcs/initServerSocket.cpp	\
+				srcs/Client.cpp				\
+				srcs/Server.cpp				\
 
 INC_DIR		=	includes
 
