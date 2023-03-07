@@ -1,10 +1,13 @@
 #pragma once
 
 # include <string>
-# include "Client.hpp"
 # include <vector>
 
+# include "Client.hpp"
+# include "Network.hpp"
+
 int	initServerSocket(unsigned short port);
+
 
 class Server
 {
@@ -12,17 +15,32 @@ class Server
 		int 				_socket;
 		std::string			_password;
 		std::vector<Client>	_clients;
+		Network				_network;
 
 	public:
 
-		Server(int port, std::string password)
-			: _socket(initServerSocket(port)), _password(password)	{}
+		Server(int port, std::string password);
 		
-		void	addClient(Client client);
+		
 		
 		const int&						getServerSocket(void) const;
 		const std::string&				getPassword(void) const;
 		const std::vector<Client>&		getClients(void) const;
+		const Network&					getNetwork(void) const;
+
+		/*
+		Fonction membre a coder:
+			- pollserver
+			- addClient
+			- removeClient
+			- printMsg
+			- bool checkSocket(size_t i)
+		*/
+
+		void							addClient(void);
+		void							removeClient(Client& client);
+
+
 	
 
 };

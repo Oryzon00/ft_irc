@@ -2,6 +2,8 @@
 
 # include <string>
 
+int	initClientSocket(int socket_server);
+
 class Client
 {
 	private:
@@ -10,7 +12,7 @@ class Client
 		int			_socket;
 
 	public:
-		Client(std::string nickname, int socket) : _nickname(nickname), _socket(socket)	{}
+		Client(int socket) :  _socket(initClientSocket(socket))	{}
 
 		const std::string&	getNickname(void) const;
 		const int&			getSocket(void) const;

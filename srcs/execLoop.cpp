@@ -17,23 +17,14 @@ int	initClientSocket(int socket_server);
 
 void	execLoop(Server &server)
 {
-	size_t	nb = 0;
-	struct pollfd	pfds[SOMAXCONN];
-	bzero(pfds, sizeof(struct pollfd) * SOMAXCONN);
-
-	pfds[nb].fd = server.getServerSocket();
-	pfds[nb].events = POLLIN;
-	nb++;
-
-
 	char	buffer[512] = {0};
 
 	while (42)
 	{
-		poll(pfds, nb, 0);
+		poll(server.pfds, nb, 0); //serverpoll
 		for(size_t i = 0; i < nb; i++)
 		{
-			if (pfds[i].revents & POLLIN)
+			if (pfds[i].revents & POLLIN) //checkSocket
 			{
 				std::cout << "fd nb " << i << " ready" << std::endl;
 				if (i == SERVER_INDEX)//if server is ready --> new connection
@@ -46,12 +37,12 @@ void	execLoop(Server &server)
 				}
 				else //client is ready --> new connection
 				{
+					//printMsg
 					size_t	ret = recv(pfds[i].fd, buffer, sizeof(buffer), 0);
 					std::cout << "Message received from client: " << std::endl << buffer << std::endl;
 
 					(void)ret;
 				}
-				//recv
 			}
 		}
 	}

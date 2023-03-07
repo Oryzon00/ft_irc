@@ -1,8 +1,15 @@
 # include "Server.hpp"
 
-void	Server::addClient(Client client)
+
+Server::Server(int port, std::string password)	: _socket(initServerSocket(port)), _password(password)
 {
-	_clients.push_back(client);
+	_network.addSocket(_socket);
+}
+
+
+void	Server::addClient(void)
+{
+	_clients.push_back(Client(_socket));
 }
 		
 const int&					Server::getServerSocket(void) const
@@ -17,4 +24,9 @@ const std::string&			Server::getPassword(void) const
 const std::vector<Client>&	Server::getClients(void) const
 {
 	return _clients;
+}
+
+const Network&				Server::getNetwork(void) const
+{
+	return _network;
 }
