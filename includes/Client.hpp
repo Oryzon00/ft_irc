@@ -6,6 +6,7 @@ class Client
 {
 	private:
 		std::string	_nickname;
+		std::string	_process;
 		int			_socket;
 
 	public:

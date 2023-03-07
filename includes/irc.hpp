@@ -4,7 +4,6 @@
 # include <string>
 # include <cctype>
 # include <cstdlib>
-# include <sys/select.h>
 
 # include "CustomException.hpp"
 # include "Server.hpp"
@@ -27,7 +26,9 @@ equivalent)
 49152 - 65535 – the Dynamic Ports, also referred to as the Private Ports. 
 */
 
+void	execLoop(Server &server);
 
 # define SUCCESS 1
 # define FAILURE 0
 # define ERROR_EXCEPTION 1
+# define SERVER_INDEX	0

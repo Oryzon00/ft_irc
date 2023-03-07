@@ -1,14 +1,32 @@
 #include "irc.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 
+
+int	initClientSocket(int socket_server)
+{
+	struct sockaddr_in client_sin;
+	socklen_t size = sizeof(client_sin);
+	
+	int client_socket = accept(socket_server, (sockaddr *)  &client_sin, &size);
+	if (client_socket < 0)
+		throw SocketException("accept()");
+
+	if (fcntl(client_socket, F_SETFL, O_NONBLOCK) < 0)
+		throw SocketException("fcntl()");
+	return (client_socket);
+}
 
 int	initServerSocket(unsigned short port)
 {
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock < 0)
 		throw SocketException("socket()");
-	
+
+	if (fcntl(sock, F_SETFL, O_NONBLOCK) < 0)
+		throw SocketException("fcntl()");
+
 	int	enable = 1;
 	if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &enable, sizeof(int)))
 		throw SocketException("setsockopt()");
@@ -23,6 +41,6 @@ int	initServerSocket(unsigned short port)
 	
 	if (listen(sock, SOMAXCONN))
 		throw SocketException("listen()");
-	
+
 	return (sock);
 }
