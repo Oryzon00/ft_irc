@@ -5,6 +5,7 @@
 
 # include "Client.hpp"
 # include "Network.hpp"
+# include "CustomException.hpp"
 
 int	initServerSocket(unsigned short port);
 
@@ -30,12 +31,17 @@ class Server
 
 		/*
 		Fonction membre a coder:
-			- pollserver
-			- addClient
+			- pollserver ***
+			- addClient	 ***
 			- removeClient
 			- printMsg
-			- bool checkSocket(size_t i)
+			- bool checkSocket(size_t i) ***
 		*/
+
+		void							poll(void);
+		size_t							_recv(size_t index, char* buffer);
+
+		bool							checkSocket(size_t index, short event);
 
 		void							addClient(void);
 		void							removeClient(Client& client);

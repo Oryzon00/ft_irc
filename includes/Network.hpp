@@ -4,6 +4,7 @@
 # include <sys/socket.h>
 # include <poll.h>
 # include <strings.h>
+# include "CustomException.hpp"
 
 
 
@@ -18,5 +19,10 @@ class Network
 
 		void	addSocket(int socket);
 
-		const struct
+		void	_poll(void);
+
+		size_t	size(void) const;
+
+		struct pollfd&	operator[](size_t index);
+
 };

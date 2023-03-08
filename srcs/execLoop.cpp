@@ -21,29 +21,26 @@ void	execLoop(Server &server)
 
 	while (42)
 	{
-		poll(server.pfds, nb, 0); //serverpoll
-		for(size_t i = 0; i < nb; i++)
+		server.poll();
+		for(size_t i = 0; i < server.getNetwork().size(); i++)
 		{
-			if (pfds[i].revents & POLLIN) //checkSocket
+			if (server.checkSocket(i, POLLIN)) //checkSocket
 			{
 				std::cout << "fd nb " << i << " ready" << std::endl;
 				if (i == SERVER_INDEX)//if server is ready --> new connection
 				{
 					//add client
 					std::cout << "new connection to server" << std::endl;
-					pfds[nb].fd = initClientSocket(server.getServerSocket());
-					pfds[nb].events = POLLIN;
-					nb++;
+					server.addClient();
 				}
 				else //client is ready --> new connection
 				{
-					//printMsg
-					size_t	ret = recv(pfds[i].fd, buffer, sizeof(buffer), 0);
+					server._recv(i, buffer);
+					//recv en boucle tant ret > 0 
 					std::cout << "Message received from client: " << std::endl << buffer << std::endl;
-
-					(void)ret;
 				}
 			}
+			//if (server.checkSocket(i, POLLHUP)) //add POLLHUP to poll
 		}
 	}
 
