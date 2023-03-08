@@ -4,6 +4,7 @@
 # include <string>
 # include <cctype>
 # include <cstdlib>
+# include <signal.h>
 
 # include "CustomException.hpp"
 # include "Server.hpp"
@@ -28,7 +29,8 @@ equivalent)
 
 void	execLoop(Server &server);
 
-# define SUCCESS 1
-# define FAILURE 0
-# define ERROR_EXCEPTION 1
-# define SERVER_INDEX	0
+# define SUCCESS 			1
+# define FAILURE 			0
+# define ERROR_EXCEPTION	1
+# define SERVER_INDEX		0
+# define DISCONNECT			0
