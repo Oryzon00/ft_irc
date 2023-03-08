@@ -6,7 +6,7 @@
 /*   By: qcherel <qcherel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/22 15:51:27 by qcherel           #+#    #+#             */
-/*   Updated: 2023/02/24 19:01:06 by qcherel          ###   ########.fr       */
+/*   Updated: 2023/03/08 12:24:22 by qcherel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ int main(int ac, char **av)
 		//Add all connected clients to the socket set
 		while (++i < connected_clients)
 			FD_SET(client_sock[i], &fds);
-		//Setup select to fds in Read mode
+		//read on all FD from the socket set and keep only those with updates
 		if(select(last_fd + 1, &fds, NULL, NULL, NULL) == -1)
 		{
 			perror("in select()");
@@ -119,7 +119,7 @@ int main(int ac, char **av)
 		
 		if (FD_ISSET(STDIN_FILENO, &fds)) //Receiving something on STDIN (user inputs on server terminal)
 			exit(1);
-		else if (FD_ISSET(sock, &fds)) // Receiving something on server socket (a new client is trying to connect);
+		else if (FD_ISSET(sock, &fds)) // Receiving something on server socket (a new client is trying to connect)
 		{
 			//Add a socket for the new client
 			client_sock[connected_clients] = create_new_client(sock, username[connected_clients]);
@@ -133,6 +133,14 @@ int main(int ac, char **av)
 		}
 		else
 		{
+			i = -1;
+			while (++i < connected_clients)
+			{
+				if (FD_ISSET(client_sock[i], &fds))
+				{
+					if ()
+				}
+			}
 			//Read and output connected client sockets	
 		}
 		//A implementer : client read and send, client deconnection, close sockets if stdin
