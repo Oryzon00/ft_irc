@@ -64,5 +64,12 @@ class CustomException : public std::exception
 		}
 };
 
+class CloseServerException : public std::exception
+{
+	public:
 
-
+		virtual const char* what(void) const throw()
+		{
+			return ("\nClosing server...");
+		}
+};

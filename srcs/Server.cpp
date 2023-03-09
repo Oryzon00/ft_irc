@@ -4,6 +4,7 @@
 Server::Server(int port, std::string password)	: _socket(initServerSocket(port)), _password(password)
 {
 	_network.addSocket(_socket);
+	_clients.push_back(Client());
 }
 
 
@@ -37,16 +38,26 @@ void						Server::poll(void)
 	_network._poll();
 }
 
-size_t						Server::_recv(size_t index, char* buffer)
+int						Server::readPackages(size_t index, char* buffer)
 {
-	size_t	ret = true;
-	while (ret)
+	int ret = 1;
+
+	do
 	{
-		ret = recv(_network[index].fd, buffer, sizeof(buffer), 0);
-		if (ret < 0)
-			throw SocketException("recv()");
-		
+		bzero(buffer, BUFFER_LEN);
+		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
+		if (ret <= 0)
+			break;
+		_clients[index].readPackage(buffer);
 	}
+	while (ret > 0);
+	
+	if (ret != 0)
+		_clients[index].tokenizePack();
+
+	for(size_t i = 0; i < _clients[index].getCmds().size(); i++)
+		std::cout << i << ": " << _clients[index].getCmds()[i] << std::endl;
+
 	return (ret);
 }
 
@@ -59,4 +70,11 @@ void						Server::addClient(void)
 {
 	_clients.push_back(Client(_socket));
 	_network.addSocket(_clients.back().getSocket());
+}
+
+void						Server::removeClient(size_t index)
+{
+	_clients.erase(_clients.begin() + index);
+	_network.removeSocket(index);
+	std::cout << "size vector client " << _clients.size() << std::endl;
 }

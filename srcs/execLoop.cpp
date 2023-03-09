@@ -4,44 +4,43 @@
 #include <unistd.h>
 #include <strings.h>
 
-// POLLIN	Alert me when data is ready to recv() on this socket.
-// POLLOUT	Alert me when I can send() data to this socket without blocking.
-
-// struct pollfd {
-//     int fd;         // the socket descriptor
-//     short events;   // bitmap of events we're interested in
-//     short revents;  // when poll() returns, bitmap of events that occurred
-// };
-
 int	initClientSocket(int socket_server);
 
 void	execLoop(Server &server)
 {
-	char	buffer[512] = {0};
+	char	buffer[BUFFER_LEN] = {0};
 
 	while (42)
 	{
 		server.poll();
 		for(size_t i = 0; i < server.getNetwork().size(); i++)
 		{
-			if (server.checkSocket(i, POLLIN)) //checkSocket
+			if (server.checkSocket(i, POLLIN))
 			{
-				std::cout << "fd nb " << i << " ready" << std::endl;
-				if (i == SERVER_INDEX)//if server is ready --> new connection
+				std::cout << "------ fd nb " << i << " ready ------" << std::endl;
+				if (i == SERVER_INDEX)
 				{
-					//add client
 					std::cout << "new connection to server" << std::endl;
 					server.addClient();
 				}
-				else //client is ready --> new connection
+				else 
 				{
-					server._recv(i, buffer);
-					//recv en boucle tant ret > 0 
-					std::cout << "Message received from client: " << std::endl << buffer << std::endl;
+					if (server.readPackages(i, buffer) == DISCONNECT)
+					{
+						std::cout << "client disconnected" << std::endl;
+						server.removeClient(i);
+					}
+						
+					
 				}
 			}
-			//if (server.checkSocket(i, POLLHUP)) //add POLLHUP to poll
+			// if (server.checkSocket(i, POLLHUP)) //add POLLHUP to poll
+			// {
+			// 	std::cout << "hola" << std::endl;
+			// }
 		}
+		//ON AGIT
+		sleep (1);
 	}
 
 

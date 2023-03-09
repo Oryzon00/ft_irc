@@ -2,10 +2,13 @@
 
 # include <string>
 # include <vector>
+# include <iostream>
 
 # include "Client.hpp"
 # include "Network.hpp"
 # include "CustomException.hpp"
+
+# define BUFFER_LEN			1024
 
 int	initServerSocket(unsigned short port);
 
@@ -29,22 +32,14 @@ class Server
 		const std::vector<Client>&		getClients(void) const;
 		const Network&					getNetwork(void) const;
 
-		/*
-		Fonction membre a coder:
-			- pollserver ***
-			- addClient	 ***
-			- removeClient
-			- printMsg
-			- bool checkSocket(size_t i) ***
-		*/
 
 		void							poll(void);
-		size_t							_recv(size_t index, char* buffer);
+		int								readPackages(size_t index, char* buffer);
 
 		bool							checkSocket(size_t index, short event);
 
 		void							addClient(void);
-		void							removeClient(Client& client);
+		void							removeClient(size_t index);
 
 
 	
