@@ -15,8 +15,7 @@
 void	execLoop(Server &server);
 void	sigint_handler_main_process(int signum);
 
-# define SUCCESS 			1
-# define FAILURE 			0
+# define SUCCESS			0
 # define ERROR_EXCEPTION	1
 # define SERVER_INDEX		0
 # define DISCONNECT			0
