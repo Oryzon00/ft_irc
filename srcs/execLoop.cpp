@@ -17,7 +17,7 @@ void	execLoop(Server &server)
 		{
 			if (server.checkSocket(index, POLLIN))
 			{
-				std::cout << "------ fd nb " << index << " ready ------" << std::endl;
+				std::cout << "------ fd nb " << index << " ready to read ------" << std::endl << std::endl;
 				if (index == SERVER_INDEX)
 				{
 					std::cout << "new connection to server" << std::endl;
@@ -32,10 +32,8 @@ void	execLoop(Server &server)
 					}
 					else if (server.checkSocket(index, POLLOUT))
 					{
-						std::cout << "on peut repondre au socket" << std::endl;
-						// int ret = send(server.getClients()[index].getSocket(), server.getClients()[index].getPackages().c_str(), server.getClients()[index].getPackages().size(), 0);
-						// std::cout << "retour de send() " << ret << std::endl;
-						server.sendPackages(index);
+						std::cout << "writing to client" << std::endl;
+						server.processQuery(index);
 					}
 					
 				}

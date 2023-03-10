@@ -25,6 +25,8 @@ class Client
 		Client(void);
 		~Client(void);
 
+		Client&							operator=(const Client& rhs);
+
 		const int&						getSocket(void) const;
 		const std::string&				getNickname(void) const;
 		const std::string&				getPackages(void) const;
@@ -36,6 +38,9 @@ class Client
 
 		void							readFromClient(char* buffer);
 		void							sendToClient(void);
-		void							tokenizePack(void);							
+		void							tokenizePack(void);			
+		void							clearPackage(void);
+									
+
 
 };

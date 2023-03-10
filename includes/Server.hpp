@@ -42,6 +42,8 @@ class Server
 		void							addClient(void);
 		void							removeClient(size_t index);
 
+		void							processQuery(int index);
+
 
 	
 

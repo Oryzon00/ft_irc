@@ -55,15 +55,17 @@ int							Server::readPackages(size_t index, char* buffer)
 	if (ret != 0)
 		_clients[index].tokenizePack();
 
+	std::cout  << "-----RECEIVED-----" << std::endl;
 	for(size_t i = 0; i < _clients[index].getCmds().size(); i++)
 		std::cout << i << ": " << _clients[index].getCmds()[i] << std::endl;
+	std::cout << "-----END-----" << std::endl << std::endl;
 
 	return (ret);
 }
 
 void						Server::sendPackages(size_t index)
 {
-	_clients[index].setToSend(_clients[index].getPackages());
+	
 	_clients[index].sendToClient();
 }
 
@@ -82,5 +84,12 @@ void						Server::removeClient(size_t index)
 {
 	_clients.erase(_clients.begin() + index);
 	_network.removeSocket(index);
-	std::cout << "size vector client " << _clients.size() << std::endl;
+}
+
+void					Server::processQuery(int index)
+{
+	_clients[index].setToSend(_clients[index].getPackages());
+
+	sendPackages(index);
+
 }

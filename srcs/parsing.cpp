@@ -31,6 +31,7 @@ void	print_arg(t_arg& arg)
 {
 	std::cout << "server is reading on port " << arg.port << std::endl;
 	std::cout << "server password is '" << arg.password << "'" <<  std::endl;
+	std::cout << std::endl;
 }
 
 void	parsing(int ac, char **av, t_arg & arg)
