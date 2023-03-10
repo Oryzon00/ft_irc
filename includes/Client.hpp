@@ -31,7 +31,7 @@ class Client
 		const std::string&				getNickname(void) const;
 		const std::string&				getPackages(void) const;
 		const std::string&				getToSend(void) const;
-		const std::vector<std::string>&	getCmds(void) const;
+		std::vector<std::string>&		getCmds(void);
 
 		void							setToSend(const std::string& str);
 		
