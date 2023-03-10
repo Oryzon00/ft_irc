@@ -13,33 +13,34 @@ void	execLoop(Server &server)
 	while (42)
 	{
 		server.poll();
-		for(size_t i = 0; i < server.getNetwork().size(); i++)
+		for(size_t index = 0; index < server.getNetwork().size(); index++)
 		{
-			if (server.checkSocket(i, POLLIN))
+			if (server.checkSocket(index, POLLIN))
 			{
-				std::cout << "------ fd nb " << i << " ready ------" << std::endl;
-				if (i == SERVER_INDEX)
+				std::cout << "------ fd nb " << index << " ready ------" << std::endl;
+				if (index == SERVER_INDEX)
 				{
 					std::cout << "new connection to server" << std::endl;
 					server.addClient();
 				}
 				else 
 				{
-					if (server.readPackages(i, buffer) == DISCONNECT)
+					if (server.readPackages(index, buffer) == DISCONNECT)
 					{
 						std::cout << "client disconnected" << std::endl;
-						server.removeClient(i);
+						server.removeClient(index);
 					}
-						
+					else if (server.checkSocket(index, POLLOUT))
+					{
+						std::cout << "on peut repondre au socket" << std::endl;
+						// int ret = send(server.getClients()[index].getSocket(), server.getClients()[index].getPackages().c_str(), server.getClients()[index].getPackages().size(), 0);
+						// std::cout << "retour de send() " << ret << std::endl;
+						server.sendPackages(index);
+					}
 					
 				}
 			}
-			// if (server.checkSocket(i, POLLHUP)) //add POLLHUP to poll
-			// {
-			// 	std::cout << "hola" << std::endl;
-			// }
 		}
-		//ON AGIT
 		sleep (1);
 	}
 

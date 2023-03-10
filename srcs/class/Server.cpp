@@ -38,7 +38,7 @@ void						Server::poll(void)
 	_network._poll();
 }
 
-int						Server::readPackages(size_t index, char* buffer)
+int							Server::readPackages(size_t index, char* buffer)
 {
 	int ret = 1;
 
@@ -48,7 +48,7 @@ int						Server::readPackages(size_t index, char* buffer)
 		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
 		if (ret <= 0)
 			break;
-		_clients[index].readPackage(buffer);
+		_clients[index].readFromClient(buffer);
 	}
 	while (ret > 0);
 	
@@ -59,6 +59,12 @@ int						Server::readPackages(size_t index, char* buffer)
 		std::cout << i << ": " << _clients[index].getCmds()[i] << std::endl;
 
 	return (ret);
+}
+
+void						Server::sendPackages(size_t index)
+{
+	_clients[index].setToSend(_clients[index].getPackages());
+	_clients[index].sendToClient();
 }
 
 bool						Server::checkSocket(size_t index, short event)

@@ -35,6 +35,7 @@ class Server
 
 		void							poll(void);
 		int								readPackages(size_t index, char* buffer);
+		void							sendPackages(size_t index);
 
 		bool							checkSocket(size_t index, short event);
 

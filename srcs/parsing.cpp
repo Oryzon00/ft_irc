@@ -27,10 +27,17 @@ void	init_arg(char **av, t_arg & arg)
 	arg.password = std::string(av[2]);
 }
 
+void	print_arg(t_arg& arg)
+{
+	std::cout << "server is reading on port " << arg.port << std::endl;
+	std::cout << "server password is '" << arg.password << "'" <<  std::endl;
+}
+
 void	parsing(int ac, char **av, t_arg & arg)
 {
 	check_nb_args(ac);
 	check_port(av[1]);
 	init_arg(av, arg);
-	std::cout << "port = " << arg.port << " | password = " << arg.password << std::endl;
+	print_arg(arg);
+	
 }
