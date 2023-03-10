@@ -1,4 +1,12 @@
-#include "ft_irc.hpp"
+#include "irc.hpp"
+
+
+void	sigint_handler_main_process(int signum)
+{
+	(void) signum;
+	throw CloseServerException();
+}
+
 
 int	main(int ac, char **av)
 {
@@ -6,8 +14,10 @@ int	main(int ac, char **av)
 	{
 		t_arg	arg;
 		parsing(ac, av, arg);
-		std::cout << "parsing OK" << std::endl;
-		std::cout << "port = " << arg.port << " | password = " << arg.password << std::endl;
+
+		signal(SIGINT, sigint_handler_main_process);
+		Server	server(arg.port, arg.password);
+		execLoop(server);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 	}
 
 	catch(const std::exception & e)
