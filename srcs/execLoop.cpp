@@ -39,8 +39,5 @@ void	execLoop(Server &server)
 				}
 			}
 		}
-		sleep (1);
 	}
-
-
 }
