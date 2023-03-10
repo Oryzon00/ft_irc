@@ -35,11 +35,14 @@ class Server
 
 		void							poll(void);
 		int								readPackages(size_t index, char* buffer);
+		void							sendPackages(size_t index);
 
 		bool							checkSocket(size_t index, short event);
 
 		void							addClient(void);
 		void							removeClient(size_t index);
+
+		void							processQuery(int index);
 
 
 	

@@ -15,7 +15,7 @@ Network::~Network(void)
 void	Network::addSocket(int socket)
 {
 	_pfds[_nb].fd = socket;
-	_pfds[_nb].events = POLLIN; 
+	_pfds[_nb].events = POLLIN | POLLOUT; 
 	_nb++;
 } 
 
