@@ -3,10 +3,11 @@ NAME		=	ircserv
 SRCS		=	srcs/main.cpp				\
 				srcs/parsing.cpp			\
 				srcs/initSocket.cpp			\
-				srcs/Client.cpp				\
-				srcs/Server.cpp				\
-				srcs/Network.cpp			\
+				srcs/class/Client.cpp		\
+				srcs/class/Server.cpp		\
+				srcs/class/Network.cpp		\
 				srcs/execLoop.cpp			\
+				srcs/signal.cpp				\
 
 
 INC_DIR		=	includes
