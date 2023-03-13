@@ -21,7 +21,7 @@ class Server
 {
 	private:
 
-		typedef								void (Server::*cmdFunction) (std::string&, Client&);
+		typedef								bool (Server::*cmdFunction) (std::string&, Client&);
 		typedef								std::vector<std::string>::iterator	itVector;
 
 		int 								_socket;
@@ -37,7 +37,8 @@ class Server
 		void							initDico(void);
 
 		/* CMDS */
-		void							cmd_CAP(std::string& str, Client& client);
+		bool							cmd_CAP(std::string& str, Client& client);
+		bool							cmd_PASS(std::string& cmd, Client& client);
 		
 
 

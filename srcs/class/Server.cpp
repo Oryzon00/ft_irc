@@ -100,7 +100,7 @@ void						Server::processQuery(int index)
 {
 	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
 	
-
+	bool	check = true; // a renommer
 	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
 	{
 		std::string key = getKey(*it);
@@ -109,11 +109,13 @@ void						Server::processQuery(int index)
 			std::cerr << "Cmd:" << key << " not found" << std::endl;
 		else if (!checkCAP(client, key))
 			return ;
-		else
-			(this->*(itFind->second))(*it, client);
+		else if (!(this->*(itFind->second))(*it, client))
+			check = false;
+
 		}
-	client.setToSend(client.getPackages()); //to delete
-	sendPackages(client);
+	// client.setToSend(client.getPackages()); //to delete
+	if (check)
+		sendPackages(client);
 }
 
 bool						Server::checkCAP(Client &client, std::string key)
@@ -134,7 +136,6 @@ bool						Server::checkCAP(Client &client, std::string key)
 
 void							Server::initDico(void)
 {
-	// std::pair<std::string, cmdFunction> myPair(std::string("CAP"), &Server::cmd_CAP);
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("CAP"), &Server::cmd_CAP));
 }
 
@@ -164,9 +165,8 @@ std::vector<std::string>		Server::getArgsCmd(std::string cmd, std::string key)
 	return (args);
 }
 
-void	Server::cmd_CAP(std::string& cmd, Client& client)
+bool	Server::cmd_CAP(std::string& cmd, Client& client)
 {
-	std::cout << "OMG ya une commande qui marche" << std::endl;
 	client.setIsIrssi(true);
 
 	std::vector<std::string>	args = getArgsCmd(cmd, "CAP");
@@ -174,5 +174,14 @@ void	Server::cmd_CAP(std::string& cmd, Client& client)
 	{
 		removeClient(client);
 		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
+		return false;
 	}
+	return (true);
+}
+
+bool	Server::cmd_PASS(std::string& cmd, Client& client)
+{
+	(void) cmd;
+	(void) client;
+	return (true);
 }
