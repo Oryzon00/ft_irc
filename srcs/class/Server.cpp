@@ -86,17 +86,16 @@ void						Server::removeClient(size_t index)
 	_network.removeSocket(index);
 }
 
-std::string					Server::getKey(std::string cmd)
+void						Server::removeClient(Client &client)
 {
-	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");
-	if (key && key[0] == ':')
-		key = strtok(NULL, " ");
-	if (!key)
-		return (std::string());
-	return (key);
+	std::vector<Client>::iterator	it = std::find(_clients.begin(), _clients.end(), client);
+	long index = it - _clients.begin();
+	_clients.erase(it);
+	_network.removeSocket(index);
 }
 
-void					Server::processQuery(int index)
+
+void						Server::processQuery(int index)
 {
 	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
 	
@@ -107,9 +106,71 @@ void					Server::processQuery(int index)
 		std::map<std::string, cmdFunction>::iterator itFind = _dico.find(key);
 		if (itFind == _dico.end())
 			std::cerr << "Cmd:" << key << " not found" << std::endl;
+		else if (!checkCAP(client, key))
+			return ;
 		else
-			(itFind->second)(*it, client);
+			itFind->second(*it, client);
 	}
 	client.setToSend(client.getPackages()); //to delete
 	sendPackages(client);
+}
+
+bool						Server::checkCAP(Client &client, std::string key)
+{
+	if (client.getIsIrssi() == false && key != "CAP")
+	{
+		removeClient(client);
+		std::cerr << "!! -- First CMD is not CAP -- !!" << std::endl;
+		return (false);
+	}
+	return (true);
+}
+
+
+/* --------------------------------------------------------------------------------- */
+
+/* ----- PRIVATE FUNCTION ----- */
+
+void							Server::initDico(void)
+{
+	// std::pair<std::string, cmdFunction> myPair(std::string("CAP"), &Server::cmd_CAP);
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("CAP"), &Server::cmd_CAP));
+}
+
+std::string						Server::getKey(std::string cmd)
+{
+	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");
+	if (key && key[0] == ':')
+		key = strtok(NULL, " ");
+	if (!key)
+		return (std::string());
+	return (key);
+}
+
+std::vector<std::string>		Server::getArgsCmd(std::string cmd, std::string key)
+{
+	std::vector<std::string>	args;
+
+	char	*token = strtok(const_cast<char*>(cmd.c_str() + cmd.find(key) + key.length()), " ");
+	if (token)
+		args.push_back(std::string(token));
+	while (token)
+	{
+		token = strtok(NULL, " "); 
+		if (token)
+			args.push_back(std::string(token));
+	}
+	return (args);
+}
+
+void	Server::cmd_CAP(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = getArgsCmd(cmd, "CAP");
+	if (args.size() != 1 || args[0] != "LS")
+	{
+		removeClient(client);
+		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
+	}
+
+	client.setIsIrssi(true);
 }
