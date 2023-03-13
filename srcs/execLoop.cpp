@@ -25,7 +25,7 @@ void	execLoop(Server &server)
 				}
 				else 
 				{
-					if (server.readPackages(index, buffer) == DISCONNECT)
+					if (server.readQuery(index, buffer) == DISCONNECT)
 					{
 						std::cout << "client disconnected" << std::endl;
 						server.removeClient(index);

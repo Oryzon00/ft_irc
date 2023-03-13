@@ -38,7 +38,7 @@ void						Server::poll(void)
 	_network._poll();
 }
 
-int							Server::readPackages(size_t index, char* buffer)
+int							Server::readQuery(size_t index, char* buffer)
 {
 	int ret = 1;
 
@@ -63,10 +63,10 @@ int							Server::readPackages(size_t index, char* buffer)
 	return (ret);
 }
 
-void						Server::sendPackages(size_t index)
+void						Server::sendPackages(Client & client)
 {
 	
-	_clients[index].sendToClient();
+	client.sendToClient(); // a tester
 }
 
 bool						Server::checkSocket(size_t index, short event)
@@ -86,10 +86,25 @@ void						Server::removeClient(size_t index)
 	_network.removeSocket(index);
 }
 
+std::string					Server::getKey(std::string& cmd)
+{
+	return (cmd);
+	// a coder
+}
+
 void					Server::processQuery(int index)
 {
-	_clients[index].setToSend(_clients[index].getPackages());
+	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
+	client.setToSend(client.getPackages()); //to delete
 
-	sendPackages(index);
+	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
+	{
+		std::string key = getKey(*it);
+		cmdFunction	cmdF = _dico[key]; //verifier retour erreur _dico[key]
+		cmdF(*it, client); 
+	}
+
+	sendPackages(client);
+
 
 }

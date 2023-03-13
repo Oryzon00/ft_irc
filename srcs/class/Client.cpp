@@ -41,7 +41,7 @@ const std::string&				Client::getToSend(void) const
 	return _to_send;
 }
 
-const std::vector<std::string>&	Client::getCmds(void) const
+std::vector<std::string>&		Client::getCmds(void) 
 {
 	return _cmds;
 }
