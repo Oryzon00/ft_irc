@@ -1,8 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(int socket)	:  _socket(initClientSocket(socket))	{}
+Client::Client(int socket)	:  _socket(initClientSocket(socket)), _isIrssi(false)	{}
 
-Client::Client(void)		:	_socket(0)							{}
+Client::Client(void)		:	_socket(0), _isIrssi(false)							{}
 
 Client::~Client(void)	{ /* close(_socket); */ }
 
@@ -19,11 +19,24 @@ Client&				Client::operator=(const Client& rhs)
 	return (*this);
 }
 
+bool	operator==(const Client& lhs, const Client& rhs)
+{
+	if (lhs.getSocket() == rhs.getSocket())
+		return true;
+	else
+		return false;
+}
+
 /* --------------------------------------------------------------------------------- */
 
 const int&						Client::getSocket(void) const
 {
 	return _socket;
+}
+
+const bool&						Client::getIsIrssi(void) const
+{
+	return _isIrssi;
 }
 
 const std::string&				Client::getNickname(void) const
@@ -51,6 +64,11 @@ void							Client::setToSend(const std::string& str)
 	_to_send = str;
 }
 
+void							Client::setIsIrssi(const bool& boolean)
+{
+	_isIrssi = boolean;
+}
+
 /* --------------------------------------------------------------------------------- */
 
 void				Client::readFromClient(char* buffer)
@@ -75,6 +93,11 @@ void				Client::tokenizePack(void)
 
 void				Client::sendToClient(void)
 {
+	if (_to_send.empty())
+	{
+		clearPackage();
+		return ;
+	}
 	if (send(_socket, _to_send.c_str(), _to_send.size(), 0) < 0)
 		throw SocketException("send()");
 	clearPackage();

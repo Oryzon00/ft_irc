@@ -4,6 +4,8 @@
 # include <vector>
 # include <map>
 # include <iostream>
+# include <algorithm>
+# include <utility>
 
 # include "Client.hpp"
 # include "Network.hpp"
@@ -19,7 +21,7 @@ class Server
 {
 	private:
 
-		typedef								void(*cmdFunction)(std::string&, Client&);
+		typedef								void (Server::*cmdFunction) (std::string&, Client&);
 		typedef								std::vector<std::string>::iterator	itVector;
 
 		int 								_socket;
@@ -27,6 +29,16 @@ class Server
 		std::map<std::string, cmdFunction>	_dico;
 		Network								_network;
 		std::vector<Client>					_clients;
+
+
+		std::string						getKey(std::string cmd);
+		std::vector<std::string>		getArgsCmd(std::string cmd, std::string key);
+		bool							checkCAP(Client &client, std::string key);
+		void							initDico(void);
+
+		/* CMDS */
+		void							cmd_CAP(std::string& str, Client& client);
+		
 
 
 
@@ -50,8 +62,9 @@ class Server
 
 		void							addClient(void);
 		void							removeClient(size_t index);
+		void							removeClient(Client &client);
 
-		std::string						getKey(std::string cmd);
+		
 		int								readQuery(size_t index, char* buffer);
 		void							processQuery(int index);
 
