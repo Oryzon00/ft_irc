@@ -109,7 +109,7 @@ void						Server::processQuery(int index)
 		else if (!checkCAP(client, key))
 			return ;
 		else
-			itFind->second(*it, client);
+			*(itFind->second)(*it, client);
 	}
 	client.setToSend(client.getPackages()); //to delete
 	sendPackages(client);
