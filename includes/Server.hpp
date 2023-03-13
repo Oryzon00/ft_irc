@@ -51,7 +51,7 @@ class Server
 		void							addClient(void);
 		void							removeClient(size_t index);
 
-		std::string						getKey(std::string& cmd);
+		std::string						getKey(std::string cmd);
 		int								readQuery(size_t index, char* buffer);
 		void							processQuery(int index);
 

@@ -86,10 +86,12 @@ void						Server::removeClient(size_t index)
 	_network.removeSocket(index);
 }
 
-std::string					Server::getKey(std::string& cmd)
+std::string					Server::getKey(std::string cmd)
 {
-	return (cmd);
-	// a coder
+	std::string key = strtok(const_cast<char *>(cmd.c_str()), " ");
+	if (key[0] == ':')
+		key = strtok(NULL, " ");
+	return (key);
 }
 
 void					Server::processQuery(int index)
@@ -100,11 +102,11 @@ void					Server::processQuery(int index)
 	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
 	{
 		std::string key = getKey(*it);
-		cmdFunction	cmdF = _dico[key]; //verifier retour erreur _dico[key]
-		cmdF(*it, client); 
+		std::map<std::string, cmdFunction>::iterator itFind = _dico.find(key);
+		if (itFind == _dico.end())
+			std::cout << "Cmd:" << key << " not found" << std::endl;
+		else
+			(itFind->second)(*it, client);
 	}
-
 	sendPackages(client);
-
-
 }
