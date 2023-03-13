@@ -5,6 +5,7 @@ Server::Server(int port, std::string password)	: _socket(initServerSocket(port))
 {
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
+	initDico();
 }
 
 
@@ -109,8 +110,8 @@ void						Server::processQuery(int index)
 		else if (!checkCAP(client, key))
 			return ;
 		else
-			*(itFind->second)(*it, client);
-	}
+			(this->*(itFind->second))(*it, client);
+		}
 	client.setToSend(client.getPackages()); //to delete
 	sendPackages(client);
 }
@@ -165,12 +166,13 @@ std::vector<std::string>		Server::getArgsCmd(std::string cmd, std::string key)
 
 void	Server::cmd_CAP(std::string& cmd, Client& client)
 {
+	std::cout << "OMG ya une commande qui marche" << std::endl;
+	client.setIsIrssi(true);
+
 	std::vector<std::string>	args = getArgsCmd(cmd, "CAP");
 	if (args.size() != 1 || args[0] != "LS")
 	{
 		removeClient(client);
 		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
 	}
-
-	client.setIsIrssi(true);
 }

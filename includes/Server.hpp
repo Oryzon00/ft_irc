@@ -21,7 +21,7 @@ class Server
 {
 	private:
 
-		typedef								void(Server::*cmdFunction)(std::string&, Client&);
+		typedef								void (Server::*cmdFunction) (std::string&, Client&);
 		typedef								std::vector<std::string>::iterator	itVector;
 
 		int 								_socket;
