@@ -38,7 +38,7 @@ void						Server::poll(void)
 	_network._poll();
 }
 
-int						Server::readPackages(size_t index, char* buffer)
+int							Server::readQuery(size_t index, char* buffer)
 {
 	int ret = 1;
 
@@ -48,17 +48,25 @@ int						Server::readPackages(size_t index, char* buffer)
 		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
 		if (ret <= 0)
 			break;
-		_clients[index].readPackage(buffer);
+		_clients[index].readFromClient(buffer);
 	}
 	while (ret > 0);
 	
 	if (ret != 0)
 		_clients[index].tokenizePack();
 
+	std::cout  << "-----RECEIVED-----" << std::endl;
 	for(size_t i = 0; i < _clients[index].getCmds().size(); i++)
 		std::cout << i << ": " << _clients[index].getCmds()[i] << std::endl;
+	std::cout << "-----END-----" << std::endl << std::endl;
 
 	return (ret);
+}
+
+void						Server::sendPackages(Client & client)
+{
+	
+	client.sendToClient(); // a tester
 }
 
 bool						Server::checkSocket(size_t index, short event)
@@ -76,5 +84,29 @@ void						Server::removeClient(size_t index)
 {
 	_clients.erase(_clients.begin() + index);
 	_network.removeSocket(index);
-	std::cout << "size vector client " << _clients.size() << std::endl;
+}
+
+std::string					Server::getKey(std::string cmd)
+{
+	std::string key = strtok(const_cast<char *>(cmd.c_str()), " ");
+	if (key[0] == ':')
+		key = strtok(NULL, " ");
+	return (key);
+}
+
+void					Server::processQuery(int index)
+{
+	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
+	client.setToSend(client.getPackages()); //to delete
+
+	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
+	{
+		std::string key = getKey(*it);
+		std::map<std::string, cmdFunction>::iterator itFind = _dico.find(key);
+		if (itFind == _dico.end())
+			std::cout << "Cmd:" << key << " not found" << std::endl;
+		else
+			(itFind->second)(*it, client);
+	}
+	sendPackages(client);
 }

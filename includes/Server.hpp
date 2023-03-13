@@ -2,11 +2,13 @@
 
 # include <string>
 # include <vector>
+# include <map>
 # include <iostream>
 
 # include "Client.hpp"
 # include "Network.hpp"
 # include "CustomException.hpp"
+
 
 # define BUFFER_LEN			1024
 
@@ -16,10 +18,17 @@ int	initServerSocket(unsigned short port);
 class Server
 {
 	private:
-		int 				_socket;
-		std::string			_password;
-		std::vector<Client>	_clients;
-		Network				_network;
+
+		typedef								void(*cmdFunction)(std::string&, Client&);
+		typedef								std::vector<std::string>::iterator	itVector;
+
+		int 								_socket;
+		std::string							_password;
+		std::map<std::string, cmdFunction>	_dico;
+		Network								_network;
+		std::vector<Client>					_clients;
+
+
 
 	public:
 
@@ -34,12 +43,17 @@ class Server
 
 
 		void							poll(void);
-		int								readPackages(size_t index, char* buffer);
+		
+		void							sendPackages(Client & client);
 
 		bool							checkSocket(size_t index, short event);
 
 		void							addClient(void);
 		void							removeClient(size_t index);
+
+		std::string						getKey(std::string cmd);
+		int								readQuery(size_t index, char* buffer);
+		void							processQuery(int index);
 
 
 	

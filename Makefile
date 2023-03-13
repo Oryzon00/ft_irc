@@ -3,10 +3,11 @@ NAME		=	ircserv
 SRCS		=	srcs/main.cpp				\
 				srcs/parsing.cpp			\
 				srcs/initSocket.cpp			\
-				srcs/Client.cpp				\
-				srcs/Server.cpp				\
-				srcs/Network.cpp			\
+				srcs/class/Client.cpp		\
+				srcs/class/Server.cpp		\
+				srcs/class/Network.cpp		\
 				srcs/execLoop.cpp			\
+				srcs/signal.cpp				\
 
 
 INC_DIR		=	includes
@@ -36,5 +37,8 @@ fclean		:	clean
 				$(RM) $(NAME)
 
 re			:	fclean all
+
+test		:	$(NAME)
+				valgrind --track-fds=yes ./$(NAME) 1234 password
 
 .PHONY		:	clean fclean re all

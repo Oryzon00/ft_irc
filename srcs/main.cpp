@@ -1,11 +1,7 @@
 #include "irc.hpp"
 
 
-void	sigint_handler_main_process(int signum)
-{
-	(void) signum;
-	throw CloseServerException();
-}
+
 
 
 int	main(int ac, char **av)
@@ -20,11 +16,16 @@ int	main(int ac, char **av)
 		execLoop(server);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 	}
 
+	catch (const CloseServerException & e)
+	{
+		std::cout << e.what() << std::endl;
+		return (SUCCESS);
+	}
 	catch(const std::exception & e)
 	{
 		std::cerr << e.what() << std::endl;
 		return (ERROR_EXCEPTION);
 	}
 	
-	return (0);
+	return (SUCCESS);
 }
