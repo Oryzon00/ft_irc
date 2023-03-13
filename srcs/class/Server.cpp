@@ -88,25 +88,28 @@ void						Server::removeClient(size_t index)
 
 std::string					Server::getKey(std::string cmd)
 {
-	std::string key = strtok(const_cast<char *>(cmd.c_str()), " ");
-	if (key[0] == ':')
+	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");
+	if (key && key[0] == ':')
 		key = strtok(NULL, " ");
+	if (!key)
+		return (std::string());
 	return (key);
 }
 
 void					Server::processQuery(int index)
 {
 	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
-	client.setToSend(client.getPackages()); //to delete
+	
 
 	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
 	{
 		std::string key = getKey(*it);
 		std::map<std::string, cmdFunction>::iterator itFind = _dico.find(key);
 		if (itFind == _dico.end())
-			std::cout << "Cmd:" << key << " not found" << std::endl;
+			std::cerr << "Cmd:" << key << " not found" << std::endl;
 		else
 			(itFind->second)(*it, client);
 	}
+	client.setToSend(client.getPackages()); //to delete
 	sendPackages(client);
 }
