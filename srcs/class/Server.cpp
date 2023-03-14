@@ -46,14 +46,15 @@ int							Server::readQuery(size_t index, char* buffer)
 	do
 	{
 		bzero(buffer, BUFFER_LEN);
-		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
-		if (ret <= 0)
+		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0); //cotinuer
+		if (ret <= 0) //on differencie pas -1 EGAIN et autre Error, doit appeler ERRNO
 			break;
 		_clients[index].readFromClient(buffer);
 	}
 	while (ret > 0);
 	
-	if (ret != 0)
+
+	if (ret != 0 )
 		_clients[index].tokenizePack();
 
 	std::cout  << "-----RECEIVED-----" << std::endl;
@@ -100,21 +101,22 @@ void						Server::processQuery(int index)
 {
 	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
 	
-	bool	check = true; // a renommer
+	bool	clientOk = true; // a renommer
 	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
 	{
 		std::string key = getKey(*it);
+		std::cout << "key = " << key << std::endl;
 		std::map<std::string, cmdFunction>::iterator itFind = _dico.find(key);
-		if (itFind == _dico.end())
-			std::cerr << "Cmd:" << key << " not found" << std::endl;
-		else if (!checkCAP(client, key))
+		if (!checkCAP(client, key))
 			return ;
+		
+		else if (itFind == _dico.end())
+			std::cerr << "Cmd:" << key << " not found" << std::endl;
 		else if (!(this->*(itFind->second))(*it, client))
-			check = false;
-
+			clientOk = false;
 		}
 	// client.setToSend(client.getPackages()); //to delete
-	if (check)
+	if (clientOk)
 		sendPackages(client);
 }
 

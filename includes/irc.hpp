@@ -13,7 +13,7 @@
 
 
 void	execLoop(Server &server);
-void	sigint_handler_main_process(int signum);
+void	signal_handler_init(void);
 
 # define SUCCESS			0
 # define ERROR_EXCEPTION	1

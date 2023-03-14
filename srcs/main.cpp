@@ -1,9 +1,6 @@
 #include "irc.hpp"
 
 
-
-
-
 int	main(int ac, char **av)
 {
 	try
@@ -11,7 +8,7 @@ int	main(int ac, char **av)
 		t_arg	arg;
 		parsing(ac, av, arg);
 
-		signal(SIGINT, sigint_handler_main_process);
+		signal_handler_init();
 		Server	server(arg.port, arg.password);
 		execLoop(server);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 	}
