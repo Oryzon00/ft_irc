@@ -109,3 +109,13 @@ void				Client::clearPackage(void)
 	_to_send.clear();
 	_cmds.clear();
 }
+
+// bool					Client::checkCommand (void)
+// {
+// 	size_t pos = _package.find('\n');
+// 	if (pos == std::string::npos) // npos == didn't find anything
+// 		return (false);
+// 	//if (pos == _package.size())
+// 		// save le reste du package dans un temp
+// 	return (true);
+// }

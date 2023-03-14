@@ -13,7 +13,7 @@
 # include "CustomException.hpp"
 
 
-# define BUFFER_LEN			1024
+# define BUFFER_LEN			4096
 # define SUCCESS			0
 # define DISCONNECT			0
 
@@ -71,7 +71,6 @@ class Server
 		
 		int								readQuery(size_t index, char* buffer);
 		void							processQuery(int index);
-
 
 	
 

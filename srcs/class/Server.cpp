@@ -55,11 +55,11 @@ int							Server::readQuery(size_t index, char* buffer)
 	while (errno != EAGAIN && ret != DISCONNECT);
 	
 
-	if (ret != DISCONNECT)
-		_clients[index].tokenizePack();
+	if (ret != DISCONNECT) /* && _clients[index].checkCommand()) */ // rajouter condition cmd complete (au moins '\n')
+		_clients[index].tokenizePack(); //
 
 	std::cout  << "-----RECEIVED-----" << std::endl;
-	for(size_t i = 0; i < _clients[index].getCmds().size(); i++)
+	for(size_t i = 0; i < _clients[index].getCmds().size(); i++) //ca va teje
 		std::cout << i << ": " << _clients[index].getCmds()[i] << std::endl;
 	std::cout << "-----END-----" << std::endl << std::endl;
 
@@ -166,6 +166,8 @@ std::vector<std::string>		Server::getArgsCmd(std::string cmd, std::string key)
 	}
 	return (args);
 }
+
+/* --------------------------------------------------------------------------------- */
 
 bool	Server::cmd_CAP(std::string& cmd, Client& client)
 {

@@ -17,10 +17,9 @@ class Client
 		std::string					_nickname;
 		std::string					_package;
 		std::string					_to_send;
-		std::vector<std::string>	_cmds;
-
+		std::vector<std::string>	_cmds; //devient une std:string		
 		
-		
+		void							clearPackage(void); //clear cmd
 
 	public:
 		Client(int socket);
@@ -43,9 +42,9 @@ class Client
 		void							readFromClient(char* buffer);
 		void							sendToClient(void);
 		void							tokenizePack(void);			
-		void							clearPackage(void);
+	
 									
-
+		// bool							checkCommand(void); // Attention si il reste qq chose apres '\n' !
 
 };
 
