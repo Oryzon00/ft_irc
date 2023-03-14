@@ -25,6 +25,7 @@ void	execLoop(Server &server)
 				}
 				else 
 				{
+					std::cout << "---- client connection number: ----" << index << std::endl;
 					if (server.readQuery(index, buffer) == DISCONNECT)
 					{
 						std::cout << "client disconnected" << std::endl;

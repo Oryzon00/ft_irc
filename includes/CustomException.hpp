@@ -2,6 +2,7 @@
 
 # include <exception>
 # include <string>
+# include "ASCII.hpp"
 
 class ParsingException : public std::exception
 {
@@ -70,6 +71,6 @@ class CloseServerException : public std::exception
 
 		virtual const char* what(void) const throw()
 		{
-			return ("\nClosing server...");
+			return (ASCII_PENGUIN);
 		}
 };

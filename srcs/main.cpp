@@ -3,6 +3,7 @@
 
 int	main(int ac, char **av)
 {
+	std::cout << ASCII_COMPUTER << std::endl;
 	try
 	{
 		t_arg	arg;

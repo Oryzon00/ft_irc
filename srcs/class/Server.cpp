@@ -46,15 +46,16 @@ int							Server::readQuery(size_t index, char* buffer)
 	do
 	{
 		bzero(buffer, BUFFER_LEN);
-		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0); //cotinuer
-		if (ret <= 0) //on differencie pas -1 EGAIN et autre Error, doit appeler ERRNO
-			break;
-		_clients[index].readFromClient(buffer);
+		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
+		if (errno != SUCCESS && errno != EAGAIN)
+			throw SocketException("recv()");
+		if (ret != DISCONNECT)
+			_clients[index].readFromClient(buffer);
 	}
-	while (ret > 0);
+	while (errno != EAGAIN && ret != DISCONNECT);
 	
 
-	if (ret != 0 )
+	if (ret != DISCONNECT)
 		_clients[index].tokenizePack();
 
 	std::cout  << "-----RECEIVED-----" << std::endl;
@@ -101,7 +102,7 @@ void						Server::processQuery(int index)
 {
 	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
 	
-	bool	clientOk = true; // a renommer
+	bool	clientOk = true; 
 	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
 	{
 		std::string key = getKey(*it);
@@ -109,7 +110,6 @@ void						Server::processQuery(int index)
 		std::map<std::string, cmdFunction>::iterator itFind = _dico.find(key);
 		if (!checkCAP(client, key))
 			return ;
-		
 		else if (itFind == _dico.end())
 			std::cerr << "Cmd:" << key << " not found" << std::endl;
 		else if (!(this->*(itFind->second))(*it, client))

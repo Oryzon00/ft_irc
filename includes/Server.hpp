@@ -6,6 +6,7 @@
 # include <iostream>
 # include <algorithm>
 # include <utility>
+# include <errno.h>
 
 # include "Client.hpp"
 # include "Network.hpp"
@@ -13,6 +14,8 @@
 
 
 # define BUFFER_LEN			1024
+# define SUCCESS			0
+# define DISCONNECT			0
 
 int	initServerSocket(unsigned short port);
 
