@@ -6,20 +6,26 @@
 # include <unistd.h>
 # include <sys/socket.h>
 # include "CustomException.hpp"
+# include <iostream>
+
+# define DELIMITER "\r\n"
 
 int	initClientSocket(int socket_server);
 
 class Client
 {
 	private:
+
 		int							_socket;
 		bool						_isIrssi;
 		std::string					_nickname;
-		std::string					_package;
-		std::string					_to_send;
-		std::vector<std::string>	_cmds; //devient une std:string		
+	
+		std::string					_package; 
+		std::string					_cmd; 		//devient une std:string
+		std::string					_to_send;	
+				
 		
-		void							clearPackage(void); //clear cmd
+		void							clearCmdSend(void); //clear cmd
 
 	public:
 		Client(int socket);
@@ -33,19 +39,25 @@ class Client
 		const std::string&				getNickname(void) const;
 		const std::string&				getPackages(void) const;
 		const std::string&				getToSend(void) const;
-		std::vector<std::string>&		getCmds(void);
+		std::string&					getCmd(void);
+
+		void							printPackage(void);
+		void							printCmd(void);
+		void							printToSend(void);
 
 		void							setToSend(const std::string& str);
 		void							setIsIrssi(const bool& boolean);
 		
 
-		void							readFromClient(char* buffer);
+		void							readBuffer(char* buffer);
 		void							sendToClient(void);
-		void							tokenizePack(void);			
-	
-									
-		// bool							checkCommand(void); // Attention si il reste qq chose apres '\n' !
 
+		
+
+		// void							tokenizePack(void);	
+		bool							checkCmdReady(void);
+		void							findCmdInPackage(void);		
+	
 };
 
 

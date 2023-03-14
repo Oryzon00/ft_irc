@@ -14,7 +14,7 @@ Client&				Client::operator=(const Client& rhs)
 		_nickname = rhs._nickname;
 		_package = rhs._package;
 		_to_send = rhs._to_send;
-		_cmds = rhs._cmds;
+		_cmd = rhs._cmd;
 	}
 	return (*this);
 }
@@ -54,10 +54,35 @@ const std::string&				Client::getToSend(void) const
 	return _to_send;
 }
 
-std::vector<std::string>&		Client::getCmds(void) 
+std::string&		Client::getCmd(void) 
 {
-	return _cmds;
+	return _cmd;
 }
+
+/* --------------------------------------------------------------------------------- */
+
+/* PRINTER */
+
+void							Client::printPackage(void)
+{
+	std::cout << _package << std::endl;
+}
+
+void							Client::printCmd(void)
+{
+	std::cout << _cmd << std::endl;
+}
+
+void							Client::printToSend(void)
+{
+	std::cout << _to_send << std::endl;
+}
+
+
+
+/* --------------------------------------------------------------------------------- */
+
+/* SETTER */
 
 void							Client::setToSend(const std::string& str)
 {
@@ -71,12 +96,13 @@ void							Client::setIsIrssi(const bool& boolean)
 
 /* --------------------------------------------------------------------------------- */
 
-void				Client::readFromClient(char* buffer)
+void				Client::readBuffer(char* buffer)
 {
-	_package += buffer;
+	if (buffer)
+		_package += buffer;
 }
 
-void				Client::tokenizePack(void)
+/* void				Client::tokenizePack(void)
 {
 	std::string	tmp = std::string(_package);
 	char* token = strtok(const_cast<char*>(tmp.c_str()), "\n\r");
@@ -84,33 +110,32 @@ void				Client::tokenizePack(void)
 		_cmds.push_back(std::string(token));
 	while (token)
 	{
-		token = strtok(NULL, "\n\r"); 
+		token = strtok(NULL, "\r\n"); 
 		if (token)
 			_cmds.push_back(std::string(token));
 	}
 		
-}
+} */
 
-void				Client::sendToClient(void)
+void				Client::sendToClient(void) //a re tester
 {
 	if (_to_send.empty())
 	{
-		clearPackage();
+		clearCmdSend();
 		return ;
 	}
 	if (send(_socket, _to_send.c_str(), _to_send.size(), 0) < 0)
 		throw SocketException("send()");
-	clearPackage();
+	clearCmdSend();
 }
 
-void				Client::clearPackage(void)
+void				Client::clearCmdSend(void)
 {
-	_package.clear();
 	_to_send.clear();
-	_cmds.clear();
+	_cmd.clear();
 }
 
-// bool					Client::checkCommand (void)
+// bool				Client::checkCommand (void)
 // {
 // 	size_t pos = _package.find('\n');
 // 	if (pos == std::string::npos) // npos == didn't find anything
@@ -119,3 +144,18 @@ void				Client::clearPackage(void)
 // 		// save le reste du package dans un temp
 // 	return (true);
 // }
+
+bool				Client::checkCmdReady(void)
+{
+	return (!_cmd.empty());
+}
+
+
+void				Client::findCmdInPackage(void) //a tester
+{
+	size_t	pos = _package.find(DELIMITER);
+	if (pos == std::string::npos)
+		return ;
+	_cmd.insert(0, _package, 0, pos);
+	_package.erase(0, pos);
+}

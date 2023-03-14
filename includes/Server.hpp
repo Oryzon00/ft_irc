@@ -39,6 +39,9 @@ class Server
 		bool							checkCAP(Client &client, std::string key);
 		void							initDico(void);
 
+		// void							sendPackages(Client & client);
+
+
 		/* CMDS */
 		bool							cmd_CAP(std::string& str, Client& client);
 		bool							cmd_PASS(std::string& cmd, Client& client);
@@ -60,7 +63,6 @@ class Server
 
 		void							poll(void);
 		
-		void							sendPackages(Client & client);
 
 		bool							checkSocket(size_t index, short event);
 
@@ -71,6 +73,8 @@ class Server
 		
 		int								readQuery(size_t index, char* buffer);
 		void							processQuery(int index);
+
+		bool							checkAnswerQuery(size_t index);
 
 	
 

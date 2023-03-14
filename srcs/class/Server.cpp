@@ -39,7 +39,8 @@ void						Server::poll(void)
 	_network._poll();
 }
 
-int							Server::readQuery(size_t index, char* buffer)
+// A REECIRE
+/* int							Server::readQuery(size_t index, char* buffer)
 {
 	int ret = 1;
 
@@ -55,7 +56,7 @@ int							Server::readQuery(size_t index, char* buffer)
 	while (errno != EAGAIN && ret != DISCONNECT);
 	
 
-	if (ret != DISCONNECT) /* && _clients[index].checkCommand()) */ // rajouter condition cmd complete (au moins '\n')
+	if (ret != DISCONNECT) // && _clients[index].checkCommand())  // rajouter condition cmd complete (au moins '\n')
 		_clients[index].tokenizePack(); //
 
 	std::cout  << "-----RECEIVED-----" << std::endl;
@@ -64,14 +65,38 @@ int							Server::readQuery(size_t index, char* buffer)
 	std::cout << "-----END-----" << std::endl << std::endl;
 
 	return (ret);
+} */
+
+int							Server::readQuery(size_t index, char* buffer)
+{
+	Client&	client = _clients[index];
+
+	bzero(buffer, BUFFER_LEN);
+	int ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
+	if (errno != SUCCESS && errno != EAGAIN)
+		throw SocketException("recv()");
+	if (ret == DISCONNECT)
+		return (DISCONNECT);
+
+	client.readBuffer(buffer);
+	std::cout  << "----- PACKAGE -----" << std::endl;
+	client.printPackage();
+
+	client.findCmdInPackage();
+	std::cout  << "----- CMD -----" << std::endl;
+	client.printCmd();
+	std::cout  << "----- RESTE PACKAGE -----" << std::endl;
+	client.printPackage();
+	std::cout << "-----END-----" << std::endl << std::endl;
+	return (ret);
 }
 
-void						Server::sendPackages(Client & client)
+/* void						Server::sendPackages(Client & client)
 {
 	
 	client.sendToClient(); // a tester
 }
-
+ */
 bool						Server::checkSocket(size_t index, short event)
 {
 	return(_network[index].revents & event);
@@ -98,7 +123,7 @@ void						Server::removeClient(Client &client)
 }
 
 
-void						Server::processQuery(int index)
+/* void						Server::processQuery(int index) a reecire
 {
 	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
 	
@@ -118,6 +143,22 @@ void						Server::processQuery(int index)
 	// client.setToSend(client.getPackages()); //to delete
 	if (clientOk)
 		sendPackages(client);
+} */
+
+
+void						Server::processQuery(int index)
+{
+	Client&											client = _clients[index];
+	std::string 									key = getKey(client.getCmd());
+	std::map<std::string, cmdFunction>::iterator	it = _dico.find(key);
+
+	std::cout << "key = " << key << std::endl;
+	if (!checkCAP(client, key))
+		return ;
+	if (it == _dico.end()) //repondre avec un code erreur??
+		std::cerr << "Cmd:" << key << " not supported" << std::endl;
+	(this->*(it->second))(client.getCmd(), client);
+	client.sendToClient();
 }
 
 bool						Server::checkCAP(Client &client, std::string key)
@@ -129,6 +170,12 @@ bool						Server::checkCAP(Client &client, std::string key)
 		return (false);
 	}
 	return (true);
+}
+
+bool						Server::checkAnswerQuery(size_t index)
+{
+	Client&	client = _clients[index];
+	return (checkSocket(index, POLLOUT) && client.checkCmdReady());
 }
 
 
@@ -169,7 +216,7 @@ std::vector<std::string>		Server::getArgsCmd(std::string cmd, std::string key)
 
 /* --------------------------------------------------------------------------------- */
 
-bool	Server::cmd_CAP(std::string& cmd, Client& client)
+bool							Server::cmd_CAP(std::string& cmd, Client& client)
 {
 	client.setIsIrssi(true);
 
@@ -183,7 +230,7 @@ bool	Server::cmd_CAP(std::string& cmd, Client& client)
 	return (true);
 }
 
-bool	Server::cmd_PASS(std::string& cmd, Client& client)
+bool							Server::cmd_PASS(std::string& cmd, Client& client)
 {
 	(void) cmd;
 	(void) client;

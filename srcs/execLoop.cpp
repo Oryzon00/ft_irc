@@ -31,7 +31,7 @@ void	execLoop(Server &server)
 						std::cout << "client disconnected" << std::endl;
 						server.removeClient(index);
 					}
-					else if (server.checkSocket(index, POLLOUT)) // si commande est entiere (check avec variable du client)
+					else if (server.checkAnswerQuery(index))
 					{
 						std::cout << "writing to client" << std::endl;
 						server.processQuery(index);
