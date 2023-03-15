@@ -66,11 +66,13 @@ std::string&		Client::getCmd(void)
 void							Client::printPackage(void)
 {
 	std::cout << _package << std::endl;
+	std::cout << "len: " << _package.length() << std::endl;
 }
 
 void							Client::printCmd(void)
 {
 	std::cout << _cmd << std::endl;
+	std::cout << "len: " << _cmd.length() << std::endl;
 }
 
 void							Client::printToSend(void)
@@ -157,5 +159,5 @@ void				Client::findCmdInPackage(void) //a tester
 	if (pos == std::string::npos)
 		return ;
 	_cmd.insert(0, _package, 0, pos);
-	_package.erase(0, pos);
+	_package.erase(0, pos + strlen(DELIMITER));
 }
