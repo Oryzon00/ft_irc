@@ -18,7 +18,10 @@ class Client
 
 		int							_socket;
 		bool						_isIrssi;
+		bool						_passOK;
 		std::string					_nickname;
+		std::string					_username;
+		std::string					_realname;
 	
 		std::string					_package; 
 		std::string					_cmd;

@@ -1,6 +1,7 @@
 #include "Client.hpp"
 
-Client::Client(int socket)	:  _socket(initClientSocket(socket)), _isIrssi(false)	{}
+Client::Client(int socket)	:
+		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), 	{}
 
 Client::Client(void)		:	_socket(0), _isIrssi(false)							{}
 

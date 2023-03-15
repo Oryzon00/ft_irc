@@ -83,9 +83,16 @@ bool							Server::cmd_CAP(std::string& cmd, Client& client)
 
 bool							Server::cmd_PASS(std::string& cmd, Client& client)
 {
-	(void) cmd;
-	(void) client;
-	return (true);
+	std::vector<std::string>	args = findArgsCmd(cmd, "PASS");
+	if (args.empty())
+		cmd_error(461, client);
+	else if ()
+		cmd_error(462, client);
+	else if (args[0] != _password)
+		cmd_error(464, client);
+	else 
+		return (true);
+	return (false);
 }
 
 /* --------------------------------------------------------------------------------- */
@@ -136,8 +143,8 @@ int							Server::readQuery(size_t index, char* buffer)
 	client.findCmdInPackage();
 	
 	client.printCmd();
-	
 	client.printPackage();
+
 	return (ret);
 }
 
@@ -179,7 +186,7 @@ void						Server::processQuery(int index)
 	if (it == _dico.end()) //repondre avec un code erreur??
 		std::cerr << "Cmd:" << key << " not supported" << std::endl;
 	callFunCmd(it->second, client);
-	client.sendToClient();
+	client.sendToClient(); // a faire dans les func cmd
 }
 
 

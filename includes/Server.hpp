@@ -23,6 +23,7 @@ int	initServerSocket(unsigned short port);
 class Server
 {
 	private:
+		const std::string					_name =  "13-20h_IRC";
 
 		typedef								bool (Server::*cmdFunction) (std::string&, Client&);
 		typedef								std::vector<std::string>::iterator	itVector;
@@ -32,6 +33,7 @@ class Server
 		std::map<std::string, cmdFunction>	_dico;
 		Network								_network;
 		std::vector<Client>					_clients;
+
 
 
 		std::string						findKey(std::string cmd);
