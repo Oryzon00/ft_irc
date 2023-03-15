@@ -9,9 +9,88 @@ Server::Server(int port, std::string password)	: _socket(initServerSocket(port))
 }
 
 
+/* --------------------------------------------------------------------------------- */
+
+/* ----- PRIVATE FUNCTION ----- */
+
+std::string						Server::findKey(std::string cmd)
+{
+	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");
+	if (key && key[0] == ':')
+		key = strtok(NULL, " ");
+	if (!key)
+		return (std::string());
+	return (key);
+}
+
+std::vector<std::string>		Server::findArgsCmd(std::string cmd, std::string key)
+{
+	std::vector<std::string>	args;
+
+	char	*token = strtok(const_cast<char*>(cmd.c_str() + cmd.find(key) + key.length()), " ");
+	if (token)
+		args.push_back(std::string(token));
+	while (token)
+	{
+		token = strtok(NULL, " "); 
+		if (token)
+			args.push_back(std::string(token));
+	}
+	return (args);
+}
+
+bool						Server::checkCAP(Client &client, std::string key)
+{
+	if (client.getIsIrssi() == false && key != "CAP")
+	{
+		removeClient(client);
+		std::cerr << "!! -- First CMD is not CAP -- !!" << std::endl;
+		return (false);
+	}
+	return (true);
+}
+
+void							Server::initDico(void)
+{
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("CAP"), &Server::cmd_CAP));
+}
+
+void							Server::callFunCmd(cmdFunction f, Client & client)
+{
+	(this->*(f))(client.getCmd(), client);
+}
+
+
+
 
 /* --------------------------------------------------------------------------------- */
 
+/* CMD */
+
+bool							Server::cmd_CAP(std::string& cmd, Client& client)
+{
+	client.setIsIrssi(true);
+
+	std::vector<std::string>	args = findArgsCmd(cmd, "CAP");
+	if (args.size() != 1 || args[0] != "LS")
+	{
+		removeClient(client);
+		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
+		return false;
+	}
+	return (true);
+}
+
+bool							Server::cmd_PASS(std::string& cmd, Client& client)
+{
+	(void) cmd;
+	(void) client;
+	return (true);
+}
+
+/* --------------------------------------------------------------------------------- */
+
+/* GETTER */
 	
 const int&					Server::getServerSocket(void) const
 {
@@ -34,38 +113,13 @@ const Network&				Server::getNetwork(void) const
 
 /* --------------------------------------------------------------------------------- */
 
+/* PUBLIC FUNCTION */
+
 void						Server::poll(void)
 {
 	_network._poll();
 }
 
-// A REECIRE
-/* int							Server::readQuery(size_t index, char* buffer)
-{
-	int ret = 1;
-
-	do
-	{
-		bzero(buffer, BUFFER_LEN);
-		ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
-		if (errno != SUCCESS && errno != EAGAIN)
-			throw SocketException("recv()");
-		if (ret != DISCONNECT)
-			_clients[index].readFromClient(buffer);
-	}
-	while (errno != EAGAIN && ret != DISCONNECT);
-	
-
-	if (ret != DISCONNECT) // && _clients[index].checkCommand())  // rajouter condition cmd complete (au moins '\n')
-		_clients[index].tokenizePack(); //
-
-	std::cout  << "-----RECEIVED-----" << std::endl;
-	for(size_t i = 0; i < _clients[index].getCmds().size(); i++) //ca va teje
-		std::cout << i << ": " << _clients[index].getCmds()[i] << std::endl;
-	std::cout << "-----END-----" << std::endl << std::endl;
-
-	return (ret);
-} */
 
 int							Server::readQuery(size_t index, char* buffer)
 {
@@ -79,24 +133,15 @@ int							Server::readQuery(size_t index, char* buffer)
 		return (DISCONNECT);
 
 	client.readBuffer(buffer);
-	std::cout  << "----- PACKAGE -----" << std::endl;
-	client.printPackage();
-
 	client.findCmdInPackage();
-	std::cout  << "----- CMD -----" << std::endl;
+	
 	client.printCmd();
-	std::cout  << "----- RESTE PACKAGE -----" << std::endl;
+	
 	client.printPackage();
-	std::cout << "-----END-----" << std::endl << std::endl;
 	return (ret);
 }
 
-/* void						Server::sendPackages(Client & client)
-{
-	
-	client.sendToClient(); // a tester
-}
- */
+
 bool						Server::checkSocket(size_t index, short event)
 {
 	return(_network[index].revents & event);
@@ -123,54 +168,21 @@ void						Server::removeClient(Client &client)
 }
 
 
-/* void						Server::processQuery(int index) a reecire
-{
-	Client&	client = _clients[index]; //est ce qu'n a une copie ? ou le vrai client
-	
-	bool	clientOk = true; 
-	for (itVector it = client.getCmds().begin(); it != client.getCmds().end(); it++)
-	{
-		std::string key = getKey(*it);
-		std::cout << "key = " << key << std::endl;
-		std::map<std::string, cmdFunction>::iterator itFind = _dico.find(key);
-		if (!checkCAP(client, key))
-			return ;
-		else if (itFind == _dico.end())
-			std::cerr << "Cmd:" << key << " not found" << std::endl;
-		else if (!(this->*(itFind->second))(*it, client))
-			clientOk = false;
-		}
-	// client.setToSend(client.getPackages()); //to delete
-	if (clientOk)
-		sendPackages(client);
-} */
-
-
 void						Server::processQuery(int index)
 {
 	Client&											client = _clients[index];
-	std::string 									key = getKey(client.getCmd());
+	std::string 									key = findKey(client.getCmd());
 	std::map<std::string, cmdFunction>::iterator	it = _dico.find(key);
 
-	std::cout << "key = " << key << std::endl;
 	if (!checkCAP(client, key))
 		return ;
 	if (it == _dico.end()) //repondre avec un code erreur??
 		std::cerr << "Cmd:" << key << " not supported" << std::endl;
-	(this->*(it->second))(client.getCmd(), client);
+	callFunCmd(it->second, client);
 	client.sendToClient();
 }
 
-bool						Server::checkCAP(Client &client, std::string key)
-{
-	if (client.getIsIrssi() == false && key != "CAP")
-	{
-		removeClient(client);
-		std::cerr << "!! -- First CMD is not CAP -- !!" << std::endl;
-		return (false);
-	}
-	return (true);
-}
+
 
 bool						Server::checkAnswerQuery(size_t index)
 {
@@ -180,59 +192,3 @@ bool						Server::checkAnswerQuery(size_t index)
 
 
 /* --------------------------------------------------------------------------------- */
-
-/* ----- PRIVATE FUNCTION ----- */
-
-void							Server::initDico(void)
-{
-	_dico.insert(std::pair<std::string, cmdFunction>(std::string("CAP"), &Server::cmd_CAP));
-}
-
-std::string						Server::getKey(std::string cmd)
-{
-	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");
-	if (key && key[0] == ':')
-		key = strtok(NULL, " ");
-	if (!key)
-		return (std::string());
-	return (key);
-}
-
-std::vector<std::string>		Server::getArgsCmd(std::string cmd, std::string key)
-{
-	std::vector<std::string>	args;
-
-	char	*token = strtok(const_cast<char*>(cmd.c_str() + cmd.find(key) + key.length()), " ");
-	if (token)
-		args.push_back(std::string(token));
-	while (token)
-	{
-		token = strtok(NULL, " "); 
-		if (token)
-			args.push_back(std::string(token));
-	}
-	return (args);
-}
-
-/* --------------------------------------------------------------------------------- */
-
-bool							Server::cmd_CAP(std::string& cmd, Client& client)
-{
-	client.setIsIrssi(true);
-
-	std::vector<std::string>	args = getArgsCmd(cmd, "CAP");
-	if (args.size() != 1 || args[0] != "LS")
-	{
-		removeClient(client);
-		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
-		return false;
-	}
-	return (true);
-}
-
-bool							Server::cmd_PASS(std::string& cmd, Client& client)
-{
-	(void) cmd;
-	(void) client;
-	return (true);
-}

@@ -29,6 +29,8 @@ bool	operator==(const Client& lhs, const Client& rhs)
 
 /* --------------------------------------------------------------------------------- */
 
+/* GETTER */
+
 const int&						Client::getSocket(void) const
 {
 	return _socket;
@@ -65,18 +67,19 @@ std::string&		Client::getCmd(void)
 
 void							Client::printPackage(void)
 {
+	std::cout  << "----- RESTE PACKAGE -----" << std::endl;
 	std::cout << _package << std::endl;
-	std::cout << "len: " << _package.length() << std::endl;
 }
 
 void							Client::printCmd(void)
 {
+	std::cout  << "----- CMD -----" << std::endl;
 	std::cout << _cmd << std::endl;
-	std::cout << "len: " << _cmd.length() << std::endl;
 }
 
 void							Client::printToSend(void)
 {
+
 	std::cout << _to_send << std::endl;
 }
 
@@ -98,26 +101,23 @@ void							Client::setIsIrssi(const bool& boolean)
 
 /* --------------------------------------------------------------------------------- */
 
+/* PRIVATE FUNCTION */
+
+void				Client::clearCmdSend(void)
+{
+	_to_send.clear();
+	_cmd.clear();
+}
+
+/* --------------------------------------------------------------------------------- */
+
+/* PUBLIC FUNCTION */
+
 void				Client::readBuffer(char* buffer)
 {
 	if (buffer)
 		_package += buffer;
 }
-
-/* void				Client::tokenizePack(void)
-{
-	std::string	tmp = std::string(_package);
-	char* token = strtok(const_cast<char*>(tmp.c_str()), "\n\r");
-	if (token)
-		_cmds.push_back(std::string(token));
-	while (token)
-	{
-		token = strtok(NULL, "\r\n"); 
-		if (token)
-			_cmds.push_back(std::string(token));
-	}
-		
-} */
 
 void				Client::sendToClient(void) //a re tester
 {
@@ -131,21 +131,7 @@ void				Client::sendToClient(void) //a re tester
 	clearCmdSend();
 }
 
-void				Client::clearCmdSend(void)
-{
-	_to_send.clear();
-	_cmd.clear();
-}
 
-// bool				Client::checkCommand (void)
-// {
-// 	size_t pos = _package.find('\n');
-// 	if (pos == std::string::npos) // npos == didn't find anything
-// 		return (false);
-// 	//if (pos == _package.size())
-// 		// save le reste du package dans un temp
-// 	return (true);
-// }
 
 bool				Client::checkCmdReady(void)
 {
@@ -153,7 +139,7 @@ bool				Client::checkCmdReady(void)
 }
 
 
-void				Client::findCmdInPackage(void) //a tester
+void				Client::findCmdInPackage(void)
 {
 	size_t	pos = _package.find(DELIMITER);
 	if (pos == std::string::npos)

@@ -11,6 +11,13 @@ Network::~Network(void)
 		close(_pfds[i].fd);
 }
 
+struct pollfd&	Network::operator[](size_t index)
+{
+	return(_pfds[index]);
+}
+
+/* --------------------------------------------------------------------------------- */
+
 
 void	Network::addSocket(int socket)
 {
@@ -28,11 +35,6 @@ void	Network::_poll(void)
 size_t	Network::size(void) const
 {
 	return(_nb);
-}
-
-struct pollfd&	Network::operator[](size_t index)
-{
-	return(_pfds[index]);
 }
 
 void			Network::removeSocket(size_t index)

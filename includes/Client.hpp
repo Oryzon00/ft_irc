@@ -21,7 +21,7 @@ class Client
 		std::string					_nickname;
 	
 		std::string					_package; 
-		std::string					_cmd; 		//devient une std:string
+		std::string					_cmd;
 		std::string					_to_send;	
 				
 		
@@ -50,13 +50,9 @@ class Client
 		
 
 		void							readBuffer(char* buffer);
-		void							sendToClient(void);
-
-		
-
-		// void							tokenizePack(void);	
 		bool							checkCmdReady(void);
-		void							findCmdInPackage(void);		
+		void							findCmdInPackage(void);
+		void							sendToClient(void);	
 	
 };
 

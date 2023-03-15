@@ -34,15 +34,17 @@ class Server
 		std::vector<Client>					_clients;
 
 
-		std::string						getKey(std::string cmd);
-		std::vector<std::string>		getArgsCmd(std::string cmd, std::string key);
+		std::string						findKey(std::string cmd);
+		std::vector<std::string>		findArgsCmd(std::string cmd, std::string key);
 		bool							checkCAP(Client &client, std::string key);
 		void							initDico(void);
+		void							callFunCmd(cmdFunction f, Client & client);
 
+		
 		// void							sendPackages(Client & client);
 
 
-		/* CMDS */
+		/* CMD */
 		bool							cmd_CAP(std::string& str, Client& client);
 		bool							cmd_PASS(std::string& cmd, Client& client);
 		
@@ -52,7 +54,6 @@ class Server
 	public:
 
 		Server(int port, std::string password);
-		
 		
 		
 		const int&						getServerSocket(void) const;

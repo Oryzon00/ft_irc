@@ -17,10 +17,10 @@ void	execLoop(Server &server)
 		{
 			if (server.checkSocket(index, POLLIN))
 			{
-				std::cout << "------ fd nb " << index << " ready to read ------" << std::endl << std::endl;
+				// std::cout << "------ fd nb " << index << " ready to read ------" << std::endl << std::endl;
 				if (index == SERVER_INDEX)
 				{
-					std::cout << "new connection to server" << std::endl;
+					std::cout << "---- new connection to server ----" << std::endl;
 					server.addClient();
 				}
 				else 
@@ -28,17 +28,19 @@ void	execLoop(Server &server)
 					std::cout << "---- client connection number: ----" << index << std::endl;
 					if (server.readQuery(index, buffer) == DISCONNECT)
 					{
-						std::cout << "client disconnected" << std::endl;
+						std::cout << "---- client disconnected ----" << std::endl;
 						server.removeClient(index);
 					}
 					else if (server.checkAnswerQuery(index))
 					{
-						std::cout << "writing to client" << std::endl;
+						std::cout << "---- processQuery of client ----" << std::endl;
 						server.processQuery(index);
 					}
 					
 				}
 			}
+			
 		}
+		
 	}
 }
