@@ -1,9 +1,9 @@
 #include "Client.hpp"
 
 Client::Client(int socket)	:
-		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), 	{}
+		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false)	{}
 
-Client::Client(void)		:	_socket(0), _isIrssi(false)							{}
+Client::Client(void)		:	_socket(0), _isIrssi(false), _passOK(false)	{}
 
 Client::~Client(void)	{ /* close(_socket); */ }
 
@@ -14,7 +14,6 @@ Client&				Client::operator=(const Client& rhs)
 		_socket = rhs._socket;
 		_nickname = rhs._nickname;
 		_package = rhs._package;
-		_to_send = rhs._to_send;
 		_cmd = rhs._cmd;
 	}
 	return (*this);
@@ -42,19 +41,19 @@ const bool&						Client::getIsIrssi(void) const
 	return _isIrssi;
 }
 
+const bool&						Client::getPassOk(void) const
+{
+	return _passOK;
+}
+
 const std::string&				Client::getNickname(void) const
 {
-	return _to_send;
+	return _nickname;
 }
 
 const std::string&				Client::getPackages(void) const
 {
 	return _package;
-}
-
-const std::string&				Client::getToSend(void) const
-{
-	return _to_send;
 }
 
 std::string&		Client::getCmd(void) 
@@ -78,35 +77,28 @@ void							Client::printCmd(void)
 	std::cout << _cmd << std::endl;
 }
 
-void							Client::printToSend(void)
-{
-
-	std::cout << _to_send << std::endl;
-}
-
 
 
 /* --------------------------------------------------------------------------------- */
 
 /* SETTER */
 
-void							Client::setToSend(const std::string& str)
-{
-	_to_send = str;
-}
-
 void							Client::setIsIrssi(const bool& boolean)
 {
 	_isIrssi = boolean;
+}
+
+void							Client::setPassOk(const bool& boolean)
+{
+	_passOK = boolean;
 }
 
 /* --------------------------------------------------------------------------------- */
 
 /* PRIVATE FUNCTION */
 
-void				Client::clearCmdSend(void)
+void				Client::clearCmd(void)
 {
-	_to_send.clear();
 	_cmd.clear();
 }
 
@@ -120,16 +112,10 @@ void				Client::readBuffer(char* buffer)
 		_package += buffer;
 }
 
-void				Client::sendToClient(void) //a re tester
+void				Client::sendToClient(std::string str)
 {
-	if (_to_send.empty())
-	{
-		clearCmdSend();
-		return ;
-	}
-	if (send(_socket, _to_send.c_str(), _to_send.size(), 0) < 0)
+	if (send(_socket, str.c_str(), str.size(), 0) < 0)
 		throw SocketException("send()");
-	clearCmdSend();
 }
 
 

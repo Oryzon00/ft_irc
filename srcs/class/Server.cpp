@@ -1,7 +1,8 @@
 # include "Server.hpp"
 
 
-Server::Server(int port, std::string password)	: _socket(initServerSocket(port)), _password(password)
+Server::Server(int port, std::string password)
+	: _name("13-20h_IRC"), _socket(initServerSocket(port)), _password(password)
 {
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
@@ -53,6 +54,8 @@ bool						Server::checkCAP(Client &client, std::string key)
 void							Server::initDico(void)
 {
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("CAP"), &Server::cmd_CAP));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PASS"), &Server::cmd_PASS));
+
 }
 
 void							Server::callFunCmd(cmdFunction f, Client & client)
@@ -61,39 +64,47 @@ void							Server::callFunCmd(cmdFunction f, Client & client)
 }
 
 
-
+const std::string		Server::prefixServer(void) const
+{
+	return (":" + _name);
+}
 
 /* --------------------------------------------------------------------------------- */
 
-/* CMD */
+/* ERR */
 
-bool							Server::cmd_CAP(std::string& cmd, Client& client)
+void							Server::error_handler(int ERR_CODE, Client &client)
 {
-	client.setIsIrssi(true);
-
-	std::vector<std::string>	args = findArgsCmd(cmd, "CAP");
-	if (args.size() != 1 || args[0] != "LS")
+	switch (ERR_CODE)
 	{
-		removeClient(client);
-		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
-		return false;
+		case ERR_NEEDMOREPARAMS:
+			f_ERR_NEEDMOREPARAMS(client);
+			break;
+		default:
+			break;
 	}
-	return (true);
 }
 
-bool							Server::cmd_PASS(std::string& cmd, Client& client)
+void							Server::f_ERR_NEEDMOREPARAMS(Client &client)
 {
-	std::vector<std::string>	args = findArgsCmd(cmd, "PASS");
-	if (args.empty())
-		cmd_error(461, client);
-	else if ()
-		cmd_error(462, client);
-	else if (args[0] != _password)
-		cmd_error(464, client);
-	else 
-		return (true);
-	return (false);
+	std::string code = " 461 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + findKey(client.getCmd())
+		+ ": Not Enough Parameters";
+    client.sendToClient(str);
+	removeClient(client);
 }
+
+/* RPL */
+
+
+void							Server::reply_handler(int RPL_CODE, Client &client)
+{
+	(void) RPL_CODE;
+	(void) client;
+}
+
+
+
 
 /* --------------------------------------------------------------------------------- */
 
@@ -184,9 +195,12 @@ void						Server::processQuery(int index)
 	if (!checkCAP(client, key))
 		return ;
 	if (it == _dico.end()) //repondre avec un code erreur??
+	{
 		std::cerr << "Cmd:" << key << " not supported" << std::endl;
-	callFunCmd(it->second, client);
-	client.sendToClient(); // a faire dans les func cmd
+		client.clearCmd();
+	}
+	else
+		callFunCmd(it->second, client);
 }
 
 

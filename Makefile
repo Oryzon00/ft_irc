@@ -5,6 +5,7 @@ SRCS		=	srcs/main.cpp				\
 				srcs/initSocket.cpp			\
 				srcs/class/Client.cpp		\
 				srcs/class/Server.cpp		\
+				srcs/class/Servercmd.cpp	\
 				srcs/class/Network.cpp		\
 				srcs/execLoop.cpp			\
 				srcs/signal.cpp				\

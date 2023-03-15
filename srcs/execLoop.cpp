@@ -20,7 +20,7 @@ void	execLoop(Server &server)
 				// std::cout << "------ fd nb " << index << " ready to read ------" << std::endl << std::endl;
 				if (index == SERVER_INDEX)
 				{
-					std::cout << "---- new connection to server ----" << std::endl;
+					std::cout << std::endl << "---- new connection to server ----" << std::endl;
 					server.addClient();
 				}
 				else 
