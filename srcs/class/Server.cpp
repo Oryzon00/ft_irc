@@ -24,18 +24,35 @@ std::string						Server::findKey(std::string cmd)
 	return (key);
 }
 
+//ne pas split apres le trailing
+/* USER ajung ajung localhost :Adrian JUNG */
+
 std::vector<std::string>		Server::findArgsCmd(std::string cmd, std::string key)
 {
 	std::vector<std::string>	args;
+	std::string					str;
 
 	char	*token = strtok(const_cast<char*>(cmd.c_str() + cmd.find(key) + key.length()), " ");
 	if (token)
 		args.push_back(std::string(token));
+	
 	while (token)
 	{
-		token = strtok(NULL, " "); 
+		token = strtok(NULL, " ");
 		if (token)
-			args.push_back(std::string(token));
+		{
+			str = token;
+			if (str.find(':') == 0)
+			{
+				do
+				{
+					token = strtok(NULL, " ");
+					if (token)
+						str += std::string(" ") + std::string(token); 
+				} while (token);
+			}
+			args.push_back(str);
+		}	
 	}
 	return (args);
 }
@@ -68,13 +85,6 @@ bool						Server::checkCAP(Client &client, std::string key)
 	return (true);
 }
 
-void							Server::initDico(void)
-{
-	_dico.insert(std::pair<std::string, cmdFunction>(std::string("CAP"), &Server::cmd_CAP));
-	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PASS"), &Server::cmd_PASS));
-	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NICK"), &Server::cmd_NICK));
-
-}
 
 void							Server::callFunCmd(cmdFunction f, Client & client)
 {
@@ -152,7 +162,7 @@ void						Server::processQuery(int index)
 		return ;
 	try
 	{
-		if (it == _dico.end()) //repondre avec un code erreur??
+		if (it == _dico.end())
 			f_ERR_UNKNOWNCOMMAND(client);
 		else
 			callFunCmd(it->second, client);

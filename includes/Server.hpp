@@ -96,6 +96,7 @@ class Server
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
+		void							cmd_USER(std::string& cmd, Client& client);
 		
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);

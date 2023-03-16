@@ -1,9 +1,12 @@
 #include "Client.hpp"
 
 Client::Client(int socket)	:
-		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _nickname("*")	{}
+		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _registered(false),
+		_nickname("*")	{}
 
-Client::Client(void)		:	_socket(0), _isIrssi(false), _passOK(false), _nickname("*")	{}
+Client::Client(void)		:
+		_socket(0), _isIrssi(false), _passOK(false), _registered(false),
+		_nickname("*")	{}
 
 Client::~Client(void)	{ /* close(_socket); */ }
 
@@ -46,9 +49,25 @@ const bool&						Client::getPassOk(void) const
 	return _passOK;
 }
 
+const bool&						Client::getRegistered(void) const
+{
+
+	return _registered;
+}
+
 const std::string&				Client::getNickname(void) const
 {
 	return _nickname;
+}
+
+const std::string&				Client::getUsername(void) const
+{
+	return	_username;
+}
+
+const std::string&				Client::getRealname(void) const
+{
+	return _realname;
 }
 
 const std::string&				Client::getPackages(void) const
@@ -88,6 +107,11 @@ void							Client::setIsIrssi(const bool& boolean)
 	_isIrssi = boolean;
 }
 
+void							Client::setRegistered(const bool& boolean)
+{
+	_registered = boolean;
+}
+
 void							Client::setPassOk(const bool& boolean)
 {
 	_passOK = boolean;
@@ -96,6 +120,16 @@ void							Client::setPassOk(const bool& boolean)
 void							Client::setNickname(const std::string& nick)
 {
 	_nickname = nick;
+}
+
+void							Client::setUsername(const std::string& str)
+{
+	_username = str;
+}
+
+void							Client::setRealname(const std::string& str)
+{
+	_realname = str;
 }
 
 /* --------------------------------------------------------------------------------- */
