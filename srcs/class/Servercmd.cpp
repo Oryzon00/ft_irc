@@ -52,7 +52,7 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 	std::vector<std::string>	args = findArgsCmd(cmd, "NICK");
 	if (!client.getPassOk())
 		error_handler(ERR_PASSWDMISMATCH, client);
-	else if (args.empty())
+	else if (args.size() != 1)
 		error_handler(ERR_NEEDMOREPARAMS, client);
 	else if (checkAvailNick(args[0]) == false)
 		error_handler(ERR_NICKNAMEINUSE, client);
@@ -121,7 +121,6 @@ void	Server::f_ERR_NEEDMOREPARAMS(Client &client)
 	std::string	str = prefixServer() + code + client.getNickname() + " " + findKey(client.getCmd())
 		+ " :Not Enough Parameters\n";
     client.sendToClient(str);
-	quitClientCmd(client);
 }
 
 void	Server::f_ERR_ALREADYREGISTERED(Client &client)
