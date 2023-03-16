@@ -94,13 +94,15 @@ class Server
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
+		void							cmd_USER(std::string& cmd, Client& client);
 		
 		/* ERR */
-		void							error_handler(int ERR_CODE, Client &client);
-		void							f_ERR_UNKNOWNCOMMAND(Client &client);
-		void							f_ERR_NEEDMOREPARAMS(Client &client);
-		void							f_ERR_ALREADYREGISTERED(Client &client);
-		void							f_ERR_PASSWDMISMATCH(Client &client);
+		void							error_handler(int ERR_CODE, Client& client);
+		void							f_ERR_UNKNOWNCOMMAND(Client& client);
+		void							f_ERR_NEEDMOREPARAMS(Client& client);
+		void							f_ERR_ALREADYREGISTERED(Client& client);
+		void							f_ERR_PASSWDMISMATCH(Client& client);
+
 		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);
 

@@ -36,11 +36,8 @@ void	execLoop(Server &server)
 						std::cout << "---- processQuery of client ----" << std::endl;
 						server.processQuery(index);
 					}
-					
 				}
 			}
-			
 		}
-		
 	}
 }

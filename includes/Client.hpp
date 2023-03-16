@@ -19,6 +19,7 @@ class Client
 		int							_socket;
 		bool						_isIrssi;
 		bool						_passOK;
+		bool						_registered;
 		std::string					_nickname;
 		std::string					_username;
 		std::string					_realname;
@@ -36,7 +37,10 @@ class Client
 		const int&						getSocket(void) const;
 		const bool&						getIsIrssi(void) const;
 		const bool&						getPassOk(void) const;
+		const bool&						getRegistered(void) const;
 		const std::string&				getNickname(void) const;
+		const std::string&				getUsername(void) const;
+		const std::string&				getRealname(void) const;
 		const std::string&				getPackages(void) const;
 		std::string&					getCmd(void);
 
@@ -45,12 +49,16 @@ class Client
 
 		void							setIsIrssi(const bool& boolean);
 		void							setPassOk(const bool& boolean);
+		void							setRegistered(const bool& boolean);
+		void							setUsername(const std::string& str);
+		void							setRealname(const std::string& str);
 		
 		void							clearCmd(void);
 		void							readBuffer(char* buffer);
 		bool							checkCmdReady(void);
 		void							findCmdInPackage(void);
 		void							sendToClient(std::string str);	
+		//check registration
 	
 };
 
