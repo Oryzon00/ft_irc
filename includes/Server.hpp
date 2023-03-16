@@ -37,21 +37,21 @@ Channel Operation
 	PART message
 	TOPIC message
 	NAMES message
-	LIST message
+	LIST message //PAS A FAIRE
 	INVITE message
 	KICK message
 
 Sending Messages
 	PRIVMSG message
-	NOTICE message
+	NOTICE message //PAS A FAIRE
 
 User-Based Queries
-	WHO message
-	WHOIS message
+	WHO message //PAS A FAIRE
+	WHOIS message //PAS A FAIRE
 
 Operator Messages
 	KILL message
-	RESTART message ??
+	RESTART message
 
 Server Queries and Commands
 	MODE
@@ -64,12 +64,7 @@ Server Queries and Commands
 # define SUCCESS			0
 # define DISCONNECT			0
 
-
-
-
 int	initServerSocket(unsigned short port);
-
-
 
 class Server
 {
