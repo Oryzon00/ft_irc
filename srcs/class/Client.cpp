@@ -93,6 +93,11 @@ void							Client::setPassOk(const bool& boolean)
 	_passOK = boolean;
 }
 
+void							Client::setNickname(const std::string& nick)
+{
+	_nickname = nick;
+}
+
 /* --------------------------------------------------------------------------------- */
 
 /* PRIVATE FUNCTION */

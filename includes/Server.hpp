@@ -84,6 +84,8 @@ class Server
 
 		std::string						findKey(std::string cmd);
 		std::vector<std::string>		findArgsCmd(std::string cmd, std::string key);
+		bool							checkAvailNick(const std::string str);
+		bool							checkValidName(const std::string& str);
 		bool							checkCAP(Client &client, std::string key);
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
@@ -101,7 +103,10 @@ class Server
 		void							f_ERR_NEEDMOREPARAMS(Client &client);
 		void							f_ERR_ALREADYREGISTERED(Client &client);
 		void							f_ERR_PASSWDMISMATCH(Client &client);
-		/* RPL */
+		void							f_ERR_NICKNAMEINUSE(Client &client);
+		void							f_ERR_ERRONEUSNICKNAME(Client &client);
+		void							f_ERR_NONICKNAMEGIVEN(Client &client);
+/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);
 
 

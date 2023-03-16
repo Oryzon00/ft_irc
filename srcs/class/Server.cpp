@@ -40,6 +40,23 @@ std::vector<std::string>		Server::findArgsCmd(std::string cmd, std::string key)
 	return (args);
 }
 
+bool						Server::checkAvailNick(const std::string str)
+{
+	for(std::vector<Client>::iterator it = _clients.begin() + 1; it != _clients.end(); it++)
+	{
+		if (str == it->getNickname())
+			return (false);
+	}
+	return (true);
+}
+
+bool						Server::checkValidName(const std::string& str)
+{
+	if (str.empty() || str == "*" || str.length() >= 20)
+		return (false);
+	return (true);
+}
+
 bool						Server::checkCAP(Client &client, std::string key)
 {
 	if (client.getIsIrssi() == false && key != "CAP")
@@ -55,6 +72,7 @@ void							Server::initDico(void)
 {
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("CAP"), &Server::cmd_CAP));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PASS"), &Server::cmd_PASS));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NICK"), &Server::cmd_NICK));
 
 }
 

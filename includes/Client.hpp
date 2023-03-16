@@ -45,6 +45,7 @@ class Client
 
 		void							setIsIrssi(const bool& boolean);
 		void							setPassOk(const bool& boolean);
+		void							setNickname(const std::string& nick);
 		
 		void							clearCmd(void);
 		void							readBuffer(char* buffer);

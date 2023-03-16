@@ -45,12 +45,19 @@ void							Server::cmd_PASS(std::string& cmd, Client& client)
 
 void							Server::cmd_NICK(std::string& cmd, Client& client)
 {
-	std::vector<std::string>	args = findArgsCmd(cmd, "PASS");
+	std::vector<std::string>	args = findArgsCmd(cmd, "NICK");
 	if (!client.getPassOk())
 		error_handler(ERR_PASSWDMISMATCH, client);
 	else if (args.empty())
-		error_handler(ERR_NONICKNAMEGIVEN, client);
-	//else if (checkAvailName(args[0]))
+		error_handler(ERR_NEEDMOREPARAMS, client);
+	else if (checkAvailNick(args[0]) == false)
+		error_handler(ERR_NICKNAMEINUSE, client);
+	else if (checkValidName(args[0]) == false)
+		error_handler(ERR_ERRONEUSNICKNAME, client);
+	else
+		client.setNickname(args[0]);
+	std::cout << client.getNickname() <<std::endl;
+	client.clearCmd();
 }
 
 
@@ -70,6 +77,12 @@ void							Server::error_handler(int ERR_CODE, Client &client)
 			break;
 		case ERR_PASSWDMISMATCH:
 			f_ERR_PASSWDMISMATCH(client);
+			break;
+		case ERR_NICKNAMEINUSE:
+			f_ERR_NICKNAMEINUSE(client);
+			break;
+		case ERR_ERRONEUSNICKNAME:
+			f_ERR_ERRONEUSNICKNAME(client);
 			break;
 		default:
 			break;
@@ -108,6 +121,28 @@ void							Server::f_ERR_UNKNOWNCOMMAND(Client &client)
 		+ " :Unknown command\n";
     client.sendToClient(str);
 	client.clearCmd();
+}
+
+void							Server::f_ERR_NICKNAMEINUSE(Client &client)
+{
+	std::string code = " 433 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + findArgsCmd(client.getCmd(), "NICK")[0] 
+		+ " :Nickname is already in use\n";
+    client.sendToClient(str);
+}
+
+void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
+{
+	std::string code = " 432 ";
+	std::vector<std::string> args = findArgsCmd(client.getCmd(), "NICK");
+	std::string str;
+	if (args.size() == 1)
+		str = prefixServer() + code + client.getNickname() + " " + args[0] 
+			+ " :Erroneus nickname\n";
+    else
+		str = prefixServer() + code + client.getNickname() + args[0] + " " + args[1]
+			+ " :Erroneus nickname\n";
+	client.sendToClient(str);
 }
 
 
