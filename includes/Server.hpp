@@ -23,39 +23,38 @@ send and receive private messages */
 CMD A FAIRE
 
 CONNECTION
-	CAP***
-	PASS***
-	NICK+**
-	USER
-	PING
-	PONG moi
-	OPER
-	QUIT moi
+	CAP		DONE
+	PASS	DONE
+	NICK	DONE
+	USER	DONE
+	PING	DONE
+	OPER	--> Adrian (mettre bool dans client)
+	QUIT	
+
+class CHANNELL --> QUENTIN
+check registration --> LOUIS
+001 - 005 + 251 + 255 + 452 --> LOUIS
 
 Channel Operation
 	JOIN message
 	PART message
 	TOPIC message
 	NAMES message
-	LIST message //PAS A FAIRE
 	INVITE message
 	KICK message
 
 Sending Messages
 	PRIVMSG message
-	NOTICE message //PAS A FAIRE
-
-User-Based Queries
-	WHO message //PAS A FAIRE
-	WHOIS message //PAS A FAIRE
 
 Operator Messages
-	KILL message
-	RESTART message
+	KILL message	--> Adrian
+	RESTART message	--> Adrian
 
 Server Queries and Commands
 	MODE
 	MOTD
+
+
 
 */
 
