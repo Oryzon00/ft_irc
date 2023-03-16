@@ -1,5 +1,6 @@
 #include "Server.hpp"
 
+#include "../../includes/Server.hpp" // A SUPPRIMER
 
 /* CMD */
 
@@ -53,6 +54,22 @@ void							Server::cmd_NICK(std::string& cmd, Client& client)
 	//else if (checkAvailName(args[0]))
 }
 
+void							Server::cmd_PING(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "PING");
+
+	if (args.empty() || args.size() > 1)
+		error_handler(ERR_NEEDMOREPARAMS, client);
+	else
+		client.sendToClient(prefixServer() + " PONG " + _name + " :" + args[0] + "\r\n");
+	client.clearCmd();
+}
+
+/*void							Server::cmd_QUIT(std::string& cmd, Client& client)
+{
+	//If client connected to channel, write in channel
+}*/
+
 
 /* --------------------------------------------------------------------------------- */
 
@@ -82,7 +99,6 @@ void							Server::f_ERR_NEEDMOREPARAMS(Client &client)
 	std::string	str = prefixServer() + code + client.getNickname() + " " + findKey(client.getCmd())
 		+ " :Not Enough Parameters\n";
     client.sendToClient(str);
-	quitClientCmd(client);
 }
 
 void							Server::f_ERR_ALREADYREGISTERED(Client &client)
@@ -90,7 +106,6 @@ void							Server::f_ERR_ALREADYREGISTERED(Client &client)
 	std::string code = " 462 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " :You may not reregister\n";
     client.sendToClient(str);
-	quitClientCmd(client);
 }
 
 void							Server::f_ERR_PASSWDMISMATCH(Client &client)
@@ -98,7 +113,6 @@ void							Server::f_ERR_PASSWDMISMATCH(Client &client)
 	std::string code = " 464 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " :Password incorrect\n";
     client.sendToClient(str);
-	quitClientCmd(client);
 }
 
 void							Server::f_ERR_UNKNOWNCOMMAND(Client &client)

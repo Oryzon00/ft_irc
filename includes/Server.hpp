@@ -23,14 +23,14 @@ send and receive private messages */
 CMD A FAIRE
 
 CONNECTION
-	CAP
-	PASS
-	NICK
+	CAP***
+	PASS***
+	NICK+**
 	USER
 	PING
-	PONG
+	PONG moi
 	OPER
-	QUIT
+	QUIT moi
 
 Channel Operation
 	JOIN message
@@ -94,8 +94,11 @@ class Server
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
-		
-		/* ERR */
+		void							cmd_PING(std::string& cmd, Client& client); // C'est un pong
+	//	void							cmd_QUIT(std::string& cmd, Client& client);
+
+
+	/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);
 		void							f_ERR_UNKNOWNCOMMAND(Client &client);
 		void							f_ERR_NEEDMOREPARAMS(Client &client);
