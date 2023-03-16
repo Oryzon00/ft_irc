@@ -134,7 +134,7 @@ void						Server::processQuery(int index)
 		return ;
 	if (it == _dico.end()) //repondre avec un code erreur??
 	{
-		//appeler ERR_UNKNOWNCOMMAND
+		f_ERR_UNKNOWNCOMMAND(client);
 		std::cerr << "Cmd:" << key << " not supported" << std::endl;
 		client.clearCmd();
 	}
