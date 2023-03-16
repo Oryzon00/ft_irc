@@ -132,25 +132,20 @@ void						Server::processQuery(int index)
 
 	if (!checkCAP(client, key))
 		return ;
-	if (it == _dico.end()) //repondre avec un code erreur??
+	try
 	{
-		f_ERR_UNKNOWNCOMMAND(client);
-		std::cerr << "Cmd:" << key << " not supported" << std::endl;
-		client.clearCmd();
-	}
-	else
-	{
-		try
-		{
+		if (it == _dico.end()) //repondre avec un code erreur??
+			f_ERR_UNKNOWNCOMMAND(client);
+		else
 			callFunCmd(it->second, client);
-			client.findCmdInPackage();
-			if (checkAnswerQuery(index))
-				processQuery(index);
-		}
-		catch(const ClientDestroyedException& e)
-		{
-			std::cerr << e.what() << '\n';
-		}
+			
+		client.findCmdInPackage();
+		if (checkAnswerQuery(index))
+			processQuery(index);
+	}
+	catch(const ClientDestroyedException& e)
+	{
+		std::cerr << e.what() << '\n';
 	}
 }
 

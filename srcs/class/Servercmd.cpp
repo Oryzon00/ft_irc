@@ -107,7 +107,7 @@ void							Server::f_ERR_UNKNOWNCOMMAND(Client &client)
 	std::string	str = prefixServer() + code + client.getNickname() + " " + findKey(client.getCmd())
 		+ " :Unknown command\n";
     client.sendToClient(str);
-	//quitClientCmd(client);
+	client.clearCmd();
 }
 
 
