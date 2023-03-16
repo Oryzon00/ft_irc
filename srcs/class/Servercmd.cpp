@@ -3,6 +3,19 @@
 
 /* CMD */
 
+//faire fonction check
+//	-passOK
+//	-isIrssi
+
+void							Server::quitClientCmd(Client &client)
+{
+	removeClient(client);
+	throw ClientDestroyedException();
+}
+
+/* --------------------------------------------------------------------------------- */
+
+
 void							Server::cmd_CAP(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "CAP");
@@ -28,4 +41,41 @@ void							Server::cmd_PASS(std::string& cmd, Client& client)
 		client.setPassOk(true);
 	client.clearCmd();
 
+}
+
+/* --------------------------------------------------------------------------------- */
+
+/* ERR */
+
+void							Server::error_handler(int ERR_CODE, Client &client)
+{
+	switch (ERR_CODE)
+	{
+		case ERR_NEEDMOREPARAMS:
+			f_ERR_NEEDMOREPARAMS(client);
+			break;
+		default:
+			break;
+	}
+}
+
+void							Server::f_ERR_NEEDMOREPARAMS(Client &client)
+{
+	std::string code = " 461 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + findKey(client.getCmd())
+		+ ": Not Enough Parameters";
+    client.sendToClient(str);
+	quitClientCmd(client);
+}
+
+/* --------------------------------------------------------------------------------- */
+
+
+/* RPL */
+
+
+void							Server::reply_handler(int RPL_CODE, Client &client)
+{
+	(void) RPL_CODE;
+	(void) client;
 }

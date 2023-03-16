@@ -74,3 +74,13 @@ class CloseServerException : public std::exception
 			return (ASCII_PENGUIN);
 		}
 };
+
+class ClientDestroyedException : public std::exception
+{
+	public:
+
+		virtual const char* what(void) const throw()
+		{
+			return ("client is destroyed");
+		}
+};

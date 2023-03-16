@@ -71,42 +71,7 @@ const std::string		Server::prefixServer(void) const
 
 /* --------------------------------------------------------------------------------- */
 
-/* ERR */
 
-void							Server::error_handler(int ERR_CODE, Client &client)
-{
-	switch (ERR_CODE)
-	{
-		case ERR_NEEDMOREPARAMS:
-			f_ERR_NEEDMOREPARAMS(client);
-			break;
-		default:
-			break;
-	}
-}
-
-void							Server::f_ERR_NEEDMOREPARAMS(Client &client)
-{
-	std::string code = " 461 ";
-	std::string	str = prefixServer() + code + client.getNickname() + " " + findKey(client.getCmd())
-		+ ": Not Enough Parameters";
-    client.sendToClient(str);
-	removeClient(client);
-}
-
-/* RPL */
-
-
-void							Server::reply_handler(int RPL_CODE, Client &client)
-{
-	(void) RPL_CODE;
-	(void) client;
-}
-
-
-
-
-/* --------------------------------------------------------------------------------- */
 
 /* GETTER */
 	
@@ -159,6 +124,36 @@ int							Server::readQuery(size_t index, char* buffer)
 	return (ret);
 }
 
+void						Server::processQuery(int index)
+{
+	Client&											client = _clients[index];
+	std::string 									key = findKey(client.getCmd());
+	std::map<std::string, cmdFunction>::iterator	it = _dico.find(key);
+
+	if (!checkCAP(client, key))
+		return ;
+	if (it == _dico.end()) //repondre avec un code erreur??
+	{
+		//appeler ERR_UNKNOWNCOMMAND
+		std::cerr << "Cmd:" << key << " not supported" << std::endl;
+		client.clearCmd();
+	}
+	else
+	{
+		try
+		{
+			callFunCmd(it->second, client);
+			client.findCmdInPackage();
+			if (checkAnswerQuery(index))
+				processQuery(index);
+		}
+		catch(const ClientDestroyedException& e)
+		{
+			std::cerr << e.what() << '\n';
+		}
+	}
+}
+
 
 bool						Server::checkSocket(size_t index, short event)
 {
@@ -186,22 +181,6 @@ void						Server::removeClient(Client &client)
 }
 
 
-void						Server::processQuery(int index)
-{
-	Client&											client = _clients[index];
-	std::string 									key = findKey(client.getCmd());
-	std::map<std::string, cmdFunction>::iterator	it = _dico.find(key);
-
-	if (!checkCAP(client, key))
-		return ;
-	if (it == _dico.end()) //repondre avec un code erreur??
-	{
-		std::cerr << "Cmd:" << key << " not supported" << std::endl;
-		client.clearCmd();
-	}
-	else
-		callFunCmd(it->second, client);
-}
 
 
 

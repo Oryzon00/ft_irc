@@ -47,7 +47,7 @@ Sending Messages
 
 User-Based Queries
 	WHO message
-	WHOIS message ??
+	WHOIS message
 
 Operator Messages
 	KILL message
@@ -93,6 +93,7 @@ class Server
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
+		void							quitClientCmd(Client &client);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);

@@ -1,9 +1,9 @@
 #include "Client.hpp"
 
 Client::Client(int socket)	:
-		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false)	{}
+		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _nickname("*")	{}
 
-Client::Client(void)		:	_socket(0), _isIrssi(false), _passOK(false)	{}
+Client::Client(void)		:	_socket(0), _isIrssi(false), _passOK(false), _nickname("*")	{}
 
 Client::~Client(void)	{ /* close(_socket); */ }
 
