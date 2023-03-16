@@ -84,6 +84,8 @@ class Server
 
 		std::string						findKey(std::string cmd);
 		std::vector<std::string>		findArgsCmd(std::string cmd, std::string key);
+		bool							checkAvailNick(const std::string str);
+		bool							checkValidName(const std::string& str);
 		bool							checkCAP(Client &client, std::string key);
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
@@ -94,17 +96,20 @@ class Server
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
-		void							cmd_PING(std::string& cmd, Client& client); // C'est un pong
+		void							cmd_PING(std::string& cmd, Client& client);
 	//	void							cmd_QUIT(std::string& cmd, Client& client);
+		void							cmd_USER(std::string& cmd, Client& client);
 
-
-	/* ERR */
+		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);
 		void							f_ERR_UNKNOWNCOMMAND(Client &client);
 		void							f_ERR_NEEDMOREPARAMS(Client &client);
 		void							f_ERR_ALREADYREGISTERED(Client &client);
 		void							f_ERR_PASSWDMISMATCH(Client &client);
-		/* RPL */
+		void							f_ERR_NICKNAMEINUSE(Client &client);
+		void							f_ERR_ERRONEUSNICKNAME(Client &client);
+		void							f_ERR_NONICKNAMEGIVEN(Client &client);
+/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);
 
 
