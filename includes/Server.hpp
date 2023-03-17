@@ -62,6 +62,7 @@ Server Queries and Commands
 # define BUFFER_LEN			4096
 # define SUCCESS			0
 # define DISCONNECT			0
+# define OPER_PASSWD		"operPassword"
 
 int	initServerSocket(unsigned short port);
 
@@ -90,6 +91,7 @@ class Server
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);
+		Client*							find_client_by_nick(std::string nick);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
@@ -104,7 +106,7 @@ class Server
 		void							error_handler(int ERR_CODE, Client &client);
 
 		void							f_ERR_UNKNOWNCOMMAND(Client &client);
-		void							f_ERR_NEEDMOREPARAMS(Client &client);
+		void							f_ERR_WRONGNBPARAMS(Client &client);
 		void							f_ERR_ALREADYREGISTERED(Client &client);
 		void							f_ERR_PASSWDMISMATCH(Client &client);
 		void							f_ERR_NICKNAMEINUSE(Client &client);

@@ -14,6 +14,17 @@ Server::Server(int port, std::string password)
 
 /* ----- PRIVATE FUNCTION ----- */
 
+
+Client*							Server::find_client_by_nick(std::string nick)
+{
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->getNickname() == nick)
+			return (&(*it));
+	}
+	return (NULL);
+}
+
 std::string						Server::findKey(std::string cmd)
 {
 	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");
@@ -145,10 +156,7 @@ int							Server::readQuery(size_t index, char* buffer)
 
 	client.readBuffer(buffer);
 	client.findCmdInPackage();
-	
-	client.printCmd();
-	client.printPackage();
-
+	client.printCmd(); // a enlever
 	return (ret);
 }
 
