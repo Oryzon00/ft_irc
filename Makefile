@@ -7,6 +7,7 @@ SRCS		=	srcs/main.cpp				\
 				srcs/class/Server.cpp		\
 				srcs/class/Servercmd.cpp	\
 				srcs/class/Network.cpp		\
+				srcs/class/Channel.cpp		\
 				srcs/execLoop.cpp			\
 				srcs/signal.cpp				\
 

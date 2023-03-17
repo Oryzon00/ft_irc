@@ -12,6 +12,7 @@
 # include "Client.hpp"
 # include "Network.hpp"
 # include "CustomException.hpp"
+# include "Channel.hpp"
 
 
 /* authenticate, set a nickname, a username, join a channel,
@@ -79,6 +80,7 @@ class Server
 		std::map<std::string, cmdFunction>	_dico;
 		Network								_network;
 		std::vector<Client>					_clients;
+		std::vector<Channel>				_chans;
 
 	/* ------------------------------------------------------------------ */
 
