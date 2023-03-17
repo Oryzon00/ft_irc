@@ -20,6 +20,7 @@ class Client
 		bool						_isIrssi;
 		bool						_passOK;
 		bool						_registered;
+		bool						_oper;
 		std::string					_nickname;
 		std::string					_username;
 		std::string					_realname;
@@ -38,6 +39,7 @@ class Client
 		const bool&						getIsIrssi(void) const;
 		const bool&						getPassOk(void) const;
 		const bool&						getRegistered(void) const;
+		const bool&						getOper(void) const;
 		const std::string&				getNickname(void) const;
 		const std::string&				getUsername(void) const;
 		const std::string&				getRealname(void) const;
@@ -49,8 +51,9 @@ class Client
 
 		void							setIsIrssi(const bool& boolean);
 		void							setPassOk(const bool& boolean);
-		void							setNickname(const std::string& nick);
 		void							setRegistered(const bool& boolean);
+		void							setOper(const bool& boolean);
+		void							setNickname(const std::string& nick);
 		void							setUsername(const std::string& str);
 		void							setRealname(const std::string& str);
 		

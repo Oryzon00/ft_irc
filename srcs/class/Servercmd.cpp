@@ -1,7 +1,5 @@
 #include "Server.hpp"
 
-/* CMD */
-
 void	Server::quitClientCmd(Client &client)
 {
 	removeClient(client);
@@ -20,6 +18,7 @@ void	Server::initDico(void)
 
 /* --------------------------------------------------------------------------------- */
 
+/* CMD */
 
 void	Server::cmd_CAP(std::string& cmd, Client& client)
 {
@@ -65,7 +64,7 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 	client.clearCmd();
 }
 
-void							Server::cmd_PING(std::string& cmd, Client& client)
+void	Server::cmd_PING(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "PING");
 
@@ -100,8 +99,18 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	//client.check registration
 }
 
+/*
+=============== read 22 bytes from CLIENT (4) ==================
+OPER adrian password
 
-
+=============== read 54 bytes from SERVER (5) ===================
+:my.server.name 491 adrian :No O-lines for your host
+ */
+void	Server::cmd_OPER(std::string& cmd, Client& client)
+{
+	(void) cmd;
+	(void) client;
+}
 
 
 /* --------------------------------------------------------------------------------- */
@@ -130,6 +139,11 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 		default:
 			break;
 	}
+}
+
+void	Server::f_ERR_NOOPERHOST(Client &client) //a gerer?
+{
+	(void) client;
 }
 
 void	Server::f_ERR_NEEDMOREPARAMS(Client &client)
@@ -194,6 +208,30 @@ void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 
 void	Server::reply_handler(int RPL_CODE, Client &client)
 {
-	(void) RPL_CODE;
-	(void) client;
+	switch (RPL_CODE)
+	{
+		case RPL_YOUREOPER:
+			f_RPL_YOUREOPER(client);
+			break;
+		default:
+			break;
+	}
+}
+
+/*
+=============== read 22 bytes from CLIENT (4) ==================
+OPER adrian password
+
+=============== read 54 bytes from SERVER (5) ===================
+:my.server.name 491 adrian :No O-lines for your host
+ */
+
+void	Server::f_RPL_YOUREOPER(Client &client)
+{
+	std::string					code = " 381 ";
+	std::vector<std::string>	args = findArgsCmd(client.getCmd(), "OPER");
+
+	std::string	str = prefixServer() + code + client.getNickname() + " "
+		+ ":You are now an IRC operator";
+	client.sendToClient(str);
 }
