@@ -3,6 +3,7 @@
 # include <string>
 # include <vector>
 # include <map>
+# include <list>
 # include <iostream>
 # include <algorithm>
 # include <utility>
@@ -63,6 +64,7 @@ Server Queries and Commands
 # define BUFFER_LEN			4096
 # define SUCCESS			0
 # define DISCONNECT			0
+# define OPER_PASSWD		"operPassword"
 
 int	initServerSocket(unsigned short port);
 
@@ -92,6 +94,7 @@ class Server
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);
+		Client*							find_client_by_nick(std::string nick);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
@@ -101,18 +104,24 @@ class Server
 	//	void							cmd_QUIT(std::string& cmd, Client& client);
 		void							cmd_USER(std::string& cmd, Client& client);
 		void							cmd_JOIN(std::string& cmd, Client& client);
+		void							cmd_OPER(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);
+
 		void							f_ERR_UNKNOWNCOMMAND(Client &client);
-		void							f_ERR_NEEDMOREPARAMS(Client &client);
+		void							f_ERR_WRONGNBPARAMS(Client &client);
 		void							f_ERR_ALREADYREGISTERED(Client &client);
 		void							f_ERR_PASSWDMISMATCH(Client &client);
 		void							f_ERR_NICKNAMEINUSE(Client &client);
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
-/* RPL */
+		void							f_ERR_NOOPERHOST(Client &client); //a gerer??
+
+		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);
+
+		void							f_RPL_YOUREOPER(Client &client);
 
 
 	public:

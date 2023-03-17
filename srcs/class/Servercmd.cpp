@@ -1,7 +1,5 @@
 #include "Server.hpp"
 
-/* CMD */
-
 void	Server::quitClientCmd(Client &client)
 {
 	removeClient(client);
@@ -15,11 +13,13 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NICK"), &Server::cmd_NICK));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
 
 }
 
 /* --------------------------------------------------------------------------------- */
 
+/* CMD */
 
 void	Server::cmd_CAP(std::string& cmd, Client& client)
 {
@@ -37,11 +37,14 @@ void	Server::cmd_PASS(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "PASS");
 	if (args.empty())
-		error_handler(ERR_NEEDMOREPARAMS, client);
+		error_handler(ERR_WRONGNBPARAMS, client);
 	else if (client.getPassOk())
 		error_handler(ERR_ALREADYREGISTERED, client);
 	else if (args[0] != _password)
+	{
 		error_handler(ERR_PASSWDMISMATCH, client);
+		quitClientCmd(client);
+	}
 	else
 		client.setPassOk(true);
 	client.clearCmd();
@@ -54,7 +57,7 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 	if (!client.getPassOk())
 		error_handler(ERR_PASSWDMISMATCH, client);
 	else if (args.size() != 1)
-		error_handler(ERR_NEEDMOREPARAMS, client);
+		error_handler(ERR_WRONGNBPARAMS, client);
 	else if (checkAvailNick(args[0]) == false)
 		error_handler(ERR_NICKNAMEINUSE, client);
 	else if (checkValidName(args[0]) == false)
@@ -65,12 +68,12 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 	client.clearCmd();
 }
 
-void							Server::cmd_PING(std::string& cmd, Client& client)
+void	Server::cmd_PING(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "PING");
 
 	if (args.size() != 1)
-		error_handler(ERR_NEEDMOREPARAMS, client);
+		error_handler(ERR_WRONGNBPARAMS, client);
 	else
 		client.sendToClient(prefixServer() + " PONG " + _name + " :" + args[0] + "\n");
 	client.clearCmd();
@@ -89,7 +92,7 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	else if (client.getRegistered())
 		error_handler(ERR_ALREADYREGISTERED, client);
 	else if (args.size() != 4)
-		error_handler(ERR_NEEDMOREPARAMS, client);
+		error_handler(ERR_WRONGNBPARAMS, client);
 	else
 	{
 		client.setUsername(args[0]);
@@ -103,12 +106,35 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 void	Server::cmd_JOIN(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "JOIN");
-	if (args.empty() || args.size > 2)
-		error_handler(ERR_NEEDMOREPARAMS, client);
-	client.setIsIrssi(true);
+	if (!client.getPassOk())
+		error_handler(ERR_PASSWDMISMATCH, client);
+	if (args.size() == 1)
+	{
+		std::list<std::string>
+	}
 	client.clearCmd();
 }
 
+void	Server::cmd_OPER(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "OPER");
+	Client*	client_oper = NULL;
+
+	if (args.size() == 2)
+		client_oper = find_client_by_nick(args[0]);
+	if (args.size() != 2)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else if (args[1] != OPER_PASSWD)
+		error_handler(ERR_PASSWDMISMATCH, client);
+	else if (client_oper == NULL)
+		error_handler(ERR_NOOPERHOST, client);
+	else
+	{
+		reply_handler(RPL_YOUREOPER, *client_oper);
+		client.setOper(true);
+	}
+	client.clearCmd();
+}
 
 
 /* --------------------------------------------------------------------------------- */
@@ -119,8 +145,8 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 {
 	switch (ERR_CODE)
 	{
-		case ERR_NEEDMOREPARAMS:
-			f_ERR_NEEDMOREPARAMS(client);
+		case ERR_WRONGNBPARAMS:
+			f_ERR_WRONGNBPARAMS(client);
 			break;
 		case ERR_ALREADYREGISTERED:
 			f_ERR_ALREADYREGISTERED(client);
@@ -134,16 +160,26 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 		case ERR_ERRONEUSNICKNAME:
 			f_ERR_ERRONEUSNICKNAME(client);
 			break;
+		case ERR_NOOPERHOST:
+			f_ERR_NOOPERHOST(client);
 		default:
 			break;
 	}
 }
 
-void	Server::f_ERR_NEEDMOREPARAMS(Client &client)
+void	Server::f_ERR_NOOPERHOST(Client &client) //a gerer?
+{
+	std::string code = " 491 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " "
+		+ " :No O-lines for your host\n";
+    client.sendToClient(str);
+}
+
+void	Server::f_ERR_WRONGNBPARAMS(Client &client)
 {
 	std::string code = " 461 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + findKey(client.getCmd())
-		+ " :Not Enough Parameters\n";
+		+ " :Wrong number of parameters\n";
     client.sendToClient(str);
 }
 
@@ -201,6 +237,21 @@ void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 
 void	Server::reply_handler(int RPL_CODE, Client &client)
 {
-	(void) RPL_CODE;
-	(void) client;
+	switch (RPL_CODE)
+	{
+		case RPL_YOUREOPER:
+			f_RPL_YOUREOPER(client);
+			break;
+		default:
+			break;
+	}
+}
+
+void	Server::f_RPL_YOUREOPER(Client &client)
+{
+	std::string					code = " 381 ";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " "
+		+ ":You are now an IRC operator\n";
+	client.sendToClient(str);
 }

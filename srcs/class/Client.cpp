@@ -2,11 +2,11 @@
 
 Client::Client(int socket)	:
 		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _registered(false),
-		_nickname("*")	{}
+		_oper(false), _nickname("*")	{}
 
 Client::Client(void)		:
 		_socket(0), _isIrssi(false), _passOK(false), _registered(false),
-		_nickname("*")	{}
+		_oper(false), _nickname("*")	{}
 
 Client::~Client(void)	{ /* close(_socket); */ }
 
@@ -53,6 +53,11 @@ const bool&						Client::getRegistered(void) const
 {
 
 	return _registered;
+}
+
+const bool&						Client::getOper(void) const
+{
+	return _oper;
 }
 
 const std::string&				Client::getNickname(void) const
@@ -115,6 +120,11 @@ void							Client::setRegistered(const bool& boolean)
 void							Client::setPassOk(const bool& boolean)
 {
 	_passOK = boolean;
+}
+
+void							Client::setOper(const bool& boolean)
+{
+	_oper = boolean;
 }
 
 void							Client::setNickname(const std::string& nick)
