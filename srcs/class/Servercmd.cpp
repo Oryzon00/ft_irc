@@ -14,6 +14,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("KILL"), &Server::cmd_KILL));
 
 }
 
@@ -103,15 +104,6 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	//client.check registration
 }
 
-/*
-=============== read 22 bytes from CLIENT (4) ==================
-OPER adrian password
-
-=============== read 54 bytes from SERVER (5) ===================
-:my.server.name 491 adrian :No O-lines for your host
- */
-
-
 void	Server::cmd_OPER(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "OPER");
@@ -131,6 +123,42 @@ void	Server::cmd_OPER(std::string& cmd, Client& client)
 		client.setOper(true);
 	}
 	client.clearCmd();
+}
+
+void	Server::cmd_KILL(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "KILL");
+	Client*						client_cible = NULL;
+	std::string					cible_nick;
+	std::string					comment;
+	std::string					client_nick;
+
+	if (args.size() == 2)
+	{
+		cible_nick = args[0];
+		comment = args[1]; //j'espere que comment est apres un :
+		client_cible = find_client_by_nick(cible_nick);
+	}
+
+	if (args.size() != 2)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else if (!client.getOper())
+		error_handler(ERR_NOPRIVILEGES, client);
+	else if (!client_cible)
+		error_handler(ERR_NOSUCHNICK, client);
+	else
+	{
+		for (std::vector<Client>::iterator it = _clients.begin() + 1; it != _clients.end(); it++)
+			f_RPL_KILLREPLY(*it, cible_nick, client, comment);
+		if (client_cible)
+		{
+			client_nick = client.getNickname();
+			removeClient(*client_cible);
+			// client = *(find_client_by_nick(client_nick)); 	//recuperer bonne ref de client
+		}	
+	}
+
+	find_client_by_nick(client_nick)->clearCmd();
 }
 
 
@@ -159,6 +187,13 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 			break;
 		case ERR_NOOPERHOST:
 			f_ERR_NOOPERHOST(client);
+			break;
+		case ERR_NOPRIVILEGES:
+			f_ERR_NOPRIVILEGES(client);
+			break;
+		case ERR_NOSUCHNICK:
+			f_ERR_NOSUCHNICK(client);
+			break;
 		default:
 			break;
 	}
@@ -203,7 +238,7 @@ void	Server::f_ERR_UNKNOWNCOMMAND(Client &client)
 	client.clearCmd();
 }
 
-void							Server::f_ERR_NICKNAMEINUSE(Client &client)
+void	Server::f_ERR_NICKNAMEINUSE(Client &client)
 {
 	std::string code = " 433 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + findArgsCmd(client.getCmd(), "NICK")[0] 
@@ -211,7 +246,7 @@ void							Server::f_ERR_NICKNAMEINUSE(Client &client)
     client.sendToClient(str);
 }
 
-void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
+void	Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 {
 	std::string code = " 432 ";
 	std::vector<std::string> args = findArgsCmd(client.getCmd(), "NICK");
@@ -224,6 +259,24 @@ void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 			+ " :Erroneus nickname\n";
 	client.sendToClient(str);
 }
+
+void	Server::f_ERR_NOPRIVILEGES(Client &client)
+{
+	std::string code = " 481 ";
+	std::string str = prefixServer() + code + client.getNickname() + " " 
+		+ ":Permission Denied - You're not an IRC operator\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOSUCHNICK(Client & client)
+{
+	std::string code = " 401 ";
+	std::vector<std::string> args = findArgsCmd(client.getCmd(), "KILL");
+	std::string str = prefixServer() + code + client.getNickname() + " " + args[0] + " "
+		+ ":No such nick\n";
+	client.sendToClient(str);
+}
+
 
 
 /* --------------------------------------------------------------------------------- */
@@ -246,9 +299,17 @@ void	Server::reply_handler(int RPL_CODE, Client &client)
 
 void	Server::f_RPL_YOUREOPER(Client &client)
 {
-	std::string					code = " 381 ";
+	std::string	code = " 381 ";
 
 	std::string	str = prefixServer() + code + client.getNickname() + " "
 		+ ":You are now an IRC operator\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_KILLREPLY(Client &client, std::string cible_nick, Client& killer, std::string &comment)
+{
+	std::string code = " 1001 ";
+	std::string	str = prefixServer() + code + cible_nick + " was KILLED  by "
+		+ killer.getNickname() + " :" + comment + "\n";
 	client.sendToClient(str);
 }

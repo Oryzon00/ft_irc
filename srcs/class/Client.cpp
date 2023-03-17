@@ -15,7 +15,13 @@ Client&				Client::operator=(const Client& rhs)
 	if (this != &rhs)
 	{
 		_socket = rhs._socket;
+		_isIrssi = rhs._isIrssi;
+		_passOK = rhs._passOK;
+		_registered = rhs._registered;
+		_oper = rhs._oper;
 		_nickname = rhs._nickname;
+		_username = rhs._username;
+		_realname = rhs._realname;
 		_package = rhs._package;
 		_cmd = rhs._cmd;
 	}
@@ -148,6 +154,7 @@ void							Client::setRealname(const std::string& str)
 
 void				Client::clearCmd(void)
 {
+	std::cout << "clearCmd client nick: " << _nickname << std::endl;
 	_cmd.clear();
 }
 

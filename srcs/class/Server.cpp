@@ -100,6 +100,7 @@ bool						Server::checkCAP(Client &client, std::string key)
 void							Server::callFunCmd(cmdFunction f, Client & client)
 {
 	(this->*(f))(client.getCmd(), client);
+	// client.clearCmd(); --> a mettre ici, et a enlever dans les appels de function
 }
 
 
@@ -166,8 +167,8 @@ void						Server::processQuery(int index)
 	std::string 									key = findKey(client.getCmd());
 	std::map<std::string, cmdFunction>::iterator	it = _dico.find(key);
 
-	if (!checkCAP(client, key))
-		return ;
+	// if (!checkCAP(client, key)) // aremetre
+	// 	return ;
 	try
 	{
 		if (it == _dico.end())
