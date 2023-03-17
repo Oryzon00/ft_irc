@@ -5,6 +5,7 @@
 # include "Server.hpp"
 # include "parsing.hpp"
 # include "signal.hpp"
+# include "tools.hpp"
 
 
 void	execLoop(Server &server);

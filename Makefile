@@ -10,6 +10,7 @@ SRCS		=	srcs/main.cpp				\
 				srcs/class/Channel.cpp		\
 				srcs/execLoop.cpp			\
 				srcs/signal.cpp				\
+				srcs/tools.cpp				\
 
 
 INC_DIR		=	includes

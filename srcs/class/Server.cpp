@@ -25,6 +25,16 @@ Client*							Server::find_client_by_nick(std::string nick)
 	return (NULL);
 }
 
+Channel*						Server::findChannel(std::string name)
+{
+	for (std::vector<Channel>::iterator it = _chans.begin(); it != _chans.end(); it++)
+	{
+		if (it->getName() == name)
+			return (&(*it));
+	}
+	return (NULL);
+}
+
 std::string						Server::findKey(std::string cmd)
 {
 	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");

@@ -14,6 +14,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("JOIN"), &Server::cmd_JOIN));
 
 }
 
@@ -103,15 +104,35 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	//client.check registration
 }
 
+void	Server::join_channel(Client& client, std::string name, std::string key)
+{
+	Channel* channel = findChannel(name);
+	if (!channel)
+		_chans.push_back(Channel(client, name, key));
+	else if (key != channel->getKey())
+		f_ERR_BADCHANNELKEY(client, *channel);
+	else 
+		channel->addMember(client);
+
+	//bans in channels?
+}
+
 void	Server::cmd_JOIN(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "JOIN");
 	if (!client.getPassOk())
 		error_handler(ERR_PASSWDMISMATCH, client);
-	if (args.size() == 1)
+	else if (args.size() <= 2 && !args.empty())
 	{
-		std::list<std::string>
+		std::vector<std::string>		chans = strToVec(args[0], ",");
+		std::vector<std::string>		keys;
+		if (args.begin() + 1 != args.end())
+			keys = strToVec(args[1], ",");
+		for(size_t i = 0; i < chans.size(); i++)
+			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "");
 	}
+	else
+		error_handler(ERR_WRONGNBPARAMS, client);
 	client.clearCmd();
 }
 
@@ -162,6 +183,7 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 			break;
 		case ERR_NOOPERHOST:
 			f_ERR_NOOPERHOST(client);
+			break;
 		default:
 			break;
 	}
@@ -227,6 +249,14 @@ void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 			+ " :Erroneus nickname\n";
 	client.sendToClient(str);
 }
+
+void							Server::f_ERR_BADCHANNELKEY(Client &client, Channel& channel)
+{
+	std::string code = " 475 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel.getName() + " :Cannot join channel (Wrong Key)\n";
+    client.sendToClient(str);
+}
+
 
 
 /* --------------------------------------------------------------------------------- */

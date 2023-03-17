@@ -13,13 +13,14 @@ class Channel
 
 	public:
 		Channel();
-		Channel(const std::string& name);
+		Channel(Client& client, const std::string& name, const std::string& key);
 		~Channel(void);
 
 		Client&			operator[](size_t index);
 
 		const std::string&		getName() const;
 		const std::string&		getTopic() const;
+		const std::string&		getKey() const;
 
 		void			addMember(Client& client);
 		void			SendToAll(Client& client);

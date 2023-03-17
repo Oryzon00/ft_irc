@@ -14,6 +14,7 @@
 # include "Network.hpp"
 # include "CustomException.hpp"
 # include "Channel.hpp"
+# include "tools.hpp"
 
 
 /* authenticate, set a nickname, a username, join a channel,
@@ -95,6 +96,8 @@ class Server
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);
 		Client*							find_client_by_nick(std::string nick);
+		Channel*						findChannel(std::string name);
+		void							join_channel(Client& client, std::string name, std::string key);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
@@ -117,6 +120,8 @@ class Server
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
 		void							f_ERR_NOOPERHOST(Client &client); //a gerer??
+		void							f_ERR_BADCHANNELKEY(Client &client, Channel& channel);
+
 
 		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);

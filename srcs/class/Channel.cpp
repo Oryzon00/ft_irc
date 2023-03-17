@@ -1,6 +1,9 @@
 #include "Channel.hpp"
 
-Channel::Channel(const std::string& name): _name(name) 			{}
+Channel::Channel(Client& client, const std::string& name, const std::string& key): _name(name), _key(key)
+{
+	_members.push_back(client);
+}
 
 Channel::Channel() 												{}
 
@@ -19,6 +22,11 @@ const std::string&			Channel::getName() const
 const std::string&			Channel::getTopic() const
 {
 	return (_topic);
+}
+
+const std::string&			Channel::getKey() const
+{
+	return (_key);
 }
 
 void						Channel::addMember(Client& client)
