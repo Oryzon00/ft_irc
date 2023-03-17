@@ -90,8 +90,10 @@ class Server
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);
+		void							welcomeClient (Client &client);
 
-		/* CMD */
+
+	/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
@@ -108,11 +110,19 @@ class Server
 		void							f_ERR_NICKNAMEINUSE(Client &client);
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
-/* RPL */
+		void							f_ERR_NOMOTD(Client &client);
+
+		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);
+		void							f_RPL_WELCOME(Client &client);
+		void							f_RPL_YOURHOST(Client &client);
+		void							f_RPL_CREATED(Client &client);
+		void							f_RPL_MYINFO(Client &client);
+		void							f_RPL_ISUPPORT(Client &client);
 
 
-	public:
+
+public:
 
 		Server(int port, std::string password);
 		

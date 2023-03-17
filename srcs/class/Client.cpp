@@ -51,7 +51,6 @@ const bool&						Client::getPassOk(void) const
 
 const bool&						Client::getRegistered(void) const
 {
-
 	return _registered;
 }
 
