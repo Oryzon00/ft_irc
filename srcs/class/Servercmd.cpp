@@ -100,7 +100,14 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	//client.check registration
 }
 
-
+void	Server::cmd_JOIN(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "JOIN");
+	if (args.empty() || args.size > 2)
+		error_handler(ERR_NEEDMOREPARAMS, client);
+	client.setIsIrssi(true);
+	client.clearCmd();
+}
 
 
 

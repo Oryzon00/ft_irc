@@ -39,10 +39,10 @@ check registration --> LOUIS
 Channel Operation
 	JOIN message
 	PART message
-	TOPIC message
+	TOPIC message			Chan Oper Only if trying to change the topic
 	NAMES message
-	INVITE message
-	KICK message
+	INVITE message			Chan Oper Only
+	KICK message			Chan Oper Only
 
 Sending Messages
 	PRIVMSG message
@@ -52,7 +52,7 @@ Operator Messages
 	RESTART message	--> Adrian
 
 Server Queries and Commands
-	MODE
+	MODE		Chan Oper Only if trying to change Chan Modes
 	MOTD
 
 
@@ -100,6 +100,7 @@ class Server
 		void							cmd_PING(std::string& cmd, Client& client);
 	//	void							cmd_QUIT(std::string& cmd, Client& client);
 		void							cmd_USER(std::string& cmd, Client& client);
+		void							cmd_JOIN(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);
