@@ -12,6 +12,7 @@
 # include "Client.hpp"
 # include "Network.hpp"
 # include "CustomException.hpp"
+# include "Channel.hpp"
 
 
 /* authenticate, set a nickname, a username, join a channel,
@@ -28,10 +29,10 @@ CONNECTION
 	NICK	DONE
 	USER	DONE
 	PING	DONE
-	OPER	--> Adrian (mettre bool dans client)
-	QUIT	
+	OPER	DONE
+	QUIT	--> LOUIS
 
-class CHANNELL --> QUENTIN
+class CHANNELL --> QUENTIN DONE
 check registration --> LOUIS
 001 - 005 + 251 + 255 + 452 --> LOUIS
 
@@ -52,16 +53,14 @@ Operator Messages
 
 Server Queries and Commands
 	MODE
-	MOTD
-
-
-
+	MOTD                                                                                                                                                                                                                         
 */
 
 
 # define BUFFER_LEN			4096
 # define SUCCESS			0
 # define DISCONNECT			0
+# define OPER_PASSWD		"operpass"
 
 int	initServerSocket(unsigned short port);
 
@@ -78,6 +77,7 @@ class Server
 		std::map<std::string, cmdFunction>	_dico;
 		Network								_network;
 		std::vector<Client>					_clients;
+		std::vector<Channel>				_chans;
 
 	/* ------------------------------------------------------------------ */
 
@@ -91,6 +91,7 @@ class Server
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);
 		void							welcomeClient (Client &client);
+		Client*							find_client_by_nick(std::string nick);
 
 
 	/* CMD */
@@ -100,17 +101,24 @@ class Server
 		void							cmd_PING(std::string& cmd, Client& client);
 		void							cmd_QUIT(std::string& cmd, Client& client);
 		void							cmd_USER(std::string& cmd, Client& client);
+		void							cmd_OPER(std::string& cmd, Client& client);
+		void							cmd_KILL(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);
+
 		void							f_ERR_UNKNOWNCOMMAND(Client &client);
-		void							f_ERR_NEEDMOREPARAMS(Client &client);
+		void							f_ERR_WRONGNBPARAMS(Client &client);
 		void							f_ERR_ALREADYREGISTERED(Client &client);
 		void							f_ERR_PASSWDMISMATCH(Client &client);
 		void							f_ERR_NICKNAMEINUSE(Client &client);
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
 		void							f_ERR_NOMOTD(Client &client);
+		void							f_ERR_NOOPERHOST(Client &client);
+		void							f_ERR_NOPRIVILEGES(Client &client);
+		void							f_ERR_NOSUCHNICK(Client & client);
+		
 
 		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);
@@ -119,10 +127,10 @@ class Server
 		void							f_RPL_CREATED(Client &client);
 		void							f_RPL_MYINFO(Client &client);
 		void							f_RPL_ISUPPORT(Client &client);
-
-
-
-public:
+		void							f_RPL_YOUREOPER(Client &client);
+		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
+											Client &killer, std::string &comment);
+	public:
 
 		Server(int port, std::string password);
 		
