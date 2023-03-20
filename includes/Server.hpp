@@ -30,11 +30,11 @@ CONNECTION
 	USER	DONE
 	PING	DONE
 	OPER	DONE
-	QUIT	--> LOUIS
+	QUIT	DONE
 
 class CHANNELL --> QUENTIN DONE
 check registration --> LOUIS
-001 - 005 + 251 + 255 + 452 --> LOUIS
+001 - 005 + 251 + 255 + 452 --> DONE
 
 Channel Operation
 	JOIN message
@@ -48,7 +48,7 @@ Sending Messages
 	PRIVMSG message
 
 Operator Messages
-	KILL message	--> Adrian
+	KILL message	--> DONE
 	RESTART message	--> Adrian
 
 Server Queries and Commands

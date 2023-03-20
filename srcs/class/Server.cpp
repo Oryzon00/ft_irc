@@ -147,8 +147,8 @@ int							Server::readQuery(size_t index, char* buffer)
 
 	bzero(buffer, BUFFER_LEN);
 	int ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
-	if (errno != SUCCESS && errno != EAGAIN)
-		throw SocketException("recv()");
+	// if (errno != SUCCESS && errno != EAGAIN) //enlever sujet???
+	// 	throw SocketException("recv()");
 	if (ret == DISCONNECT)
 		return (DISCONNECT);
 
