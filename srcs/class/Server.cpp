@@ -1,6 +1,5 @@
 # include "Server.hpp"
 
-
 Server::Server(int port, std::string password)
 	: _name("13-20h.IRC"), _socket(initServerSocket(port)), _password(password)
 {
@@ -87,7 +86,7 @@ bool						Server::checkCAP(Client &client, std::string key)
 	if (client.getIsIrssi() == false && key != "CAP")
 	{
 		removeClient(client);
-		std::cerr << "!! -- First CMD is not CAP -- !!" << std::endl;
+		std::cout << "!! -- First CMD is not CAP -- !!" << std::endl;
 		return (false);
 	}
 	return (true);

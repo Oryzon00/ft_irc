@@ -90,14 +90,16 @@ class Server
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);
+		void							welcomeClient (Client &client);
 		Client*							find_client_by_nick(std::string nick);
 
-		/* CMD */
+
+	/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
 		void							cmd_PING(std::string& cmd, Client& client);
-	//	void							cmd_QUIT(std::string& cmd, Client& client);
+		void							cmd_QUIT(std::string& cmd, Client& client);
 		void							cmd_USER(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
 		void							cmd_KILL(std::string& cmd, Client& client);
@@ -112,6 +114,7 @@ class Server
 		void							f_ERR_NICKNAMEINUSE(Client &client);
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
+		void							f_ERR_NOMOTD(Client &client);
 		void							f_ERR_NOOPERHOST(Client &client);
 		void							f_ERR_NOPRIVILEGES(Client &client);
 		void							f_ERR_NOSUCHNICK(Client & client);
@@ -119,7 +122,11 @@ class Server
 
 		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client);
-
+		void							f_RPL_WELCOME(Client &client);
+		void							f_RPL_YOURHOST(Client &client);
+		void							f_RPL_CREATED(Client &client);
+		void							f_RPL_MYINFO(Client &client);
+		void							f_RPL_ISUPPORT(Client &client);
 		void							f_RPL_YOUREOPER(Client &client);
 		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
 											Client &killer, std::string &comment);
