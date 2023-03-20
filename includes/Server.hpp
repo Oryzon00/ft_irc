@@ -31,12 +31,12 @@ CONNECTION
 	NICK	DONE
 	USER	DONE
 	PING	DONE
-	OPER	--> Adrian (mettre bool dans client)
-	QUIT	
+	OPER	DONE
+	QUIT	DONE
 
 class CHANNEL --> QUENTIN
 check registration --> LOUIS
-001 - 005 + 251 + 255 + 452 --> LOUIS
+001 - 005 + 251 + 255 + 452 --> DONE
 
 Channel Operation
 	JOIN message
@@ -50,7 +50,7 @@ Sending Messages
 	PRIVMSG message
 
 Operator Messages
-	KILL message	--> Adrian
+	KILL message	--> DONE
 	RESTART message	--> Adrian
 
 Server Queries and Commands
@@ -65,7 +65,7 @@ Server Queries and Commands
 # define BUFFER_LEN			4096
 # define SUCCESS			0
 # define DISCONNECT			0
-# define OPER_PASSWD		"operPassword"
+# define OPER_PASSWD		"operpass"
 
 int	initServerSocket(unsigned short port);
 
@@ -96,19 +96,22 @@ class Server
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);
+		void							welcomeClient (Client &client);
 		Client*							find_client_by_nick(std::string nick);
 		Channel*						findChannel(std::string name);
 		void							join_channel(Client& client, std::string name, std::string key);
 
-		/* CMD */
+
+	/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
 		void							cmd_PING(std::string& cmd, Client& client);
-	//	void							cmd_QUIT(std::string& cmd, Client& client);
+		void							cmd_QUIT(std::string& cmd, Client& client);
 		void							cmd_USER(std::string& cmd, Client& client);
 		void							cmd_JOIN(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
+		void							cmd_KILL(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");
@@ -120,20 +123,27 @@ class Server
 		void							f_ERR_NICKNAMEINUSE(Client &client);
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
-		void							f_ERR_NOOPERHOST(Client &client); //a gerer??
 		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name);
-
+		void							f_ERR_NOMOTD(Client &client);
+		void							f_ERR_NOOPERHOST(Client &client);
+		void							f_ERR_NOPRIVILEGES(Client &client);
+		void							f_ERR_NOSUCHNICK(Client & client);
 
 		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client, const std::string& str = "");
 
-		void							f_RPL_YOUREOPER(Client &client);
 		void							f_RPL_TOPIC(Client &client, const std::string& channel_name);
 		void							f_RPL_NAMREPLY(Client &client, const std::string& channel_name);
 		void							f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name);
-
-
+		void							f_RPL_WELCOME(Client &client);
+		void							f_RPL_YOURHOST(Client &client);
+		void							f_RPL_CREATED(Client &client);
+		void							f_RPL_MYINFO(Client &client);
+		void							f_RPL_ISUPPORT(Client &client);
+		void							f_RPL_YOUREOPER(Client &client);
+		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
+											Client &killer, std::string &comment);
 	public:
 
 		Server(int port, std::string password);

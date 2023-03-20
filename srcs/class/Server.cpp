@@ -1,8 +1,7 @@
 # include "Server.hpp"
 
-
 Server::Server(int port, std::string password)
-	: _name("13-20h_IRC"), _socket(initServerSocket(port)), _password(password)
+	: _name("13-20h.IRC"), _socket(initServerSocket(port)), _password(password)
 {
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
@@ -44,9 +43,6 @@ std::string						Server::findKey(std::string cmd)
 		return (std::string());
 	return (key);
 }
-
-//ne pas split apres le trailing
-/* USER ajung ajung localhost :Adrian JUNG */
 
 std::vector<std::string>		Server::findArgsCmd(std::string cmd, std::string key)
 {
@@ -107,7 +103,7 @@ bool						Server::checkCAP(Client &client, std::string key)
 	if (client.getIsIrssi() == false && key != "CAP")
 	{
 		removeClient(client);
-		std::cerr << "!! -- First CMD is not CAP -- !!" << std::endl;
+		std::cout << "!! -- First CMD is not CAP -- !!" << std::endl;
 		return (false);
 	}
 	return (true);
@@ -117,6 +113,7 @@ bool						Server::checkCAP(Client &client, std::string key)
 void							Server::callFunCmd(cmdFunction f, Client & client)
 {
 	(this->*(f))(client.getCmd(), client);
+	client.clearCmd();
 }
 
 
@@ -166,8 +163,8 @@ int							Server::readQuery(size_t index, char* buffer)
 
 	bzero(buffer, BUFFER_LEN);
 	int ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
-	if (errno != SUCCESS && errno != EAGAIN)
-		throw SocketException("recv()");
+	// if (errno != SUCCESS && errno != EAGAIN) //enlever sujet???
+	// 	throw SocketException("recv()");
 	if (ret == DISCONNECT)
 		return (DISCONNECT);
 
@@ -183,8 +180,8 @@ void						Server::processQuery(int index)
 	std::string 									key = findKey(client.getCmd());
 	std::map<std::string, cmdFunction>::iterator	it = _dico.find(key);
 
-	if (!checkCAP(client, key))
-		return ;
+	// if (!checkCAP(client, key)) // aremetre
+	// 	return ;
 	try
 	{
 		if (it == _dico.end())

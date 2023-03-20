@@ -15,7 +15,13 @@ Client&				Client::operator=(const Client& rhs)
 	if (this != &rhs)
 	{
 		_socket = rhs._socket;
+		_isIrssi = rhs._isIrssi;
+		_passOK = rhs._passOK;
+		_registered = rhs._registered;
+		_oper = rhs._oper;
 		_nickname = rhs._nickname;
+		_username = rhs._username;
+		_realname = rhs._realname;
 		_package = rhs._package;
 		_cmd = rhs._cmd;
 	}
@@ -51,7 +57,6 @@ const bool&						Client::getPassOk(void) const
 
 const bool&						Client::getRegistered(void) const
 {
-
 	return _registered;
 }
 

@@ -24,7 +24,6 @@ class Client
 		std::string					_nickname;
 		std::string					_username;
 		std::string					_realname;
-	
 		std::string					_package; 
 		std::string					_cmd;
 

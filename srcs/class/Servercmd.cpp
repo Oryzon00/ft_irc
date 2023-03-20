@@ -13,9 +13,24 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NICK"), &Server::cmd_NICK));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
-	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("JOIN"), &Server::cmd_JOIN));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("QUIT"), &Server::cmd_QUIT));
 
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("kill"), &Server::cmd_KILL));
+}
+
+void	Server::welcomeClient(Client &client)
+{
+	reply_handler(RPL_WELCOME, client);
+	reply_handler(RPL_YOURHOST, client);
+	reply_handler(RPL_CREATED, client);
+	reply_handler(RPL_MYINFO, client);
+	reply_handler(RPL_ISUPPORT, client); // a finir en fin de projet
+
+	//RPL_UMODEIS or cmd_MODE on user
+
+	error_handler(ERR_NOMOTD, client);
 }
 
 /* --------------------------------------------------------------------------------- */
@@ -31,7 +46,6 @@ void	Server::cmd_CAP(std::string& cmd, Client& client)
 		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
 	}
 	client.setIsIrssi(true);
-	client.clearCmd();
 }
 
 void	Server::cmd_PASS(std::string& cmd, Client& client)
@@ -48,7 +62,6 @@ void	Server::cmd_PASS(std::string& cmd, Client& client)
 	}
 	else
 		client.setPassOk(true);
-	client.clearCmd();
 
 }
 
@@ -65,8 +78,6 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 		error_handler(ERR_ERRONEUSNICKNAME, client);
 	else
 		client.setNickname(args[0]);
-	std::cout << client.getNickname() <<std::endl;
-	client.clearCmd();
 }
 
 void	Server::cmd_PING(std::string& cmd, Client& client)
@@ -77,13 +88,22 @@ void	Server::cmd_PING(std::string& cmd, Client& client)
 		error_handler(ERR_WRONGNBPARAMS, client);
 	else
 		client.sendToClient(prefixServer() + " PONG " + _name + " :" + args[0] + "\n");
-	client.clearCmd();
 }
 
-/*void							Server::cmd_QUIT(std::string& cmd, Client& client)
+void							Server::cmd_QUIT(std::string& cmd, Client& client)
 {
-	//If client connected to channel, write in channel
-}*/
+	std::vector<std::string>	args = findArgsCmd(cmd, "QUIT");
+
+	std::string	str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " QUIT ";
+	if (!args.empty())
+		str += args[0] + "\n";
+	else
+		str += ":left without a reason :o\n";
+
+	for (std::vector<Client>::iterator it = _clients.begin() + 1; it != _clients.end(); it++)
+		it->sendToClient(str);
+	quitClientCmd(client);
+}
 
 void	Server::cmd_USER(std::string& cmd, Client& client)
 {
@@ -99,9 +119,9 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 		client.setUsername(args[0]);
 		client.setRealname(args[3].substr(1, std::string::npos));
 		client.setRegistered(true);
+		welcomeClient(client);
 	}
 	client.clearCmd();
-	//client.check registration
 }
 
 void	Server::join_channel(Client& client, std::string name, std::string key)
@@ -164,9 +184,40 @@ void	Server::cmd_OPER(std::string& cmd, Client& client)
 	else
 	{
 		reply_handler(RPL_YOUREOPER, *client_oper);
-		client.setOper(true);
+		client_oper->setOper(true);
 	}
-	client.clearCmd();
+}
+
+void	Server::cmd_KILL(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "kill");
+	Client*						client_cible = NULL;
+	std::string					cible_nick;
+	std::string					comment;
+
+	if (args.size() == 2)
+	{
+		cible_nick = args[0];
+		comment = args[1]; //j'espere que comment commence par un  :
+		client_cible = find_client_by_nick(cible_nick);
+	}
+
+	if (args.size() != 2)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else if (!client.getOper())
+		error_handler(ERR_NOPRIVILEGES, client);
+	else if (!client_cible)
+		error_handler(ERR_NOSUCHNICK, client);
+	else
+	{
+		for (std::vector<Client>::iterator it = _clients.begin() + 1; it != _clients.end(); it++)
+			f_RPL_KILLREPLY(*it, cible_nick, client, comment);
+		if (client_cible)
+		{
+			client.clearCmd();
+			quitClientCmd(*client_cible);
+		}
+	}
 }
 
 
@@ -193,6 +244,9 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_ERRONEUSNICKNAME:
 			f_ERR_ERRONEUSNICKNAME(client);
 			break;
+		case ERR_NOMOTD:
+			f_ERR_NOMOTD(client);
+			break;
 		case ERR_NOOPERHOST:
 			f_ERR_NOOPERHOST(client);
 			break;
@@ -201,6 +255,12 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 			break;
 		case ERR_NOSUCHCHANNEL:
 			f_ERR_NOSUCHCHANNEL(client, str);
+			break;
+		case ERR_NOPRIVILEGES:
+			f_ERR_NOPRIVILEGES(client);
+			break;
+		case ERR_NOSUCHNICK:
+			f_ERR_NOSUCHNICK(client);
 			break;
 		default:
 			break;
@@ -246,7 +306,7 @@ void	Server::f_ERR_UNKNOWNCOMMAND(Client &client)
 	client.clearCmd();
 }
 
-void							Server::f_ERR_NICKNAMEINUSE(Client &client)
+void	Server::f_ERR_NICKNAMEINUSE(Client &client)
 {
 	std::string code = " 433 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + findArgsCmd(client.getCmd(), "NICK")[0] 
@@ -254,7 +314,7 @@ void							Server::f_ERR_NICKNAMEINUSE(Client &client)
     client.sendToClient(str);
 }
 
-void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
+void	Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 {
 	std::string code = " 432 ";
 	std::vector<std::string> args = findArgsCmd(client.getCmd(), "NICK");
@@ -282,6 +342,30 @@ void							Server::f_ERR_BADCHANNELKEY(Client &client, const std::string& channe
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot join channel (Wrong Key)\n";
     client.sendToClient(str);
 }
+	
+void	Server::f_ERR_NOMOTD(Client &client)
+{
+	std::string code = " 422 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :MOTD is not supported\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOPRIVILEGES(Client &client)
+{
+	std::string code = " 481 ";
+	std::string str = prefixServer() + code + client.getNickname() + " " 
+		+ ":Permission Denied - You're not an IRC operator\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOSUCHNICK(Client & client)
+{
+	std::string code = " 401 ";
+	std::vector<std::string> args = findArgsCmd(client.getCmd(), "kill");
+	std::string str = prefixServer() + code + client.getNickname() + " " + args[0] + " "
+		+ ":No such nick\n";
+	client.sendToClient(str);
+}
 
 
 
@@ -295,6 +379,21 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 {
 	switch (RPL_CODE)
 	{
+		case RPL_WELCOME:
+			f_RPL_WELCOME(client);
+			break;
+		case RPL_YOURHOST:
+			f_RPL_YOURHOST(client);
+			break;
+		case RPL_CREATED:
+			f_RPL_CREATED(client);
+			break;
+		case RPL_MYINFO:
+			f_RPL_MYINFO(client);
+			break;
+		case RPL_ISUPPORT:
+			f_RPL_ISUPPORT(client);
+			break;
 		case RPL_YOUREOPER:
 			f_RPL_YOUREOPER(client);
 			break;
@@ -314,7 +413,7 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 
 void	Server::f_RPL_YOUREOPER(Client &client)
 {
-	std::string					code = " 381 ";
+	std::string	code = " 381 ";
 
 	std::string	str = prefixServer() + code + client.getNickname() + " "
 		+ ":You are now an IRC operator\n";
@@ -345,5 +444,61 @@ void	Server::f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name)
 
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
 		+ ":END of /NAMES list\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_KILLREPLY(Client &client, std::string cible_nick, Client& killer, std::string &comment)
+{
+	std::string code = " 1001 ";
+	std::string	str = prefixServer() + code + cible_nick + " was KILLED  by "
+		+ killer.getNickname() + " " + comment + "\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_WELCOME(Client &client)
+{
+	std::string code = " 001 ";
+	std::string str;
+
+	str = prefixServer() + code + client.getNickname() + " :Welcome to the Internet Relay Network, " + client.getNickname() + "\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_YOURHOST(Client &client)
+{
+	std::string code = " 002 ";
+	std::string str;
+
+	str = prefixServer() + code + client.getNickname() + " :Your host is " + _name + ", running version 1.0.42 \n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_CREATED(Client &client)
+{
+	std::string code = " 003 ";
+	std::string str;
+
+	str = prefixServer() + code + client.getNickname() + " :This server was created Mon Feb 20 2023 at 16:56:42 \n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_MYINFO(Client &client)
+{
+	std::string code = " 004 ";
+	std::string str;
+
+	str = prefixServer() + code + client.getNickname() + " " + _name + " 1.0.42 " + "\'no user modes available\'\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_ISUPPORT(Client &client)
+{
+	//fonction a faire a la fin pou rajouter tt les commandes et option de commandes
+	// si + de 13 token faire plusieurs sendToClient
+
+	std::string code = " 005 ";
+	std::string str;
+
+	str = prefixServer() + code + client.getNickname() + " NICK PING :are supported by this server\n";
 	client.sendToClient(str);
 }
