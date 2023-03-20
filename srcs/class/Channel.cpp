@@ -31,10 +31,12 @@ const std::string&			Channel::getKey() const
 
 void						Channel::addMember(Client& client)
 {
+	SendToAll(client.getNickname() + " JOIN " + getName() + "\n");
 	_members.push_back(client);
 }
 
-void 						Channel::SendToAll(Client& client)
+void 						Channel::SendToAll(const std::string& str)
 {
-	(void) client;
+	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
+		it->sendToClient(str);
 }

@@ -23,5 +23,5 @@ class Channel
 		const std::string&		getKey() const;
 
 		void			addMember(Client& client);
-		void			SendToAll(Client& client);
+		void			SendToAll(const std::string& str);
 };

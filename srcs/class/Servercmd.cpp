@@ -61,7 +61,7 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 		error_handler(ERR_WRONGNBPARAMS, client);
 	else if (checkAvailNick(args[0]) == false)
 		error_handler(ERR_NICKNAMEINUSE, client);
-	else if (checkValidName(args[0]) == false)
+	else if (checkValidNick(args[0]) == false)
 		error_handler(ERR_ERRONEUSNICKNAME, client);
 	else
 		client.setNickname(args[0]);
@@ -107,13 +107,25 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 void	Server::join_channel(Client& client, std::string name, std::string key)
 {
 	Channel* channel = findChannel(name);
-	if (!channel)
+	if (!channel && validChannelName(name))
+	{
 		_chans.push_back(Channel(client, name, key));
+		client.sendToClient(client.getNickname() + " JOIN " + name + "\n");
+		reply_handler(RPL_TOPIC, client, name);
+		reply_handler(RPL_NAMREPLY, client, name);
+		reply_handler(RPL_ENDOFNAMES, client, name);
+	}
+	else if (!channel)
+		error_handler(ERR_NOSUCHCHANNEL, client, name);
 	else if (key != channel->getKey())
-		f_ERR_BADCHANNELKEY(client, *channel);
-	else 
+		error_handler(ERR_BADCHANNELKEY, client, name);
+	else
+	{
 		channel->addMember(client);
-
+		reply_handler(RPL_TOPIC, client, name);
+		reply_handler(RPL_NAMREPLY, client, name);
+		reply_handler(RPL_ENDOFNAMES, client, name);
+	}
 	//bans in channels?
 }
 
@@ -162,7 +174,7 @@ void	Server::cmd_OPER(std::string& cmd, Client& client)
 
 /* ERR */
 
-void	Server::error_handler(int ERR_CODE, Client &client)
+void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 {
 	switch (ERR_CODE)
 	{
@@ -183,6 +195,12 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 			break;
 		case ERR_NOOPERHOST:
 			f_ERR_NOOPERHOST(client);
+			break;
+		case ERR_BADCHANNELKEY:
+			f_ERR_BADCHANNELKEY(client, str);
+			break;
+		case ERR_NOSUCHCHANNEL:
+			f_ERR_NOSUCHCHANNEL(client, str);
 			break;
 		default:
 			break;
@@ -250,10 +268,18 @@ void							Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 	client.sendToClient(str);
 }
 
-void							Server::f_ERR_BADCHANNELKEY(Client &client, Channel& channel)
+void							Server::f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name)
+{
+	std::string code = " 403 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Channel Invalid\n";
+    client.sendToClient(str);
+}
+
+
+void							Server::f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name)
 {
 	std::string code = " 475 ";
-	std::string	str = prefixServer() + code + client.getNickname() + " " + channel.getName() + " :Cannot join channel (Wrong Key)\n";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot join channel (Wrong Key)\n";
     client.sendToClient(str);
 }
 
@@ -265,12 +291,21 @@ void							Server::f_ERR_BADCHANNELKEY(Client &client, Channel& channel)
 /* RPL */
 
 
-void	Server::reply_handler(int RPL_CODE, Client &client)
+void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 {
 	switch (RPL_CODE)
 	{
 		case RPL_YOUREOPER:
 			f_RPL_YOUREOPER(client);
+			break;
+		case RPL_TOPIC:
+			f_RPL_TOPIC(client, str);
+			break;
+		case RPL_NAMREPLY:
+			f_RPL_NAMREPLY(client, str);
+			break;
+		case RPL_ENDOFNAMES:
+			f_RPL_ENDOFNAMES(client, str);
 			break;
 		default:
 			break;
@@ -283,5 +318,32 @@ void	Server::f_RPL_YOUREOPER(Client &client)
 
 	std::string	str = prefixServer() + code + client.getNickname() + " "
 		+ ":You are now an IRC operator\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_TOPIC(Client &client, const std::string& channel_name)
+{
+	std::string					code = " 332 ";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
+		+ " :" + findChannel(channel_name)->getTopic() + "\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
+{
+	std::string					code = " 353 ";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
+		+ ":List of Names in channel\n"; // A finir
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name)
+{
+	std::string					code = " 366 ";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
+		+ ":END of /NAMES list\n";
 	client.sendToClient(str);
 }

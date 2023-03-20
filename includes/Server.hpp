@@ -34,7 +34,7 @@ CONNECTION
 	OPER	--> Adrian (mettre bool dans client)
 	QUIT	
 
-class CHANNELL --> QUENTIN
+class CHANNEL --> QUENTIN
 check registration --> LOUIS
 001 - 005 + 251 + 255 + 452 --> LOUIS
 
@@ -89,7 +89,8 @@ class Server
 		std::string						findKey(std::string cmd);
 		std::vector<std::string>		findArgsCmd(std::string cmd, std::string key);
 		bool							checkAvailNick(const std::string str);
-		bool							checkValidName(const std::string& str);
+		bool							checkValidNick(const std::string& str);
+		bool							validChannelName(const std::string& name);
 		bool							checkCAP(Client &client, std::string key);
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
@@ -110,7 +111,7 @@ class Server
 		void							cmd_OPER(std::string& cmd, Client& client);
 
 		/* ERR */
-		void							error_handler(int ERR_CODE, Client &client);
+		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");
 
 		void							f_ERR_UNKNOWNCOMMAND(Client &client);
 		void							f_ERR_WRONGNBPARAMS(Client &client);
@@ -120,13 +121,17 @@ class Server
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
 		void							f_ERR_NOOPERHOST(Client &client); //a gerer??
-		void							f_ERR_BADCHANNELKEY(Client &client, Channel& channel);
+		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name);
 
 
 		/* RPL */
-		void							reply_handler(int RPL_CODE, Client &client);
+		void							reply_handler(int RPL_CODE, Client &client, const std::string& str = "");
 
 		void							f_RPL_YOUREOPER(Client &client);
+		void							f_RPL_TOPIC(Client &client, const std::string& channel_name);
+		void							f_RPL_NAMREPLY(Client &client, const std::string& channel_name);
+		void							f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name);
 
 
 	public:
