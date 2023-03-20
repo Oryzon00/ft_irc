@@ -154,7 +154,6 @@ void							Client::setRealname(const std::string& str)
 
 void				Client::clearCmd(void)
 {
-	std::cout << "clearCmd client nick: " << _nickname << std::endl;
 	_cmd.clear();
 }
 

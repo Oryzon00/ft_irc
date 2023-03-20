@@ -2,7 +2,7 @@
 
 
 Server::Server(int port, std::string password)
-	: _name("13-20h_IRC"), _socket(initServerSocket(port)), _password(password)
+	: _name("13-20h.IRC"), _socket(initServerSocket(port)), _password(password)
 {
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
@@ -34,9 +34,6 @@ std::string						Server::findKey(std::string cmd)
 		return (std::string());
 	return (key);
 }
-
-//ne pas split apres le trailing
-/* USER ajung ajung localhost :Adrian JUNG */
 
 std::vector<std::string>		Server::findArgsCmd(std::string cmd, std::string key)
 {
@@ -100,7 +97,7 @@ bool						Server::checkCAP(Client &client, std::string key)
 void							Server::callFunCmd(cmdFunction f, Client & client)
 {
 	(this->*(f))(client.getCmd(), client);
-	// client.clearCmd(); --> a mettre ici, et a enlever dans les appels de function
+	client.clearCmd();
 }
 
 

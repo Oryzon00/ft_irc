@@ -31,7 +31,6 @@ void	Server::cmd_CAP(std::string& cmd, Client& client)
 		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
 	}
 	client.setIsIrssi(true);
-	client.clearCmd();
 }
 
 void	Server::cmd_PASS(std::string& cmd, Client& client)
@@ -48,7 +47,6 @@ void	Server::cmd_PASS(std::string& cmd, Client& client)
 	}
 	else
 		client.setPassOk(true);
-	client.clearCmd();
 
 }
 
@@ -66,7 +64,6 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 	else
 		client.setNickname(args[0]);
 	std::cout << client.getNickname() <<std::endl;
-	client.clearCmd();
 }
 
 void	Server::cmd_PING(std::string& cmd, Client& client)
@@ -77,7 +74,6 @@ void	Server::cmd_PING(std::string& cmd, Client& client)
 		error_handler(ERR_WRONGNBPARAMS, client);
 	else
 		client.sendToClient(prefixServer() + " PONG " + _name + " :" + args[0] + "\n");
-	client.clearCmd();
 }
 
 /*void							Server::cmd_QUIT(std::string& cmd, Client& client)
@@ -100,7 +96,6 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 		client.setRealname(args[3].substr(1, std::string::npos));
 		client.setRegistered(true);
 	}
-	client.clearCmd();
 	//client.check registration
 }
 
@@ -120,9 +115,8 @@ void	Server::cmd_OPER(std::string& cmd, Client& client)
 	else
 	{
 		reply_handler(RPL_YOUREOPER, *client_oper);
-		client.setOper(true);
+		client_oper->setOper(true);
 	}
-	client.clearCmd();
 }
 
 void	Server::cmd_KILL(std::string& cmd, Client& client)
@@ -131,12 +125,11 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 	Client*						client_cible = NULL;
 	std::string					cible_nick;
 	std::string					comment;
-	std::string					client_nick;
 
 	if (args.size() == 2)
 	{
 		cible_nick = args[0];
-		comment = args[1]; //j'espere que comment est apres un :
+		comment = args[1]; //j'espere que comment commence par un  :
 		client_cible = find_client_by_nick(cible_nick);
 	}
 
@@ -152,13 +145,10 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 			f_RPL_KILLREPLY(*it, cible_nick, client, comment);
 		if (client_cible)
 		{
-			client_nick = client.getNickname();
-			removeClient(*client_cible);
-			// client = *(find_client_by_nick(client_nick)); 	//recuperer bonne ref de client
-		}	
+			client.clearCmd();
+			quitClientCmd(*client_cible);
+		}
 	}
-
-	find_client_by_nick(client_nick)->clearCmd();
 }
 
 
@@ -310,6 +300,6 @@ void	Server::f_RPL_KILLREPLY(Client &client, std::string cible_nick, Client& kil
 {
 	std::string code = " 1001 ";
 	std::string	str = prefixServer() + code + cible_nick + " was KILLED  by "
-		+ killer.getNickname() + " :" + comment + "\n";
+		+ killer.getNickname() + " " + comment + "\n";
 	client.sendToClient(str);
 }
