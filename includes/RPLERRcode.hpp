@@ -37,10 +37,11 @@
 # define RPL_WHOISMODES 		379
 # define RPL_YOUREOPER			381
 # define RPL_WHOISSECURE 		671
-# define RPL_KILLREPLY			1001 //tester si code n'explose pas dans irssi
+
+# define RPL_KILLREPLY			1001
+# define ERR_NOTREGISTERED		1002
 
 # define ERR_NOSUCHNICK			401
-// # define ERR_NOSUCHSERVER		402 //pas a gerer dans KILL
 # define ERR_NOSUCHCHANNEL		403
 # define ERR_CANNOTSENDTOCHAN	404
 # define ERR_TOOMANYCHANNELS	405
@@ -68,4 +69,3 @@
 # define ERR_NOPRIVILEGES		481
 # define ERR_CHANOPRIVSNEEDED	482
 # define ERR_NOOPERHOST			491
-// # define ERR_NOPRIVS			723 //pas gerer dans kill

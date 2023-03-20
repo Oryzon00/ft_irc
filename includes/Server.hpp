@@ -90,6 +90,7 @@ class Server
 		bool							checkAvailNick(const std::string str);
 		bool							checkValidName(const std::string& str);
 		bool							checkCAP(Client &client, std::string key);
+		bool							checkRegistered(cmdFunction f, Client & client);
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
@@ -98,7 +99,7 @@ class Server
 		Client*							find_client_by_nick(std::string nick);
 
 
-	/* CMD */
+		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
@@ -123,6 +124,7 @@ class Server
 		void							f_ERR_NOOPERHOST(Client &client);
 		void							f_ERR_NOPRIVILEGES(Client &client);
 		void							f_ERR_NOSUCHNICK(Client & client);
+		void							f_ERR_NOTREGISTERED(Client& client);
 		
 
 		/* RPL */

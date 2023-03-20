@@ -220,9 +220,19 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 		case ERR_NOSUCHNICK:
 			f_ERR_NOSUCHNICK(client);
 			break;
+		case ERR_NOTREGISTERED:
+			f_ERR_NOTREGISTERED(client);
 		default:
 			break;
 	}
+}
+
+void	Server::f_ERR_NOTREGISTERED(Client &client)
+{
+	std::string code = " 1002 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		+ ": You are not registered.\n";
+	client.sendToClient(str);
 }
 
 void	Server::f_ERR_NOOPERHOST(Client &client)
@@ -357,7 +367,7 @@ void	Server::f_RPL_YOUREOPER(Client &client)
 void	Server::f_RPL_KILLREPLY(Client &client, std::string cible_nick, Client& killer, std::string &comment)
 {
 	std::string code = " 1001 ";
-	std::string	str = prefixServer() + code + cible_nick + " was KILLED  by "
+	std::string	str = prefixServer() + code + cible_nick + " was KILLED by "
 		+ killer.getNickname() + " " + comment + "\n";
 	client.sendToClient(str);
 }
