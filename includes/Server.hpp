@@ -98,7 +98,7 @@ class Server
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
 		void							cmd_PING(std::string& cmd, Client& client);
-	//	void							cmd_QUIT(std::string& cmd, Client& client);
+		void							cmd_QUIT(std::string& cmd, Client& client);
 		void							cmd_USER(std::string& cmd, Client& client);
 
 		/* ERR */

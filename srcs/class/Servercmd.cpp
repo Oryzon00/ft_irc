@@ -15,7 +15,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NICK"), &Server::cmd_NICK));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
-
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("QUIT"), &Server::cmd_QUIT));
 }
 
 void	Server::welcomeClient(Client &client)
@@ -89,10 +89,19 @@ void							Server::cmd_PING(std::string& cmd, Client& client)
 	client.clearCmd();
 }
 
-/*void							Server::cmd_QUIT(std::string& cmd, Client& client)
+void							Server::cmd_QUIT(std::string& cmd, Client& client)
 {
-	//If client connected to channel, write in channel
-}*/
+	std::vector<std::string>	args = findArgsCmd(cmd, "QUIT");
+
+	std::string	str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " QUIT ";
+	if (!args.empty())
+		str += args[0];
+	else
+		str += ":";
+
+	std::cout << str << std::endl; // A envoyer a tout les users
+	quitClientCmd(client);
+}
 
 void	Server::cmd_USER(std::string& cmd, Client& client)
 {
