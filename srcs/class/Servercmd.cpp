@@ -14,9 +14,9 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("QUIT"), &Server::cmd_QUIT));
-
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("kill"), &Server::cmd_KILL));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("restart"), &Server::cmd_RESTART));
 }
 
 void	Server::welcomeClient(Client &client)
@@ -35,6 +35,15 @@ void	Server::welcomeClient(Client &client)
 /* --------------------------------------------------------------------------------- */
 
 /* CMD */
+
+void	Server::cmd_RESTART(std::string& cmd, Client& client)
+{
+	(void) cmd;
+	if (!client.getOper())
+		error_handler(ERR_NOPRIVILEGES, client);
+	else
+		throw RestartException();
+}
 
 void	Server::cmd_CAP(std::string& cmd, Client& client)
 {
@@ -153,7 +162,7 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 	if (args.size() == 2)
 	{
 		cible_nick = args[0];
-		comment = args[1]; //j'espere que comment commence par un  :
+		comment = args[1];
 		client_cible = find_client_by_nick(cible_nick);
 	}
 
@@ -216,7 +225,7 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 	}
 }
 
-void	Server::f_ERR_NOOPERHOST(Client &client) //a gerer?
+void	Server::f_ERR_NOOPERHOST(Client &client)
 {
 	std::string code = " 491 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " "

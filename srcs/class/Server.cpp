@@ -8,6 +8,10 @@ Server::Server(int port, std::string password)
 	initDico();
 }
 
+Server::~Server(void)
+{
+
+}
 
 /* --------------------------------------------------------------------------------- */
 

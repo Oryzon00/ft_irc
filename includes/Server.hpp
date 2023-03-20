@@ -49,11 +49,15 @@ Sending Messages
 
 Operator Messages
 	KILL message	--> DONE
-	RESTART message	--> Adrian
+	RESTART message	--> DONE
 
 Server Queries and Commands
 	MODE
-	MOTD                                                                                                                                                                                                                         
+	MOTD
+
+TO DO
+--> merge channel main
+-->check registered dans process/fun + ERR_NOT REGISTERED                                                                                                                                                                                                                      
 */
 
 
@@ -103,6 +107,7 @@ class Server
 		void							cmd_USER(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
 		void							cmd_KILL(std::string& cmd, Client& client);
+		void							cmd_RESTART(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);
@@ -133,6 +138,7 @@ class Server
 	public:
 
 		Server(int port, std::string password);
+		~Server(void);
 		
 		
 		const int&						getServerSocket(void) const;
