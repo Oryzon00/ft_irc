@@ -34,10 +34,30 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 		case RPL_ENDOFNAMES:
 			f_RPL_ENDOFNAMES(client, str);
 			break;
+		case RPL_UMODEIS:
+			f_RPL_UMODEIS(client);
 		default:
 			break;
 	}
 }
+
+
+void	Server::f_RPL_UMODEIS(Client &client)
+{
+	std::string	code = " 221 ";
+	std::string modes = ":";
+	if (client.getModeI())
+		modes += "i";
+	if (client.getModeO())
+		modes += "O";
+	if (client.getModeR())
+		modes += "r";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " "
+		+ modes + "\n";
+	client.sendToClient(str);
+}
+
 
 void	Server::f_RPL_YOUREOPER(Client &client)
 {
