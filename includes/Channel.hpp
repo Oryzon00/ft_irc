@@ -6,9 +6,9 @@
 class Channel
 {
 	private:
-		std::string		_name;
+		std::string				_name;
 		std::string				_topic;
-		std::string				_key; // ????
+		std::string				_key;
 		std::vector<Client>		_members;
 
 	public:
@@ -23,6 +23,8 @@ class Channel
 		const std::string&		getTopic() const;
 		const std::string&		getKey() const;
 
+		int						size() const;
+		bool					isChanOp(Client& client);
 		void					addMember(Client& client);
 		void					removeMember(Client& client);
 		void					SendToAll(const std::string& str);

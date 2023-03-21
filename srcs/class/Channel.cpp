@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 
-Channel::Channel(Client& client, const std::string& name, const std::string& key): _name(name), _key(key)
+Channel::Channel(Client& client, const std::string& name, const std::string& key): _name(name), _topic("No Topic"), _key(key)
 {
 	_members.push_back(client);
 }
@@ -41,10 +41,20 @@ const std::string&			Channel::getKey() const
 	return (_key);
 }
 
+int							Channel::size() const
+{
+	return (_members.size());
+}
+
+bool						Channel::isChanOp(Client& client)
+{
+	return (_members[0].getNickname() == client.getNickname());
+}
+
 void						Channel::addMember(Client& client)
 {
-	SendToAll(client.getNickname() + " JOIN " + getName() + "\n");
 	_members.push_back(client);
+//	SendToAll(client.getNickname() + " JOIN :" + getName() + "\n");
 }
 
 void						Channel::removeMember(Client& client)
@@ -52,7 +62,7 @@ void						Channel::removeMember(Client& client)
 	//SendToAll(client.getNickname() + " PART " + getName() + "\n");
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
-		if (*it == client)
+		if (it->getNickname() == client.getNickname())
 		{
 			_members.erase(it);
 			return ;

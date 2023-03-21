@@ -130,18 +130,19 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	if (!channel && validChannelName(name))
 	{
 		_chans.push_back(Channel(client, name, key));
-		client.sendToClient(client.getNickname() + " JOIN " + name + "\n");
+		client.sendToClient(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
 	}
 	else if (!channel)
-		error_handler(ERR_NOSUCHCHANNEL, client, name);
+		error_handler(ERR_BADCHANMASK, client, name);
 	else if (key != channel->getKey())
 		error_handler(ERR_BADCHANNELKEY, client, name);
 	else
 	{
 		channel->addMember(client);
+		channel->SendToAll(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -161,7 +162,7 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 		if (args.begin() + 1 != args.end())
 			keys = strToVec(args[1], ",");
 		for(size_t i = 0; i < chans.size(); i++)
-			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "");
+			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "x");
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
@@ -253,8 +254,8 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_BADCHANNELKEY:
 			f_ERR_BADCHANNELKEY(client, str);
 			break;
-		case ERR_NOSUCHCHANNEL:
-			f_ERR_NOSUCHCHANNEL(client, str);
+		case ERR_BADCHANMASK:
+			f_ERR_BADCHANMASK(client, str);
 			break;
 		case ERR_NOPRIVILEGES:
 			f_ERR_NOPRIVILEGES(client);
@@ -328,10 +329,10 @@ void	Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 	client.sendToClient(str);
 }
 
-void							Server::f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name)
+void							Server::f_ERR_BADCHANMASK(Client &client, const std::string& channel_name)
 {
-	std::string code = " 403 ";
-	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Channel Invalid\n";
+	std::string code = " 476 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Bad Channel Mask\n";
     client.sendToClient(str);
 }
 
@@ -433,8 +434,16 @@ void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 {
 	std::string					code = " 353 ";
 
-	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
-		+ ":List of Names in channel\n"; // A finir
+	std::string	str = prefixServer() + code + client.getNickname() + " = " + channel_name
+		+ " :";
+	Channel *chan = findChannel(channel_name);
+	for(int i = 0; i < chan->size(); i++)
+	{
+		if (i == 0)
+			str += "@";
+		str += ((*chan)[i].getNickname() + " ");
+	}
+	str += "\n";
 	client.sendToClient(str);
 }
 
@@ -443,7 +452,7 @@ void	Server::f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name)
 	std::string					code = " 366 ";
 
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
-		+ ":END of /NAMES list\n";
+		+ " :END of /NAMES list\n";
 	client.sendToClient(str);
 }
 

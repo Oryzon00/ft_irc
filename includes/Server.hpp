@@ -123,7 +123,7 @@ class Server
 		void							f_ERR_NICKNAMEINUSE(Client &client);
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
-		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_BADCHANMASK(Client &client, const std::string& channel_name);
 		void							f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name);
 		void							f_ERR_NOMOTD(Client &client);
 		void							f_ERR_NOOPERHOST(Client &client);
