@@ -51,8 +51,10 @@ class Channel
 		bool					isChanOp(Client& client);
 		bool					isBanned(Client& client);
 		bool					isInvited(Client& client);
+		bool					isMember(Client &client);
+
 		
-		void					addMember(Client& client);
+		void					addMember(Client client);
 		void					removeMember(Client& client);
 		void					SendToAll(const std::string& str);
 };

@@ -105,6 +105,8 @@ class Server
 		Client*							find_client_by_nick(std::string nick);
 		Channel*						findChannel(std::string name);
 		void							join_channel(Client& client, std::string name, std::string key);
+		void							part_channel(Client& client, std::string name, std::string reason);
+
 
 		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
@@ -124,6 +126,8 @@ class Server
 		void							cmd_KILL(std::string& cmd, Client& client);
 		void							cmd_MODE(std::string& cmd, Client& client);
 		void							cmd_RESTART(std::string& cmd, Client& client);
+		void							cmd_PART(std::string& cmd, Client& client);
+
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");
@@ -145,6 +149,9 @@ class Server
 		void							f_ERR_NOSUCHNICK(Client & client);
 		void							f_ERR_NOTREGISTERED(Client& client);
 		void							f_ERR_USERSDONTMATCH(Client& client);
+		void							f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
+
 		
 
 		/* RPL */

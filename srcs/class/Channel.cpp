@@ -89,16 +89,23 @@ bool						Channel::isInvited(Client& client)
 	return (false);
 }
 
+bool                        Channel::isMember(Client &client)
+{
+    for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
+    {
+        if (*it == client)
+            return (true);
+    }
+    return (false);
+}
 
-void						Channel::addMember(Client& client)
+void						Channel::addMember(Client client)
 {
 	_members.push_back(client);
-//	SendToAll(client.getNickname() + " JOIN :" + getName() + "\n");
 }
 
 void						Channel::removeMember(Client& client)
 {
-	//SendToAll(client.getNickname() + " PART " + getName() + "\n");
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
 		if (it->getNickname() == client.getNickname())
