@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+#include "../../includes/Server.hpp" // A SUPPRIMER
+
 void	Server::quitClientCmd(Client &client)
 {
 	removeClient(client);
@@ -19,7 +21,8 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("MODE"), &Server::cmd_MODE));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("kill"), &Server::cmd_KILL));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("restart"), &Server::cmd_RESTART));
-	
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PRIVMSG"), &Server::cmd_PRIVMSG));
+
 }
 
 void	Server::welcomeClient(Client &client)
@@ -267,4 +270,38 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 			quitClientCmd(*client_cible);
 		}
 	}
+}
+void	Server::message_to_client(std::string clientTargetName, Client &client, std::string message)
+{
+	Client *target = find_client_by_nick(clientTargetName);
+	std::string str;
+
+	if (!target)
+		error_handler(ERR_NOSUCHNICK, client);
+	else
+	{
+		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG " + target->getNickname() + message + "\n";
+		target->sendToClient(str);
+	}
+}
+
+void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "PRIVMSG");
+
+	if (args.size() != 2 || args[1].at(0) != ':')
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		std::vector <std::string> targets = strToVec(args[0], ",");
+		for (size_t i = 0; i < targets.size(); i++) {
+			if (targets[i].at(0) == '#')
+				std::cout << "channel : '" << targets[i] << "' with message : " << args[1] << "'" << std::endl;
+			else {
+				message_to_client(targets[i], client, args[1]);
+				std::cout << "user : '" << targets[i] << "' with message : '" << args[1] << "'" << std::endl;
+			}
+		}
+	}
+	client.clearCmd();
 }

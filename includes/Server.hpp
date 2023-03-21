@@ -105,8 +105,10 @@ class Server
 		Client*							find_client_by_nick(std::string nick);
 		Channel*						findChannel(std::string name);
 		void							join_channel(Client& client, std::string name, std::string key);
+		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
+		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
 
-		void							cmd_MODE_user(std::string& cmd, Client& client,
+	void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
@@ -122,7 +124,7 @@ class Server
 		void							cmd_JOIN(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
 		void							cmd_KILL(std::string& cmd, Client& client);
-	//	void							cmd_PRIVMSG(std::string& cmd, Client& client);
+		void							cmd_PRIVMSG(std::string& cmd, Client& client);
 		void							cmd_MODE(std::string& cmd, Client& client);
 		void							cmd_RESTART(std::string& cmd, Client& client);
 
