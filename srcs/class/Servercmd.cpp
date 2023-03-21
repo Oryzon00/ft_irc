@@ -187,6 +187,10 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		error_handler(ERR_BADCHANMASK, client, name);
 	else if (key != channel->getKey())
 		error_handler(ERR_BADCHANNELKEY, client, name);
+	else if (channel->isBanned(client))
+		error_handler(ERR_BANNEDFROMCHAN, client, name);
+	else if (!channel->isInvited(client))
+		error_handler(ERR_INVITEONLYCHAN, client, name);
 	else
 	{
 		channel->addMember(client);
@@ -195,7 +199,6 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
 	}
-	//bans in channels?
 }
 
 void	Server::cmd_JOIN(std::string& cmd, Client& client)

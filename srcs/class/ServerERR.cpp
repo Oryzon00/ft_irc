@@ -45,6 +45,12 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_BADCHANMASK:
 			f_ERR_BADCHANMASK(client, str);
 			break;
+		case ERR_BANNEDFROMCHAN:
+			f_ERR_BANNEDFROMCHAN(client, str);
+			break;
+		case ERR_INVITEONLYCHAN:
+			f_ERR_INVITEONLYCHAN(client, str);
+			break;
 		default:
 			break;
 	}
@@ -163,6 +169,20 @@ void							Server::f_ERR_BADCHANNELKEY(Client &client, const std::string& channe
 {
 	std::string code = " 475 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot join channel (Wrong Key)\n";
+    client.sendToClient(str);
+}
+
+void							Server::f_ERR_BANNEDFROMCHAN(Client &client, const std::string& channel_name)
+{
+	std::string code = " 474 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :You are banned from this channel, creep (+b)\n";
+    client.sendToClient(str);
+}
+
+void							Server::f_ERR_INVITEONLYCHAN(Client &client, const std::string& channel_name)
+{
+	std::string code = " 473 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot join channel (Invite ONLY Channel +i)\n";
     client.sendToClient(str);
 }
 

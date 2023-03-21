@@ -47,7 +47,11 @@ class Channel
 		void					setModeT(const bool& boolean);
 
 		int						size() const;
+
 		bool					isChanOp(Client& client);
+		bool					isBanned(Client& client);
+		bool					isInvited(Client& client);
+		
 		void					addMember(Client& client);
 		void					removeMember(Client& client);
 		void					SendToAll(const std::string& str);

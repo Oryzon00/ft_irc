@@ -137,6 +137,8 @@ class Server
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
 		void							f_ERR_BADCHANMASK(Client &client, const std::string& channel_name);
 		void							f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name);
+		void							f_ERR_BANNEDFROMCHAN(Client &client, const std::string& channel_name);
+		void							f_ERR_INVITEONLYCHAN(Client &client, const std::string& channel_name);
 		void							f_ERR_NOMOTD(Client &client);
 		void							f_ERR_NOOPERHOST(Client &client);
 		void							f_ERR_NOPRIVILEGES(Client &client);

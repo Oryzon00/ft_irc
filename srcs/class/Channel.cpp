@@ -62,6 +62,34 @@ bool						Channel::isChanOp(Client& client)
 	return (_members[0].getNickname() == client.getNickname());
 }
 
+bool						Channel::isBanned(Client& client)
+{
+	for(std::vector<Client>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
+	{
+		if (client.getNickname() == it->getNickname())
+			return (true);
+	}
+	return (false);
+}
+
+bool						Channel::isInvited(Client& client)
+{
+	if (_mode_i == false)
+		return (true);
+	for (std::vector<Client>::iterator it = _exceptionlist->begin(); it != _exceptionlist->end(); it++)
+	{
+		if (client.getSocket() == it->getSocket())
+			return (true);
+	}
+	for (std::vector<Client>::iterator it = _invitelist.begin(); it != _invitelist.end(); it++)
+	{
+		if (client.getSocket() == it->getSocket())
+			return (true);
+	}
+	return (false);
+}
+
+
 void						Channel::addMember(Client& client)
 {
 	_members.push_back(client);
