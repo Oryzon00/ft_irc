@@ -177,7 +177,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	Channel* channel = findChannel(name);
 	if (!channel && validChannelName(name))
 	{
-		_chans.push_back(Channel(client, name, key));
+		_chans.push_back(Channel(client, name, key, &_exceptionlist));
 		client.sendToClient(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);

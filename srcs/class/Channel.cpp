@@ -1,8 +1,11 @@
 #include "Channel.hpp"
 
-Channel::Channel(Client& client, const std::string& name, const std::string& key): _name(name), _topic("No Topic"), _key(key)
+Channel::Channel(Client& founder, const std::string& name, const std::string& key,
+				std::vector<Client>* exceptionlist) :
+	_name(name), _topic("No Topic"), _key(key), _exceptionlist(exceptionlist),
+	_mode_i(false), _mode_m(false), _mode_s(false), _mode_t(true)
 {
-	_members.push_back(client);
+	_members.push_back(founder);
 }
 
 Channel::Channel() 												{}
@@ -17,6 +20,14 @@ Channel&				Channel::operator=(const Channel& rhs)
 		_topic = rhs._topic;
 		_key = rhs._key;
 		_members = rhs._members;
+		_banlist = rhs._banlist;
+		_invitelist = rhs._invitelist;
+		_exceptionlist = rhs._exceptionlist;
+		_mode_i = rhs._mode_i;
+		_mode_m = rhs._mode_m;
+		_mode_s = rhs._mode_s;
+		_mode_t = rhs._mode_t;
+
 	}
 	return (*this);
 }

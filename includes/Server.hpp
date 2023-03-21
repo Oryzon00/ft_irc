@@ -86,6 +86,7 @@ class Server
 		Network								_network;
 		std::vector<Client>					_clients;
 		std::vector<Channel>				_chans;
+		std::vector<Client>					_exceptionlist;
 
 	/* ------------------------------------------------------------------ */
 
