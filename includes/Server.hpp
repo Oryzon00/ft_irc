@@ -103,7 +103,7 @@ class Server
 		void							cmd_USER(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
 		void							cmd_KILL(std::string& cmd, Client& client);
-
+	//	void							cmd_PRIVMSG(std::string& cmd, Client& client);
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client);
 
