@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+#include "../../includes/Server.hpp"
+
 /* RPL */
 
 
@@ -36,6 +38,9 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 			break;
 		case RPL_UMODEIS:
 			f_RPL_UMODEIS(client);
+			break;
+		case RPL_TOPIC:
+			f_RPL_TOPIC(client, str);
 		default:
 			break;
 	}
@@ -155,5 +160,13 @@ void	Server::f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name)
 
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
 		+ " :END of /NAMES list\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_NOTOPIC(Client &client, std::string channel_name)
+{
+	std::string	code = " 331 ";
+
+	std::string str = prefixServer() + code + client.getNickname() + " " channel_name + " :No topic is set\n";
 	client.sendToClient(str);
 }

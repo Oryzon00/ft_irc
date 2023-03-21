@@ -45,6 +45,7 @@ class Channel
 		void					setModeM(const bool& boolean);
 		void					setModeS(const bool& boolean);
 		void					setModeT(const bool& boolean);
+		void					setTopic(const std::string& str);
 
 		int						size() const;
 		bool					isChanOp(Client& client);

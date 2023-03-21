@@ -22,7 +22,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("kill"), &Server::cmd_KILL));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("restart"), &Server::cmd_RESTART));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PRIVMSG"), &Server::cmd_PRIVMSG));
-
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("TOPIC"), &Server::cmd_TOPIC));
 }
 
 void	Server::welcomeClient(Client &client)
@@ -323,5 +323,35 @@ void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
 			}
 		}
 	}
-	client.clearCmd();
+}
+
+void	Server::cmd_TOPIC(std::string &cmd, Client &client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "TOPIC");
+	Channel* target;
+
+	if (args.empty() || args.size() > 2)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		target = findChannel(args[0]);
+		if (!target)
+			error_handler(ERR_NOSUCHCHANNEL, client);
+		else if (!target->isMember(client))
+			error_handler(ERR_NOTONCHANNEL, client, args[0]);
+		else if (args.size() == 2)
+		{
+			if (target->getModeT() && !target->isChanOp(client) && !client.getModeO())
+				error_handler(ERR_CHANOPRIVSNEEDED, client, args[0]);
+			else
+				target.setTopic(args[1]);
+		}
+		else
+		{
+			if (target->getTopic().empty())
+				reply_handler(RPL_NOTOPIC);
+			else
+				reply_handler(RPL_TOPIC);
+		}
+	}
 }

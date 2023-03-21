@@ -59,6 +59,11 @@ const bool&			Channel::getModeM() const
 	return(_mode_m);
 }
 
+void	Channel::setTopic(const std::string &str)
+{
+	_topic = str;
+}
+
 int							Channel::size() const
 {
 	return (_members.size());

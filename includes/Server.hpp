@@ -124,6 +124,7 @@ class Server
 		void							cmd_PRIVMSG(std::string& cmd, Client& client);
 		void							cmd_MODE(std::string& cmd, Client& client);
 		void							cmd_RESTART(std::string& cmd, Client& client);
+		void							cmd_TOPIC(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");
@@ -144,6 +145,8 @@ class Server
 		void							f_ERR_NOTREGISTERED(Client& client);
 		void							f_ERR_USERSDONTMATCH(Client& client);
 		void							f_ERR_CANNOTSENDTOCHAN(Client& client, const std::string& channel_name);
+
+		void							f_ERR_CHANOPRIVSNEEDED(Client& client, const std::string& channel_name);
 		
 
 		/* RPL */
@@ -161,6 +164,8 @@ class Server
 		void							f_RPL_UMODEIS(Client &client);
 		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
 											Client &killer, std::string &comment);
+		void							f_RPL_NOTOPIC(Client &client, std::string channel_name);
+
 	public:
 
 		Server(int port, std::string password);

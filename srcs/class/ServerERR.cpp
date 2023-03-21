@@ -49,6 +49,8 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 			break;
 		case ERR_CANNOTSENDTOCHAN:
 			f_ERR_CANNOTSENDTOCHAN(client, str);
+		case ERR_CHANOPRIVSNEEDED:
+			f_ERR_CHANOPRIVSNEEDED(client, str);
 		default:
 			break;
 	}
@@ -177,4 +179,10 @@ void	Server::f_ERR_CANNOTSENDTOCHAN(Client &client, const std::string& channel_n
 	client.sendToClient(str);
 }
 
+void	Server::f_ERR_CHANOPRIVSNEEDED(Client &client, const std::string &channel_name)
+{
+	std::string code = " 482 ";
+	std::string str = prefixServer() + code + client.getNickname() + " " + channel_name + " :You're not channel operator\n";
+	client.sendToClient(str);
+}
 /* --------------------------------------------------------------------------------- */
