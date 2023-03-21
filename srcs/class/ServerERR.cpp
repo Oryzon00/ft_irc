@@ -45,9 +45,30 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_BADCHANMASK:
 			f_ERR_BADCHANMASK(client, str);
 			break;
+		case ERR_UNKNOWNMODE:
+			f_ERR_UNKNOWNMODE(client, str);
+			break;
+		case ERR_UMODEUNKNOWNFLAG:
+			f_ERR_UMODEUNKNOWNFLAG(client);
 		default:
 			break;
 	}
+}
+
+void	Server::f_ERR_UMODEUNKNOWNFLAG(Client & client)
+{
+	std::string code = " 501 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		":Unknown MODE flag";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_UNKNOWNMODE(Client &client, std::string modechar)
+{
+	std::string code = " 472 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		+ modechar + " :is unknown mode char to me";
+	client.sendToClient(str);
 }
 
 void	Server::f_ERR_USERSDONTMATCH(Client &client)

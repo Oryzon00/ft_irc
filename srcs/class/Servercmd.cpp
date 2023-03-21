@@ -39,6 +39,79 @@ void	Server::welcomeClient(Client &client)
 
 /* CMD */
 
+void	Server::cmd_MODE_answer(Client & client, std::string& target, std::string flag)
+{
+	std::string str = client.getNickname() + "!~" + client.getUsername() + "@" + _name +
+		+ " MODE " + target + " :" + flag;
+	client.sendToClient(str);
+}
+
+void	Server::cmd_MODE_user_add(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+	(void) cmd;
+	std::string target = args[0];
+	std::string	flag = args[1];
+	std::string::iterator it = flag.begin();
+	it++;
+	for(; it != flag.end(); it++)
+	{
+		if (*it == 'i')
+		{
+			client.setModeI(true);
+			cmd_MODE_answer(client, target, "+i");
+		}
+		else
+			error_handler(ERR_UMODEUNKNOWNFLAG, client);
+	}
+}
+
+void	Server::cmd_MODE_user_remove(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+	(void) cmd;
+	std::string target = args[0];
+	std::string	flag = args[1];
+	std::string::iterator it = flag.begin();
+	it++;
+	for(; it != flag.end(); it++)
+	{
+		if (*it == 'i')
+		{
+			client.setModeI(false);
+			cmd_MODE_answer(client, target, "-i");
+		}
+		else
+			error_handler(ERR_UMODEUNKNOWNFLAG, client);
+	}
+}
+
+/*
+=============== read 16 bytes from CLIENT (4) ==================
+MODE adrian +i
+
+=============== read 47 bytes from SERVER (5) ===================
+:adrian!~ajung@my.server.name MODE adrian :+i
+*/
+
+/*
+MODE adrian +ioRerewrwr
+:my.server.name 501 adrian_ :Unknown MODE flag
+*/
+
+/* MODE #room b */
+
+/* MODE #room +ibekm */
+
+/*
+=============== read 30 bytes from CLIENT (4) ==================
+MODE #room +ibekm erewwerwer
+
+=============== read 117 bytes from SERVER (5) ===================
+:my.server.name 472 adrian e :is unknown mode char to me
+:adrian!~ajung@my.server.name MODE #room +b erewwerwe!*@*
+ */
+
 void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
@@ -52,7 +125,15 @@ void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 		error_handler(ERR_USERSDONTMATCH, client);
 	else if (args.size() == 1)
 		reply_handler(RPL_UMODEIS, client);
-
+	else
+	{
+		if (args[1][0] == '+')
+			cmd_MODE_user_add(cmd, client, args);
+		else if (args[1][0] == '-')
+			cmd_MODE_channel_remove(cmd, client, args);
+		else
+			error_handler(ERR_UMODEUNKNOWNFLAG, client);
+	}
 }
 
 void	Server::cmd_MODE_channel(std::string& cmd, Client& client,
@@ -138,7 +219,7 @@ void	Server::cmd_PING(std::string& cmd, Client& client)
 		client.sendToClient(prefixServer() + " PONG " + _name + " :" + args[0] + "\n");
 }
 
-void							Server::cmd_QUIT(std::string& cmd, Client& client)
+void	Server::cmd_QUIT(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "QUIT");
 

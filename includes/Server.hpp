@@ -39,7 +39,7 @@ check registration --> DONE
 001 - 005 + 251 + 255 + 452 --> DONE
 
 Channel Operation
-	JOIN message
+	JOIN message		DONE
 	PART message
 	TOPIC message			Chan Oper Only if trying to change the topic
 	NAMES message
@@ -47,7 +47,7 @@ Channel Operation
 	KICK message			Chan Oper Only
 
 Sending Messages
-	PRIVMSG message --> Louis
+	PRIVMSG message --> DONE
 
 Operator Messages
 	KILL message	--> DONE
@@ -105,9 +105,21 @@ class Server
 
 		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
+		void							cmd_MODE_user_add(std::string& cmd, Client& client,
+											std::vector<std::string>& args);
+		void							cmd_MODE_user_remove(std::string& cmd, Client& client,
+											std::vector<std::string>& args);									
+		
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
-
+		void							cmd_MODE_channel(std::string& cmd, Client& client,
+											std::vector<std::string>& args);
+		void							cmd_MODE_channel_add(std::string& cmd, Client& client,
+											std::vector<std::string>& args);
+		void							cmd_MODE_channel_remove(std::string& cmd, Client& client,
+											std::vector<std::string>& args);
+		void							cmd_MODE_answer(Client & client, std::string& target,
+										std::string flag);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
@@ -140,6 +152,8 @@ class Server
 		void							f_ERR_NOSUCHNICK(Client & client, std::string cmd_str);
 		void							f_ERR_NOTREGISTERED(Client& client);
 		void							f_ERR_USERSDONTMATCH(Client& client);
+		void							f_ERR_UNKNOWNMODE(Client& client, std::string modechar);
+		void							f_ERR_UMODEUNKNOWNFLAG(Client & client);
 		
 
 		/* RPL */
