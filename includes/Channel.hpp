@@ -48,10 +48,14 @@ class Channel
 		void					setTopic(const std::string& str);
 
 		int						size() const;
+
 		bool					isChanOp(Client& client);
-		void					addMember(Client& client);
+		bool					isBanned(Client& client);
+		bool					isInvited(Client& client);
+		bool					isMember(Client &client);
+		
+		void					addMember(Client client);
 		void					removeMember(Client& client);
 		void					SendToAll(Client& client, const std::string& str);
-		bool					isMember(Client& client);
 };
 

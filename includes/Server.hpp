@@ -104,6 +104,8 @@ class Server
 		void							join_channel(Client& client, std::string name, std::string key);
 		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
 		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
+		void							part_channel(Client& client, std::string name, std::string reason);
+
 
 	void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
@@ -125,6 +127,8 @@ class Server
 		void							cmd_MODE(std::string& cmd, Client& client);
 		void							cmd_RESTART(std::string& cmd, Client& client);
 		void							cmd_TOPIC(std::string& cmd, Client& client);
+		void							cmd_PART(std::string& cmd, Client& client);
+
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");
@@ -138,6 +142,8 @@ class Server
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
 		void							f_ERR_BADCHANMASK(Client &client, const std::string& channel_name);
 		void							f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name);
+		void							f_ERR_BANNEDFROMCHAN(Client &client, const std::string& channel_name);
+		void							f_ERR_INVITEONLYCHAN(Client &client, const std::string& channel_name);
 		void							f_ERR_NOMOTD(Client &client);
 		void							f_ERR_NOOPERHOST(Client &client);
 		void							f_ERR_NOPRIVILEGES(Client &client);
@@ -145,8 +151,10 @@ class Server
 		void							f_ERR_NOTREGISTERED(Client& client);
 		void							f_ERR_USERSDONTMATCH(Client& client);
 		void							f_ERR_CANNOTSENDTOCHAN(Client& client, const std::string& channel_name);
-
 		void							f_ERR_CHANOPRIVSNEEDED(Client& client, const std::string& channel_name);
+		void							f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
+
 		
 
 		/* RPL */

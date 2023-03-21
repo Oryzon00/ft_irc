@@ -49,8 +49,22 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 			break;
 		case ERR_CANNOTSENDTOCHAN:
 			f_ERR_CANNOTSENDTOCHAN(client, str);
+			break;
 		case ERR_CHANOPRIVSNEEDED:
 			f_ERR_CHANOPRIVSNEEDED(client, str);
+			break;
+		case ERR_BANNEDFROMCHAN:
+			f_ERR_BANNEDFROMCHAN(client, str);
+			break;
+		case ERR_INVITEONLYCHAN:
+			f_ERR_INVITEONLYCHAN(client, str);
+			break;
+		case ERR_NOTONCHANNEL:
+			f_ERR_NOTONCHANNEL(client, str);
+			break;
+		case ERR_NOSUCHCHANNEL:
+			f_ERR_NOSUCHCHANNEL(client, str);
+			break;
 		default:
 			break;
 	}
@@ -185,4 +199,33 @@ void	Server::f_ERR_CHANOPRIVSNEEDED(Client &client, const std::string &channel_n
 	std::string str = prefixServer() + code + client.getNickname() + " " + channel_name + " :You're not channel operator\n";
 	client.sendToClient(str);
 }
+
+void							Server::f_ERR_BANNEDFROMCHAN(Client &client, const std::string& channel_name)
+{
+	std::string code = " 474 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :You are banned from this channel, creep (+b)\n";
+    client.sendToClient(str);
+}
+
+void							Server::f_ERR_INVITEONLYCHAN(Client &client, const std::string& channel_name)
+{
+	std::string code = " 473 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot join channel (Invite ONLY Channel +i)\n";
+    client.sendToClient(str);
+}
+
+void							Server::f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name)
+{
+	std::string code = " 442 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " : You're not on that channel\n";
+    client.sendToClient(str);
+}
+
+void							Server::f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name)
+{
+	std::string code = " 403 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :No such channel\n";
+    client.sendToClient(str);
+}
+
 /* --------------------------------------------------------------------------------- */

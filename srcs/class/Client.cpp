@@ -37,7 +37,7 @@ bool	operator==(const Client& lhs, const Client& rhs)
 		return false;
 }
 
-bool    operator!=(const Client& lhs, const Client& rhs)
+bool	operator!=(const Client& lhs, const Client& rhs)
 {
 	return(!(lhs == rhs));
 }
@@ -184,8 +184,9 @@ void				Client::readBuffer(char* buffer)
 
 void				Client::sendToClient(std::string str)
 {
-	if (send(_socket, str.c_str(), str.size(), 0) < 0)
-		throw SocketException("send()");
+	// if (send(_socket, str.c_str(), str.size(), 0) < 0) --> protection interdite par le sujet
+	// 	throw SocketException("send()");
+	send(_socket, str.c_str(), str.size(), 0);
 }
 
 

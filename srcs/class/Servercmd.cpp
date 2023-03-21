@@ -15,6 +15,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NICK"), &Server::cmd_NICK));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PART"), &Server::cmd_PART));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("JOIN"), &Server::cmd_JOIN));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("QUIT"), &Server::cmd_QUIT));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
@@ -190,6 +191,10 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		error_handler(ERR_BADCHANMASK, client, name);
 	else if (key != channel->getKey())
 		error_handler(ERR_BADCHANNELKEY, client, name);
+	else if (channel->isBanned(client))
+		error_handler(ERR_BANNEDFROMCHAN, client, name);
+	else if (!channel->isInvited(client))
+		error_handler(ERR_INVITEONLYCHAN, client, name);
 	else
 	{
 		channel->addMember(client);
@@ -198,15 +203,12 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
 	}
-	//bans in channels?
 }
 
 void	Server::cmd_JOIN(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "JOIN");
-	if (!client.getPassOk())
-		error_handler(ERR_PASSWDMISMATCH, client);
-	else if (args.size() <= 2 && !args.empty())
+	if (args.size() <= 2 && !args.empty())
 	{
 		std::vector<std::string>		chans = strToVec(args[0], ",");
 		std::vector<std::string>		keys;
@@ -214,6 +216,40 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 			keys = strToVec(args[1], ",");
 		for(size_t i = 0; i < chans.size(); i++)
 			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "x");
+	}
+	else
+		error_handler(ERR_WRONGNBPARAMS, client);
+	client.clearCmd();
+}
+
+void	Server::part_channel(Client& client, std::string name, std::string reason)
+{
+	Channel* channel = findChannel(name);
+	if (!channel)
+		error_handler(ERR_NOSUCHCHANNEL, client, name);
+	else if (!channel->isMember(client))
+		error_handler(ERR_NOTONCHANNEL, client, name);
+	else
+	{
+		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+							+ " PART " + name + " " + reason + "\n";
+		client.sendToClient(str);
+		channel->SendToAll(client, str);
+		channel->removeMember(client);
+	}
+}
+
+void	Server::cmd_PART(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "PART");
+	if (args.size() <= 2 && !args.empty())
+	{
+		std::vector<std::string>		chans = strToVec(args[0], ",");
+		std::string						reason = "no reason";
+		if (args.begin() + 1 != args.end())
+			reason = args[1];
+		for(size_t i = 0; i < chans.size(); i++)
+			part_channel(client, chans[i], reason);
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
@@ -336,7 +372,7 @@ void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 	{
 		target = findChannel(args[0]);
 		if (!target)
-			error_handler(ERR_NOSUCHCHANNEL, client);
+			error_handler(ERR_NOSUCHCHANNEL, client, args[0]);
 		else if (!target->isMember(client))
 			error_handler(ERR_NOTONCHANNEL, client, args[0]);
 		else if (args.size() == 2)
@@ -344,14 +380,21 @@ void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 			if (target->getModeT() && !target->isChanOp(client) && !client.getModeO())
 				error_handler(ERR_CHANOPRIVSNEEDED, client, args[0]);
 			else
-				target.setTopic(args[1]);
+			{
+				std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+										  + " TOPIC " + args[0] + " " + args[1] + "\n";
+				target->setTopic(args[1]);
+				client.sendToClient(str);
+				target->SendToAll(client, str);
+
+			}
 		}
 		else
 		{
 			if (target->getTopic().empty())
-				reply_handler(RPL_NOTOPIC);
+				reply_handler(RPL_NOTOPIC, client, args[0]);
 			else
-				reply_handler(RPL_TOPIC);
+				reply_handler(RPL_TOPIC, client, args[0]);
 		}
 	}
 }
