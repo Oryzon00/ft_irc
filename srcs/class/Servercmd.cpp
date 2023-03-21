@@ -15,8 +15,10 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("QUIT"), &Server::cmd_QUIT));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("MODE"), &Server::cmd_MODE));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("kill"), &Server::cmd_KILL));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("restart"), &Server::cmd_RESTART));
+	
 }
 
 void	Server::welcomeClient(Client &client)
@@ -36,6 +38,40 @@ void	Server::welcomeClient(Client &client)
 
 /* CMD */
 
+void	Server::cmd_MODE_user(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+	std::string	nick = args[0];
+	Client*		target = find_client_by_nick(nick);
+
+	if (!target)
+		error_handler(ERR_NOSUCHNICK, client);
+	else if (nick != client.getNickname())
+		error_handler(ERR_USERSDONTMATCH, client);
+	else
+		return ;
+
+}
+
+void	Server::cmd_MODE_channel(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+
+}
+
+
+void	Server::cmd_MODE(std::string& cmd, Client & client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "MODE");
+	if (args.size() == 0)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else if (args[0][0] != '#')
+		cmd_MODE_user(cmd, client, args);
+	else if (args[0][0] == '#')
+		cmd_MODE_channel(cmd, client, args);
+	
+}
+
 void	Server::cmd_RESTART(std::string& cmd, Client& client)
 {
 	(void) cmd;
@@ -51,7 +87,7 @@ void	Server::cmd_CAP(std::string& cmd, Client& client)
 	if (args.size() != 1 || args[0] != "LS")
 	{
 		removeClient(client);
-		std::cerr << "!! -- Client CAP is not LS -- !!" << std::endl;
+		std::cout << "!! -- Client CAP is not LS -- !!" << std::endl;
 	}
 	client.setIsIrssi(true);
 }

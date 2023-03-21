@@ -35,9 +35,20 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 			break;
 		case ERR_NOTREGISTERED:
 			f_ERR_NOTREGISTERED(client);
+			break;
+		case ERR_USERSDONTMATCH:
+			f_ERR_USERSDONTMATCH(client);
 		default:
 			break;
 	}
+}
+
+void	Server::f_ERR_USERSDONTMATCH(Client &client)
+{
+	std::string code = " 502 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		+ ":Cant change mode for other users\n";
+	client.sendToClient(str);
 }
 
 void	Server::f_ERR_NOTREGISTERED(Client &client)

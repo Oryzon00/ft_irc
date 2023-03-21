@@ -30,7 +30,7 @@ CONNECTION
 	USER	DONE
 	PING	DONE
 	OPER	DONE
-	QUIT	DONE
+	QUIT	--> A FINIR (channel)
 
 Channel Operation
 	JOIN message
@@ -93,6 +93,11 @@ class Server
 		void							welcomeClient (Client &client);
 		Client*							find_client_by_nick(std::string nick);
 
+		void							cmd_MODE_user(std::string& cmd, Client& client,
+											std::vector<std::string>& args);
+		void							cmd_MODE_channel(std::string& cmd, Client& client,
+											std::vector<std::string>& args);
+
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
@@ -121,6 +126,7 @@ class Server
 		void							f_ERR_NOPRIVILEGES(Client &client);
 		void							f_ERR_NOSUCHNICK(Client & client);
 		void							f_ERR_NOTREGISTERED(Client& client);
+		void							f_ERR_USERSDONTMATCH(Client& client);
 		
 
 		/* RPL */
