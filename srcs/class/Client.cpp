@@ -37,6 +37,11 @@ bool	operator==(const Client& lhs, const Client& rhs)
 		return false;
 }
 
+bool    operator!=(const Client& lhs, const Client& rhs)
+{
+	return(!(lhs == rhs));
+}
+
 /* --------------------------------------------------------------------------------- */
 
 /* GETTER */

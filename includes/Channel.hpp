@@ -50,5 +50,7 @@ class Channel
 		bool					isChanOp(Client& client);
 		void					addMember(Client& client);
 		void					removeMember(Client& client);
-		void					SendToAll(const std::string& str);
+		void					SendToAll(Client& client, const std::string& str);
+		bool					isMember(Client& client);
 };
+

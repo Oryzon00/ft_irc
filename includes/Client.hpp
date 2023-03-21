@@ -75,3 +75,5 @@ class Client
 
 
 bool	operator==(const Client& lhs, const Client& rhs);
+bool    operator!=(const Client& lhs, const Client& rhs);
+

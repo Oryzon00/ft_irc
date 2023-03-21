@@ -143,6 +143,7 @@ class Server
 		void							f_ERR_NOSUCHNICK(Client & client, std::string cmd_str);
 		void							f_ERR_NOTREGISTERED(Client& client);
 		void							f_ERR_USERSDONTMATCH(Client& client);
+		void							f_ERR_CANNOTSENDTOCHAN(Client& client, const std::string& channel_name);
 		
 
 		/* RPL */

@@ -1,5 +1,7 @@
 #include "Channel.hpp"
 
+#include "../../includes/Channel.hpp"
+
 Channel::Channel(Client& founder, const std::string& name, const std::string& key,
 				std::vector<Client>* exceptionlist) :
 	_name(name), _topic("No Topic"), _key(key), _exceptionlist(exceptionlist),
@@ -52,6 +54,11 @@ const std::string&			Channel::getKey() const
 	return (_key);
 }
 
+const bool&			Channel::getModeM() const
+{
+	return(_mode_m);
+}
+
 int							Channel::size() const
 {
 	return (_members.size());
@@ -81,8 +88,21 @@ void						Channel::removeMember(Client& client)
 	}
 }
 
-void 						Channel::SendToAll(const std::string& str)
+void 						Channel::SendToAll(Client& client, const std::string& str)
 {
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
-		it->sendToClient(str);
+	{
+		if (*it != client)
+			it->sendToClient(str);
+	}
+}
+
+bool						Channel::isMember(Client &client)
+{
+	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
+	{
+		if (*it == client)
+			return (true);
+	}
+	return (false);
 }

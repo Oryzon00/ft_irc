@@ -193,7 +193,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	else
 	{
 		channel->addMember(client);
-		channel->SendToAll(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		channel->SendToAll(client, ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -280,8 +280,24 @@ void	Server::message_to_client(std::string clientTargetName, Client &client, std
 		error_handler(ERR_NOSUCHNICK, client);
 	else
 	{
-		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG " + target->getNickname() + message + "\n";
+		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
+				+ clientTargetName + " " + message + "\n";
 		target->sendToClient(str);
+	}
+}
+
+void	Server::message_to_channel(std::string channelTargetName, Client &client, std::string message)
+{
+	Channel *target = findChannel(channelTargetName);
+	std::string str;
+
+	if (!target || !target->isMember(client) || target->getModeM())
+		error_handler(ERR_CANNOTSENDTOCHAN, client);
+	else
+	{
+		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
+			  + channelTargetName + " " + message + "\n";
+		target->SendToAll(client, str);
 	}
 }
 
@@ -296,8 +312,12 @@ void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
 		std::vector <std::string> targets = strToVec(args[0], ",");
 		for (size_t i = 0; i < targets.size(); i++) {
 			if (targets[i].at(0) == '#')
+			{
+				message_to_channel(targets[i], client, args[1]);
 				std::cout << "channel : '" << targets[i] << "' with message : " << args[1] << "'" << std::endl;
-			else {
+			}
+			else
+			{
 				message_to_client(targets[i], client, args[1]);
 				std::cout << "user : '" << targets[i] << "' with message : '" << args[1] << "'" << std::endl;
 			}

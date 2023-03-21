@@ -47,6 +47,8 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_BADCHANMASK:
 			f_ERR_BADCHANMASK(client, str);
 			break;
+		case ERR_CANNOTSENDTOCHAN:
+			f_ERR_CANNOTSENDTOCHAN(client, str);
 		default:
 			break;
 	}
@@ -153,7 +155,7 @@ void	Server::f_ERR_NOSUCHNICK(Client & client, std::string cmd_str)
 	client.sendToClient(str);
 }
 
-void							Server::f_ERR_BADCHANMASK(Client &client, const std::string& channel_name)
+void	Server::f_ERR_BADCHANMASK(Client &client, const std::string& channel_name)
 {
 	std::string code = " 476 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Bad Channel Mask\n";
@@ -161,13 +163,18 @@ void							Server::f_ERR_BADCHANMASK(Client &client, const std::string& channel_
 }
 
 
-void							Server::f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name)
+void	Server::f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name)
 {
 	std::string code = " 475 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot join channel (Wrong Key)\n";
     client.sendToClient(str);
 }
 
-
+void	Server::f_ERR_CANNOTSENDTOCHAN(Client &client, const std::string& channel_name)
+{
+	std::string code = " 404 ";
+	std::string str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot send to channel\n";
+	client.sendToClient(str);
+}
 
 /* --------------------------------------------------------------------------------- */
