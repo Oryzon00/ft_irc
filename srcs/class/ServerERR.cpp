@@ -2,7 +2,7 @@
 
 /* ERR */
 
-void	Server::error_handler(int ERR_CODE, Client &client)
+void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 {
 	switch (ERR_CODE)
 	{
@@ -38,6 +38,13 @@ void	Server::error_handler(int ERR_CODE, Client &client)
 			break;
 		case ERR_USERSDONTMATCH:
 			f_ERR_USERSDONTMATCH(client);
+			break;
+		case ERR_BADCHANNELKEY:
+			f_ERR_BADCHANNELKEY(client, str);
+			break;
+		case ERR_BADCHANMASK:
+			f_ERR_BADCHANMASK(client, str);
+			break;
 		default:
 			break;
 	}
@@ -142,6 +149,21 @@ void	Server::f_ERR_NOSUCHNICK(Client & client)
 	std::string str = prefixServer() + code + client.getNickname() + " " + args[0] + " "
 		+ ":No such nick\n";
 	client.sendToClient(str);
+}
+
+void							Server::f_ERR_BADCHANMASK(Client &client, const std::string& channel_name)
+{
+	std::string code = " 476 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Bad Channel Mask\n";
+    client.sendToClient(str);
+}
+
+
+void							Server::f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name)
+{
+	std::string code = " 475 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Cannot join channel (Wrong Key)\n";
+    client.sendToClient(str);
 }
 
 

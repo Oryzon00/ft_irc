@@ -3,7 +3,7 @@
 /* RPL */
 
 
-void	Server::reply_handler(int RPL_CODE, Client &client)
+void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 {
 	switch (RPL_CODE)
 	{
@@ -24,6 +24,15 @@ void	Server::reply_handler(int RPL_CODE, Client &client)
 			break;
 		case RPL_YOUREOPER:
 			f_RPL_YOUREOPER(client);
+			break;
+		case RPL_TOPIC:
+			f_RPL_TOPIC(client, str);
+			break;
+		case RPL_NAMREPLY:
+			f_RPL_NAMREPLY(client, str);
+			break;
+		case RPL_ENDOFNAMES:
+			f_RPL_ENDOFNAMES(client, str);
 			break;
 		default:
 			break;
@@ -91,5 +100,40 @@ void	Server::f_RPL_ISUPPORT(Client &client)
 	std::string str;
 
 	str = prefixServer() + code + client.getNickname() + " NICK PING :are supported by this server\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_TOPIC(Client &client, const std::string& channel_name)
+{
+	std::string					code = " 332 ";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
+		+ " :" + findChannel(channel_name)->getTopic() + "\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
+{
+	std::string					code = " 353 ";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " = " + channel_name
+		+ " :";
+	Channel *chan = findChannel(channel_name);
+	for(int i = 0; i < chan->size(); i++)
+	{
+		if (i == 0)
+			str += "@";
+		str += ((*chan)[i].getNickname() + " ");
+	}
+	str += "\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name)
+{
+	std::string					code = " 366 ";
+
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
+		+ " :END of /NAMES list\n";
 	client.sendToClient(str);
 }

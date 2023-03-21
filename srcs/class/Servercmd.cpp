@@ -13,6 +13,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NICK"), &Server::cmd_NICK));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("USER"), &Server::cmd_USER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PING"), &Server::cmd_PING));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("JOIN"), &Server::cmd_JOIN));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("QUIT"), &Server::cmd_QUIT));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("OPER"), &Server::cmd_OPER));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("MODE"), &Server::cmd_MODE));
@@ -118,7 +119,7 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 		error_handler(ERR_WRONGNBPARAMS, client);
 	else if (checkAvailNick(args[0]) == false)
 		error_handler(ERR_NICKNAMEINUSE, client);
-	else if (checkValidName(args[0]) == false)
+	else if (checkValidNick(args[0]) == false)
 		error_handler(ERR_ERRONEUSNICKNAME, client);
 	else
 		client.setNickname(args[0]);
@@ -165,6 +166,51 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 		client.setRegistered(true);
 		welcomeClient(client);
 	}
+	client.clearCmd();
+}
+
+void	Server::join_channel(Client& client, std::string name, std::string key)
+{
+	Channel* channel = findChannel(name);
+	if (!channel && validChannelName(name))
+	{
+		_chans.push_back(Channel(client, name, key));
+		client.sendToClient(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		reply_handler(RPL_TOPIC, client, name);
+		reply_handler(RPL_NAMREPLY, client, name);
+		reply_handler(RPL_ENDOFNAMES, client, name);
+	}
+	else if (!channel)
+		error_handler(ERR_BADCHANMASK, client, name);
+	else if (key != channel->getKey())
+		error_handler(ERR_BADCHANNELKEY, client, name);
+	else
+	{
+		channel->addMember(client);
+		channel->SendToAll(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		reply_handler(RPL_TOPIC, client, name);
+		reply_handler(RPL_NAMREPLY, client, name);
+		reply_handler(RPL_ENDOFNAMES, client, name);
+	}
+	//bans in channels?
+}
+
+void	Server::cmd_JOIN(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "JOIN");
+	if (!client.getPassOk())
+		error_handler(ERR_PASSWDMISMATCH, client);
+	else if (args.size() <= 2 && !args.empty())
+	{
+		std::vector<std::string>		chans = strToVec(args[0], ",");
+		std::vector<std::string>		keys;
+		if (args.begin() + 1 != args.end())
+			keys = strToVec(args[1], ",");
+		for(size_t i = 0; i < chans.size(); i++)
+			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "x");
+	}
+	else
+		error_handler(ERR_WRONGNBPARAMS, client);
 	client.clearCmd();
 }
 
@@ -219,6 +265,3 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 		}
 	}
 }
-
-
-/* --------------------------------------------------------------------------------- */

@@ -28,6 +28,16 @@ Client*							Server::find_client_by_nick(std::string nick)
 	return (NULL);
 }
 
+Channel*						Server::findChannel(std::string name)
+{
+	for (std::vector<Channel>::iterator it = _chans.begin(); it != _chans.end(); it++)
+	{
+		if (it->getName() == name)
+			return (&(*it));
+	}
+	return (NULL);
+}
+
 std::string						Server::findKey(std::string cmd)
 {
 	char* key = strtok(const_cast<char *>(cmd.c_str()), " ");
@@ -78,9 +88,16 @@ bool						Server::checkAvailNick(const std::string str)
 	return (true);
 }
 
-bool						Server::checkValidName(const std::string& str)
+bool						Server::checkValidNick(const std::string& str)
 {
-	if (str.empty() || str == "*" || str.length() >= 20)
+	if (str.empty() || str == "*" || str.length() >= 20 || str[0] == '#')
+		return (false);
+	return (true);
+}
+
+bool						Server::validChannelName(const std::string& name)
+{
+	if (name.empty() || name == "*" || name.length() >= 20 || name[0] != '#')
 		return (false);
 	return (true);
 }
