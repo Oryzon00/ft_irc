@@ -5,6 +5,7 @@
 # define RPL_CREATED			003
 # define RPL_MYINFO				004
 # define RPL_ISUPPORT			005
+# define RPL_UMODEIS			221
 # define RPL_LUSERCLIENT		251
 # define RPL_LUSERME			255
 # define RPL_WHOISCERTFP 		276

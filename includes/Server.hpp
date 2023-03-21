@@ -34,13 +34,10 @@ CONNECTION
 	OPER	DONE
 	QUIT	--> A FINIR (channel)
 
-<<<<<<< HEAD
 class CHANNEL --> QUENTIN
-check registration --> LOUIS
+check registration --> DONE
 001 - 005 + 251 + 255 + 452 --> DONE
 
-=======
->>>>>>> main
 Channel Operation
 	JOIN message
 	PART message
@@ -146,7 +143,7 @@ class Server
 		void							f_ERR_NOMOTD(Client &client);
 		void							f_ERR_NOOPERHOST(Client &client);
 		void							f_ERR_NOPRIVILEGES(Client &client);
-		void							f_ERR_NOSUCHNICK(Client & client);
+		void							f_ERR_NOSUCHNICK(Client & client, std::string cmd_str);
 		void							f_ERR_NOTREGISTERED(Client& client);
 		void							f_ERR_USERSDONTMATCH(Client& client);
 		void							f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name);
@@ -166,6 +163,7 @@ class Server
 		void							f_RPL_MYINFO(Client &client);
 		void							f_RPL_ISUPPORT(Client &client);
 		void							f_RPL_YOUREOPER(Client &client);
+		void							f_RPL_UMODEIS(Client &client);
 		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
 											Client &killer, std::string &comment);
 	public:
