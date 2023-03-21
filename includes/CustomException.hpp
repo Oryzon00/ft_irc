@@ -84,3 +84,13 @@ class ClientDestroyedException : public std::exception
 			return ("client is destroyed");
 		}
 };
+
+class RestartException : public std::exception
+{
+	public:
+
+		virtual const char* what(void) const throw()
+		{
+			return ("Restarting server . . . ");
+		}
+};

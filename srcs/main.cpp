@@ -8,12 +8,15 @@ int	main(int ac, char **av)
 	{
 		t_arg	arg;
 		parsing(ac, av, arg);
-
 		signal_handler_init();
-		Server	server(arg.port, arg.password);
-		execLoop(server);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+		execLoop(arg);
 	}
 
+	catch(const RestartException & e)
+	{
+		std::cout << e.what() << std::endl;
+		main(ac, av);
+	}
 	catch (const CloseServerException & e)
 	{
 		std::cout << e.what() << std::endl;

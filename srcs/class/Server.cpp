@@ -8,6 +8,10 @@ Server::Server(int port, std::string password)
 	initDico();
 }
 
+Server::~Server(void)
+{
+
+}
 
 /* --------------------------------------------------------------------------------- */
 
@@ -19,6 +23,16 @@ Client*							Server::find_client_by_nick(std::string nick)
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
 	{
 		if (it->getNickname() == nick)
+			return (&(*it));
+	}
+	return (NULL);
+}
+
+Channel*						Server::findChannel(std::string name)
+{
+	for (std::vector<Channel>::iterator it = _chans.begin(); it != _chans.end(); it++)
+	{
+		if (it->getName() == name)
 			return (&(*it));
 	}
 	return (NULL);
@@ -74,9 +88,16 @@ bool						Server::checkAvailNick(const std::string str)
 	return (true);
 }
 
-bool						Server::checkValidName(const std::string& str)
+bool						Server::checkValidNick(const std::string& str)
 {
-	if (str.empty() || str == "*" || str.length() >= 20)
+	if (str.empty() || str == "*" || str.length() >= 20 || str[0] == '#')
+		return (false);
+	return (true);
+}
+
+bool						Server::validChannelName(const std::string& name)
+{
+	if (name.empty() || name == "*" || name.length() >= 20 || name[0] != '#')
 		return (false);
 	return (true);
 }
@@ -92,9 +113,22 @@ bool						Server::checkCAP(Client &client, std::string key)
 	return (true);
 }
 
+bool							Server::checkRegistered(cmdFunction f, Client & client)
+{
+	if (f != &Server::cmd_CAP && f != &Server::cmd_PASS && f != &Server::cmd_NICK && f != &Server::cmd_USER
+		&& !client.getModeR())
+			return (false);
+	return (true);
+}
 
 void							Server::callFunCmd(cmdFunction f, Client & client)
 {
+	if (!checkRegistered(f, client))
+	{
+		f_ERR_NOTREGISTERED(client);
+		quitClientCmd(client);
+	}
+
 	(this->*(f))(client.getCmd(), client);
 	client.clearCmd();
 }
@@ -146,8 +180,8 @@ int							Server::readQuery(size_t index, char* buffer)
 
 	bzero(buffer, BUFFER_LEN);
 	int ret = recv(_network[index].fd, buffer, BUFFER_LEN, 0);
-	if (errno != SUCCESS && errno != EAGAIN)
-		throw SocketException("recv()");
+	// if (errno != SUCCESS && errno != EAGAIN) //enlever sujet???
+	// 	throw SocketException("recv()");
 	if (ret == DISCONNECT)
 		return (DISCONNECT);
 

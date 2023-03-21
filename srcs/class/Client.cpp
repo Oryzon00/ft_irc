@@ -1,12 +1,12 @@
 #include "Client.hpp"
 
 Client::Client(int socket)	:
-		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _registered(false),
-		_oper(false), _nickname("*")	{}
+		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _mode_r(false),
+		_mode_O(false), _mode_i(false), _nickname("*")	{}
 
 Client::Client(void)		:
-		_socket(0), _isIrssi(false), _passOK(false), _registered(false),
-		_oper(false), _nickname("*")	{}
+		_socket(0), _isIrssi(false), _passOK(false), _mode_r(false),
+		_mode_O(false), _mode_i(false), _nickname("*")	{}
 
 Client::~Client(void)	{ /* close(_socket); */ }
 
@@ -17,8 +17,9 @@ Client&				Client::operator=(const Client& rhs)
 		_socket = rhs._socket;
 		_isIrssi = rhs._isIrssi;
 		_passOK = rhs._passOK;
-		_registered = rhs._registered;
-		_oper = rhs._oper;
+		_mode_r = rhs._mode_r;
+		_mode_O = rhs._mode_O;
+		_mode_i = rhs._mode_i;
 		_nickname = rhs._nickname;
 		_username = rhs._username;
 		_realname = rhs._realname;
@@ -55,14 +56,19 @@ const bool&						Client::getPassOk(void) const
 	return _passOK;
 }
 
-const bool&						Client::getRegistered(void) const
+const bool&						Client::getModeR(void) const
 {
-	return _registered;
+	return _mode_r;
 }
 
-const bool&						Client::getOper(void) const
+const bool&						Client::getModeO(void) const
 {
-	return _oper;
+	return _mode_O;
+}
+
+const bool&						Client::getModeI(void) const
+{
+	return _mode_i;
 }
 
 const std::string&				Client::getNickname(void) const
@@ -117,9 +123,9 @@ void							Client::setIsIrssi(const bool& boolean)
 	_isIrssi = boolean;
 }
 
-void							Client::setRegistered(const bool& boolean)
+void							Client::setModeR(const bool& boolean)
 {
-	_registered = boolean;
+	_mode_r = boolean;
 }
 
 void							Client::setPassOk(const bool& boolean)
@@ -127,9 +133,14 @@ void							Client::setPassOk(const bool& boolean)
 	_passOK = boolean;
 }
 
-void							Client::setOper(const bool& boolean)
+void							Client::setModeO(const bool& boolean)
 {
-	_oper = boolean;
+	_mode_O = boolean;
+}
+
+void							Client::setModeI(const bool& boolean)
+{
+	_mode_i = boolean;
 }
 
 void							Client::setNickname(const std::string& nick)
