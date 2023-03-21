@@ -47,11 +47,11 @@ void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 	Client*		target = find_client_by_nick(nick);
 
 	if (!target)
-		error_handler(ERR_NOSUCHNICK, client);
+		error_handler(ERR_NOSUCHNICK, client, "MODE");
 	else if (nick != client.getNickname())
 		error_handler(ERR_USERSDONTMATCH, client);
-	else
-		return ;
+	else if (args.size() == 1)
+		reply_handler(RPL_UMODEIS, client);
 
 }
 
@@ -256,7 +256,7 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 	else if (!client.getModeO())
 		error_handler(ERR_NOPRIVILEGES, client);
 	else if (!client_cible)
-		error_handler(ERR_NOSUCHNICK, client);
+		error_handler(ERR_NOSUCHNICK, client, "kill");
 	else
 	{
 		for (std::vector<Client>::iterator it = _clients.begin() + 1; it != _clients.end(); it++)

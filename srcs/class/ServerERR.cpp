@@ -31,7 +31,7 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 			f_ERR_NOPRIVILEGES(client);
 			break;
 		case ERR_NOSUCHNICK:
-			f_ERR_NOSUCHNICK(client);
+			f_ERR_NOSUCHNICK(client, str);
 			break;
 		case ERR_NOTREGISTERED:
 			f_ERR_NOTREGISTERED(client);
@@ -142,10 +142,10 @@ void	Server::f_ERR_NOPRIVILEGES(Client &client)
 	client.sendToClient(str);
 }
 
-void	Server::f_ERR_NOSUCHNICK(Client & client)
+void	Server::f_ERR_NOSUCHNICK(Client & client, std::string cmd_str)
 {
 	std::string code = " 401 ";
-	std::vector<std::string> args = findArgsCmd(client.getCmd(), "kill");
+	std::vector<std::string> args = findArgsCmd(client.getCmd(), cmd_str);
 	std::string str = prefixServer() + code + client.getNickname() + " " + args[0] + " "
 		+ ":No such nick\n";
 	client.sendToClient(str);
