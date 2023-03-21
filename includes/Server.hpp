@@ -32,10 +32,6 @@ CONNECTION
 	OPER	DONE
 	QUIT	DONE
 
-class CHANNELL --> QUENTIN DONE
-check registration --> LOUIS
-001 - 005 + 251 + 255 + 452 --> DONE
-
 Channel Operation
 	JOIN message
 	PART message
@@ -45,7 +41,7 @@ Channel Operation
 	KICK message
 
 Sending Messages
-	PRIVMSG message
+	PRIVMSG message --> Louis
 
 Operator Messages
 	KILL message	--> DONE
@@ -57,7 +53,6 @@ Server Queries and Commands
 
 TO DO
 --> merge channel main
--->check registered dans process/fun + ERR_NOT REGISTERED                                                                                                                                                                                                                      
 */
 
 
@@ -108,6 +103,7 @@ class Server
 		void							cmd_USER(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
 		void							cmd_KILL(std::string& cmd, Client& client);
+		void							cmd_MODE(std::string& cmd, Client& client);
 		void							cmd_RESTART(std::string& cmd, Client& client);
 
 		/* ERR */
