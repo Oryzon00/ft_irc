@@ -42,6 +42,7 @@ void	Server::welcomeClient(Client &client)
 void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
+	(void)  cmd;
 	std::string	nick = args[0];
 	Client*		target = find_client_by_nick(nick);
 
@@ -57,7 +58,9 @@ void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 void	Server::cmd_MODE_channel(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
-
+	(void) cmd;
+	(void) client;
+	(void)args;
 }
 
 
@@ -76,7 +79,7 @@ void	Server::cmd_MODE(std::string& cmd, Client & client)
 void	Server::cmd_RESTART(std::string& cmd, Client& client)
 {
 	(void) cmd;
-	if (!client.getOper())
+	if (!client.getModeO())
 		error_handler(ERR_NOPRIVILEGES, client);
 	else
 		throw RestartException();
@@ -155,7 +158,7 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	std::vector<std::string>	args = findArgsCmd(cmd, "USER");
 	if (!client.getPassOk())
 		error_handler(ERR_PASSWDMISMATCH, client);
-	else if (client.getRegistered())
+	else if (client.getModeR())
 		error_handler(ERR_ALREADYREGISTERED, client);
 	else if (args.size() != 4)
 		error_handler(ERR_WRONGNBPARAMS, client);
@@ -163,7 +166,7 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	{
 		client.setUsername(args[0]);
 		client.setRealname(args[3].substr(1, std::string::npos));
-		client.setRegistered(true);
+		client.setModeR(true);
 		welcomeClient(client);
 	}
 	client.clearCmd();
@@ -230,7 +233,7 @@ void	Server::cmd_OPER(std::string& cmd, Client& client)
 	else
 	{
 		reply_handler(RPL_YOUREOPER, *client_oper);
-		client_oper->setOper(true);
+		client_oper->setModeO(true);
 	}
 }
 
@@ -250,7 +253,7 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 
 	if (args.size() != 2)
 		error_handler(ERR_WRONGNBPARAMS, client);
-	else if (!client.getOper())
+	else if (!client.getModeO())
 		error_handler(ERR_NOPRIVILEGES, client);
 	else if (!client_cible)
 		error_handler(ERR_NOSUCHNICK, client);

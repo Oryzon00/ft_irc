@@ -116,7 +116,7 @@ bool						Server::checkCAP(Client &client, std::string key)
 bool							Server::checkRegistered(cmdFunction f, Client & client)
 {
 	if (f != &Server::cmd_CAP && f != &Server::cmd_PASS && f != &Server::cmd_NICK && f != &Server::cmd_USER
-		&& !client.getRegistered())
+		&& !client.getModeR())
 			return (false);
 	return (true);
 }
