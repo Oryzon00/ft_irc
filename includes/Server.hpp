@@ -34,10 +34,13 @@ CONNECTION
 	OPER	DONE
 	QUIT	DONE
 
+<<<<<<< HEAD
 class CHANNEL --> QUENTIN
 check registration --> LOUIS
 001 - 005 + 251 + 255 + 452 --> DONE
 
+=======
+>>>>>>> main
 Channel Operation
 	JOIN message
 	PART message
@@ -47,18 +50,18 @@ Channel Operation
 	KICK message			Chan Oper Only
 
 Sending Messages
-	PRIVMSG message
+	PRIVMSG message --> Louis
 
 Operator Messages
 	KILL message	--> DONE
-	RESTART message	--> Adrian
+	RESTART message	--> DONE
 
 Server Queries and Commands
-	MODE		Chan Oper Only if trying to change Chan Modes
+	MODE
 	MOTD
 
-
-
+TO DO
+--> merge channel main
 */
 
 
@@ -92,6 +95,7 @@ class Server
 		bool							checkValidNick(const std::string& str);
 		bool							validChannelName(const std::string& name);
 		bool							checkCAP(Client &client, std::string key);
+		bool							checkRegistered(cmdFunction f, Client & client);
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
@@ -102,7 +106,7 @@ class Server
 		void							join_channel(Client& client, std::string name, std::string key);
 
 
-	/* CMD */
+		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
 		void							cmd_PASS(std::string& cmd, Client& client);
 		void							cmd_NICK(std::string& cmd, Client& client);
@@ -112,6 +116,8 @@ class Server
 		void							cmd_JOIN(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
 		void							cmd_KILL(std::string& cmd, Client& client);
+		void							cmd_MODE(std::string& cmd, Client& client);
+		void							cmd_RESTART(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");
@@ -129,6 +135,8 @@ class Server
 		void							f_ERR_NOOPERHOST(Client &client);
 		void							f_ERR_NOPRIVILEGES(Client &client);
 		void							f_ERR_NOSUCHNICK(Client & client);
+		void							f_ERR_NOTREGISTERED(Client& client);
+		
 
 		/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client, const std::string& str = "");
@@ -147,6 +155,7 @@ class Server
 	public:
 
 		Server(int port, std::string password);
+		~Server(void);
 		
 		
 		const int&						getServerSocket(void) const;

@@ -6,10 +6,10 @@
 
 int	initClientSocket(int socket_server);
 
-void	execLoop(Server &server)
+void	execLoop(t_arg &arg)
 {
 	char	buffer[BUFFER_LEN] = {0};
-
+	Server	server(arg.port, arg.password);
 	while (42)
 	{
 		server.poll();
@@ -17,7 +17,6 @@ void	execLoop(Server &server)
 		{
 			if (server.checkSocket(index, POLLIN))
 			{
-				// std::cout << "------ fd nb " << index << " ready to read ------" << std::endl << std::endl;
 				if (index == SERVER_INDEX)
 				{
 					std::cout << std::endl << "---- new connection to server ----" << std::endl;

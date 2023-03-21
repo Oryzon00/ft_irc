@@ -6,6 +6,8 @@ SRCS		=	srcs/main.cpp				\
 				srcs/class/Client.cpp		\
 				srcs/class/Server.cpp		\
 				srcs/class/Servercmd.cpp	\
+				srcs/class/ServerERR.cpp	\
+				srcs/class/ServerRPL.cpp	\
 				srcs/class/Network.cpp		\
 				srcs/class/Channel.cpp		\
 				srcs/execLoop.cpp			\
@@ -42,6 +44,6 @@ fclean		:	clean
 re			:	fclean all
 
 test		:	$(NAME)
-				valgrind --track-fds=yes ./$(NAME) 1234 password
+				valgrind --track-fds=yes ./$(NAME) 6667 password
 
 .PHONY		:	clean fclean re all test

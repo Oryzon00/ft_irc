@@ -8,7 +8,7 @@
 # include "tools.hpp"
 
 
-void	execLoop(Server &server);
+void	execLoop(t_arg &arg);
 
 # define SUCCESS			0
 # define ERROR_EXCEPTION	1

@@ -8,6 +8,10 @@ Server::Server(int port, std::string password)
 	initDico();
 }
 
+Server::~Server(void)
+{
+
+}
 
 /* --------------------------------------------------------------------------------- */
 
@@ -109,9 +113,22 @@ bool						Server::checkCAP(Client &client, std::string key)
 	return (true);
 }
 
+bool							Server::checkRegistered(cmdFunction f, Client & client)
+{
+	if (f != &Server::cmd_CAP && f != &Server::cmd_PASS && f != &Server::cmd_NICK && f != &Server::cmd_USER
+		&& !client.getRegistered())
+			return (false);
+	return (true);
+}
 
 void							Server::callFunCmd(cmdFunction f, Client & client)
 {
+	if (!checkRegistered(f, client))
+	{
+		f_ERR_NOTREGISTERED(client);
+		quitClientCmd(client);
+	}
+
 	(this->*(f))(client.getCmd(), client);
 	client.clearCmd();
 }
