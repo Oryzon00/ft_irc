@@ -59,14 +59,14 @@ int							Channel::size() const
 
 bool						Channel::isChanOp(Client& client)
 {
-	return (_members[0].getNickname() == client.getNickname());
+	return (_members[0] == client);
 }
 
 bool						Channel::isBanned(Client& client)
 {
 	for(std::vector<Client>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
 	{
-		if (client.getNickname() == it->getNickname())
+		if (client == *it)
 			return (true);
 	}
 	return (false);
@@ -78,12 +78,12 @@ bool						Channel::isInvited(Client& client)
 		return (true);
 	for (std::vector<Client>::iterator it = _exceptionlist->begin(); it != _exceptionlist->end(); it++)
 	{
-		if (client.getSocket() == it->getSocket())
+		if (client == *it)
 			return (true);
 	}
 	for (std::vector<Client>::iterator it = _invitelist.begin(); it != _invitelist.end(); it++)
 	{
-		if (client.getSocket() == it->getSocket())
+		if (client == *it)
 			return (true);
 	}
 	return (false);
