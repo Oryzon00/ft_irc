@@ -45,6 +45,32 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 	}
 }
 
+/*
+=============== read 12 bytes from CLIENT (4) ==================
+MODE #chat
+
+=============== read 83 bytes from SERVER (5) ===================
+:my.server.name 324 adrian #chat +nt
+*/
+
+void	Server::f_RPL_CHANNELMODEIS(Client& client, Channel& channel)
+{
+	std::string code = " 324 ";
+	std::string	modes = ":";
+	if (channel.getModeI())
+		modes += "i";
+	if (channel.getKey() != "")
+		modes += "k";
+	if (channel.getModeM())
+		modes += "m";
+	if (channel.getModeS())
+		modes += "s";
+	if(channel.getModeT())
+		modes += "t";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel.getName() + " "
+		+ modes + "\n";
+	client.sendToClient(str);
+}
 
 void	Server::f_RPL_UMODEIS(Client &client)
 {
