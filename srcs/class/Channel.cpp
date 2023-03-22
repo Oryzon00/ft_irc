@@ -52,6 +52,21 @@ const std::string&			Channel::getKey() const
 	return (_key);
 }
 
+const bool&			Channel::getModeT() const
+{
+	return (_mode_t);
+}
+
+const bool&			Channel::getModeM() const
+{
+	return(_mode_m);
+}
+
+void	Channel::setTopic(const std::string &str)
+{
+	_topic = str;
+}
+
 int							Channel::size() const
 {
 	return (_members.size());
@@ -116,8 +131,12 @@ void						Channel::removeMember(Client& client)
 	}
 }
 
-void 						Channel::SendToAll(const std::string& str)
+void 						Channel::SendToAll(Client& client, const std::string& str)
 {
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
-		it->sendToClient(str);
+	{
+		if (*it != client)
+			it->sendToClient(str);
+	}
 }
+

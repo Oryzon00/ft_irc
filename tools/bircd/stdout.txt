@@ -1,2 +1,0 @@
-Wednesday March 22 2023 -- 15:23:29 +01:00
-   server started successfully

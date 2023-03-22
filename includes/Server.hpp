@@ -94,6 +94,7 @@ class Server
 		bool							validChannelName(const std::string& name);
 		bool							checkCAP(Client &client, std::string key);
 		bool							checkRegistered(cmdFunction f, Client & client);
+		bool							checkOP(Client& client, Channel& channel);
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
@@ -102,10 +103,12 @@ class Server
 		Client*							find_client_by_nick(std::string nick);
 		Channel*						findChannel(std::string name);
 		void							join_channel(Client& client, std::string name, std::string key);
+		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
+		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
 		void							part_channel(Client& client, std::string name, std::string reason);
 
 
-		void							cmd_MODE_user(std::string& cmd, Client& client,
+	void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_user_add(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
@@ -132,8 +135,10 @@ class Server
 		void							cmd_JOIN(std::string& cmd, Client& client);
 		void							cmd_OPER(std::string& cmd, Client& client);
 		void							cmd_KILL(std::string& cmd, Client& client);
+		void							cmd_PRIVMSG(std::string& cmd, Client& client);
 		void							cmd_MODE(std::string& cmd, Client& client);
 		void							cmd_RESTART(std::string& cmd, Client& client);
+		void							cmd_TOPIC(std::string& cmd, Client& client);
 		void							cmd_PART(std::string& cmd, Client& client);
 
 
@@ -160,6 +165,8 @@ class Server
 		void							f_ERR_UNKNOWNMODE(Client& client, std::string modechar);
 		void							f_ERR_UMODEUNKNOWNFLAG(Client & client);
 		void							f_ERR_NORIGHT(Client & client);
+		void							f_ERR_CANNOTSENDTOCHAN(Client& client, const std::string& channel_name);
+		void							f_ERR_CHANOPRIVSNEEDED(Client& client, const std::string& channel_name);
 		void							f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
 
@@ -180,6 +187,8 @@ class Server
 		void							f_RPL_UMODEIS(Client &client);
 		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
 											Client &killer, std::string &comment);
+		void							f_RPL_NOTOPIC(Client &client, std::string channel_name);
+
 	public:
 
 		Server(int port, std::string password);

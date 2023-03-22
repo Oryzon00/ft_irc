@@ -102,6 +102,12 @@ bool						Server::validChannelName(const std::string& name)
 	return (true);
 }
 
+bool						Server::checkOP(Client& client, Channel& channel)
+{
+	return(client.getModeO() || channel[0] == client);
+}
+
+
 bool						Server::checkCAP(Client &client, std::string key)
 {
 	if (client.getIsIrssi() == false && key != "CAP")

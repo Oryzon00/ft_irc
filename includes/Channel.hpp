@@ -45,6 +45,7 @@ class Channel
 		void					setModeM(const bool& boolean);
 		void					setModeS(const bool& boolean);
 		void					setModeT(const bool& boolean);
+		void					setTopic(const std::string& str);
 
 		int						size() const;
 
@@ -52,9 +53,9 @@ class Channel
 		bool					isBanned(Client& client);
 		bool					isInvited(Client& client);
 		bool					isMember(Client &client);
-
 		
 		void					addMember(Client client);
 		void					removeMember(Client& client);
-		void					SendToAll(const std::string& str);
+		void					SendToAll(Client& client, const std::string& str);
 };
+

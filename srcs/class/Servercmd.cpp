@@ -20,7 +20,8 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("MODE"), &Server::cmd_MODE));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("kill"), &Server::cmd_KILL));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("restart"), &Server::cmd_RESTART));
-	
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PRIVMSG"), &Server::cmd_PRIVMSG));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("TOPIC"), &Server::cmd_TOPIC));
 }
 
 void	Server::welcomeClient(Client &client)
@@ -289,10 +290,10 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		error_handler(ERR_BANNEDFROMCHAN, client, name);
 	else if (!channel->isInvited(client))
 		error_handler(ERR_INVITEONLYCHAN, client, name);
-	else
+	else if (!channel->isMember(client))
 	{
 		channel->addMember(client);
-		channel->SendToAll(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		channel->SendToAll(client, ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -325,8 +326,10 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 		error_handler(ERR_NOTONCHANNEL, client, name);
 	else
 	{
-		channel->SendToAll(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
-							+ " PART " + name + " " + reason + "\n");
+		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+							+ " PART " + name + " " + reason + "\n";
+		client.sendToClient(str);
+		channel->SendToAll(client, str);
 		channel->removeMember(client);
 	}
 }
@@ -396,6 +399,97 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 		{
 			client.clearCmd();
 			quitClientCmd(*client_cible);
+		}
+	}
+}
+void	Server::message_to_client(std::string clientTargetName, Client &client, std::string message)
+{
+	Client *target = find_client_by_nick(clientTargetName);
+	std::string str;
+
+	if (!target)
+		error_handler(ERR_NOSUCHNICK, client);
+	else
+	{
+		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
+				+ clientTargetName + " " + message + "\n";
+		target->sendToClient(str);
+	}
+}
+
+void	Server::message_to_channel(std::string channelTargetName, Client &client, std::string message)
+{
+	Channel *target = findChannel(channelTargetName);
+	std::string str;
+
+	if (!target || !target->isMember(client) || target->getModeM())
+		error_handler(ERR_CANNOTSENDTOCHAN, client);
+	else
+	{
+		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
+			  + channelTargetName + " " + message + "\n";
+		target->SendToAll(client, str);
+	}
+}
+
+void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "PRIVMSG");
+
+	if (args.size() != 2 || args[1].at(0) != ':')
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		std::vector <std::string> targets = strToVec(args[0], ",");
+		for (size_t i = 0; i < targets.size(); i++) {
+			if (targets[i].at(0) == '#')
+			{
+				message_to_channel(targets[i], client, args[1]);
+				std::cout << "channel : '" << targets[i] << "' with message : " << args[1] << "'" << std::endl;
+			}
+			else
+			{
+				message_to_client(targets[i], client, args[1]);
+				std::cout << "user : '" << targets[i] << "' with message : '" << args[1] << "'" << std::endl;
+			}
+		}
+	}
+}
+
+void	Server::cmd_TOPIC(std::string &cmd, Client &client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "TOPIC");
+	Channel* target;
+
+	if (args.empty() || args.size() > 2)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		target = findChannel(args[0]);
+		if (!target)
+			error_handler(ERR_NOSUCHCHANNEL, client, args[0]);
+		else if (!target->isMember(client))
+			error_handler(ERR_NOTONCHANNEL, client, args[0]);
+		else if (args.size() == 2)
+		{
+			if (target->getModeT() && !target->isChanOp(client) && !client.getModeO())
+				error_handler(ERR_CHANOPRIVSNEEDED, client, args[0]);
+			else
+			{
+				std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+										  + " TOPIC " + args[0] + " " + args[1] + "\n";
+				target->setTopic(args[1]);
+				client.sendToClient(str);
+				target->SendToAll(client, str);
+
+			}
+		}
+		else
+		{
+			if (target->getTopic().empty())
+				reply_handler(RPL_NOTOPIC, client, args[0]);
+			else
+				reply_handler(RPL_TOPIC, client, args[0]);
 		}
 	}
 }
