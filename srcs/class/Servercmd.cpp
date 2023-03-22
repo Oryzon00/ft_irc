@@ -123,7 +123,6 @@ MODE #room +ibekm erewwerwer
 void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
-	(void)  cmd;
 	std::string	nick = args[0];
 	Client*		target = find_client_by_nick(nick);
 
@@ -147,9 +146,12 @@ void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 void	Server::cmd_MODE_channel(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
-	(void) cmd;
-	(void) client;
-	(void)args;
+	(void)	cmd;
+	std::string	channel = args[0];
+	Chanel*		target = findChannel
+
+	if (!channel)
+		er
 }
 
 
