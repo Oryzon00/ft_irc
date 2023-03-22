@@ -33,6 +33,7 @@ CONNECTION
 	PING	DONE
 	OPER	DONE
 	QUIT	--> A FINIR (channel)
+	ERROR
 
 class CHANNEL --> QUENTIN
 check registration --> DONE
