@@ -94,6 +94,7 @@ class Server
 		bool							validChannelName(const std::string& name);
 		bool							checkCAP(Client &client, std::string key);
 		bool							checkRegistered(cmdFunction f, Client & client);
+		bool							checkOP(Client& client, Channel& channel);
 		void							initDico(void);
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
