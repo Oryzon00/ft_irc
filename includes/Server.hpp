@@ -47,7 +47,7 @@ Channel Operation
 	KICK message			Chan Oper Only
 
 Sending Messages
-	PRIVMSG message --> Louis
+	PRIVMSG message DONE
 
 Operator Messages
 	KILL message	--> DONE
@@ -106,9 +106,11 @@ class Server
 		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
 		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
 		void							part_channel(Client& client, std::string name, std::string reason);
+		void							quit_channel(Client& client, std::string name, std::string reason);
+		void							leaveAllChannels(Client& client, std::string reason);
 
 
-	void							cmd_MODE_user(std::string& cmd, Client& client,
+		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
 											std::vector<std::string>& args);

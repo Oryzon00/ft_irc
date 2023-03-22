@@ -1,5 +1,7 @@
 # include "Server.hpp"
 
+#include "../../includes/Server.hpp" // A SUPPRIMER
+
 Server::Server(int port, std::string password)
 	: _name("13-20h.IRC"), _socket(initServerSocket(port)), _password(password)
 {

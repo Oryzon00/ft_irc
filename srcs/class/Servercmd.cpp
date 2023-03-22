@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+#include "../../includes/Server.hpp" // A SUPPRIMER
+
 void	Server::quitClientCmd(Client &client)
 {
 	removeClient(client);
@@ -140,18 +142,26 @@ void	Server::cmd_PING(std::string& cmd, Client& client)
 		client.sendToClient(prefixServer() + " PONG " + _name + " :" + args[0] + "\n");
 }
 
+void	Server::leaveAllChannels(Client &client, std::string reason)
+{
+	for (size_t i = 0; i < _chans.size(); i++)
+	{
+		if (_chans[i].isMember(client))
+			quit_channel(client, _chans[i].getName(), reason);
+	}
+}
+
 void							Server::cmd_QUIT(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "QUIT");
 
-	std::string	str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " QUIT ";
+	std::string	str;
 	if (!args.empty())
 		str += args[0] + "\n";
 	else
 		str += ":left without a reason :o\n";
 
-	for (std::vector<Client>::iterator it = _clients.begin() + 1; it != _clients.end(); it++)
-		it->sendToClient(str);
+	leaveAllChannels(client, str);
 	quitClientCmd(client);
 }
 
@@ -218,6 +228,23 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
 	client.clearCmd();
+}
+
+void	Server::quit_channel(Client& client, std::string name, std::string reason)
+{
+	Channel* channel = findChannel(name);
+	if (!channel)
+		error_handler(ERR_NOSUCHCHANNEL, client, name);
+	else if (!channel->isMember(client))
+		error_handler(ERR_NOTONCHANNEL, client, name);
+	else
+	{
+		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+						  + " QUIT " + reason + "\n";
+		client.sendToClient(str);
+		channel->SendToAll(client, str);
+		channel->removeMember(client);
+	}
 }
 
 void	Server::part_channel(Client& client, std::string name, std::string reason)
@@ -346,15 +373,9 @@ void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
 		std::vector <std::string> targets = strToVec(args[0], ",");
 		for (size_t i = 0; i < targets.size(); i++) {
 			if (targets[i].at(0) == '#')
-			{
 				message_to_channel(targets[i], client, args[1]);
-				std::cout << "channel : '" << targets[i] << "' with message : " << args[1] << "'" << std::endl;
-			}
 			else
-			{
 				message_to_client(targets[i], client, args[1]);
-				std::cout << "user : '" << targets[i] << "' with message : '" << args[1] << "'" << std::endl;
-			}
 		}
 	}
 }
