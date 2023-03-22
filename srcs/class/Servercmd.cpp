@@ -42,7 +42,7 @@ void	Server::welcomeClient(Client &client)
 void	Server::cmd_MODE_answer(Client & client, std::string& target, std::string flag)
 {
 	std::string str = client.getNickname() + "!~" + client.getUsername() + "@" + _name +
-		+ " MODE " + target + " :" + flag;
+		+ " MODE " + target + " :" + flag + "\n";
 	client.sendToClient(str);
 }
 
@@ -61,6 +61,10 @@ void	Server::cmd_MODE_user_add(std::string& cmd, Client& client,
 			client.setModeI(true);
 			cmd_MODE_answer(client, target, "+i");
 		}
+		else if (*it == 'O')
+			error_handler(ERR_NORIGHT, client);
+		else if (*it == 'r')
+			error_handler(ERR_NORIGHT, client);
 		else
 			error_handler(ERR_UMODEUNKNOWNFLAG, client);
 	}
@@ -81,6 +85,10 @@ void	Server::cmd_MODE_user_remove(std::string& cmd, Client& client,
 			client.setModeI(false);
 			cmd_MODE_answer(client, target, "-i");
 		}
+		else if (*it == 'O')
+			error_handler(ERR_NORIGHT, client);
+		else if (*it == 'r')
+			error_handler(ERR_NORIGHT, client);
 		else
 			error_handler(ERR_UMODEUNKNOWNFLAG, client);
 	}
@@ -130,7 +138,7 @@ void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 		if (args[1][0] == '+')
 			cmd_MODE_user_add(cmd, client, args);
 		else if (args[1][0] == '-')
-			cmd_MODE_channel_remove(cmd, client, args);
+			cmd_MODE_user_remove(cmd, client, args);
 		else
 			error_handler(ERR_UMODEUNKNOWNFLAG, client);
 	}

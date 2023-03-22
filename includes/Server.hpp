@@ -112,12 +112,11 @@ class Server
 		
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
-		void							cmd_MODE_channel(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
 		void							cmd_MODE_channel_add(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_channel_remove(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
+
 		void							cmd_MODE_answer(Client & client, std::string& target,
 										std::string flag);
 
@@ -154,6 +153,7 @@ class Server
 		void							f_ERR_USERSDONTMATCH(Client& client);
 		void							f_ERR_UNKNOWNMODE(Client& client, std::string modechar);
 		void							f_ERR_UMODEUNKNOWNFLAG(Client & client);
+		void							f_ERR_NORIGHT(Client & client);
 		
 
 		/* RPL */

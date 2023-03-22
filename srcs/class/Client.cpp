@@ -181,7 +181,7 @@ void				Client::sendToClient(std::string str)
 {
 	// if (send(_socket, str.c_str(), str.size(), 0) < 0) --> protection interdite par le sujet
 	// 	throw SocketException("send()");
-	send(_socket, str.c_str(), str.size(), 0);
+	send(_socket, str.c_str(), str.size(), MSG_NOSIGNAL); //0 --> MSG_NO_SIGNAL
 }
 
 

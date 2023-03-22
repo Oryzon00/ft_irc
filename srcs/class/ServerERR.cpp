@@ -50,16 +50,28 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 			break;
 		case ERR_UMODEUNKNOWNFLAG:
 			f_ERR_UMODEUNKNOWNFLAG(client);
+			break;
+		case ERR_NORIGHT:
+			f_ERR_NORIGHT(client);
+			break;
 		default:
 			break;
 	}
+}
+
+void	Server::f_ERR_NORIGHT(Client & client)
+{
+	std::string code = " 1003 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		":You don't have the rights to do this\n";
+	client.sendToClient(str);
 }
 
 void	Server::f_ERR_UMODEUNKNOWNFLAG(Client & client)
 {
 	std::string code = " 501 ";
 	std::string str = prefixServer() + code + client.getNickname() + " "
-		":Unknown MODE flag";
+		":Unknown MODE flag\n";
 	client.sendToClient(str);
 }
 
@@ -67,7 +79,7 @@ void	Server::f_ERR_UNKNOWNMODE(Client &client, std::string modechar)
 {
 	std::string code = " 472 ";
 	std::string str = prefixServer() + code + client.getNickname() + " "
-		+ modechar + " :is unknown mode char to me";
+		+ modechar + " :is unknown mode char to me\n";
 	client.sendToClient(str);
 }
 
