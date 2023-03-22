@@ -220,7 +220,7 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 	client.clearCmd();
 }
 
-void	Server::part_channel(Client& client, std::string name, std::string reason)
+void	Server::part_channel(Client client, std::string name, std::string reason)
 {
 	Channel* channel = findChannel(name);
 	if (!channel)
@@ -230,12 +230,20 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 	else
 	{
 		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
-							+ " PART " + name + " " + reason + "\n";
+							+ " PART " + name;
+		if (!reason.empty())
+			str += " " + reason;
+		str += "\r\n";
 		client.sendToClient(str);
 		channel->SendToAll(client, str);
 		channel->removeMember(client);
+		if (!channel->size())
+			removeChannel(*channel);
 	}
 }
+
+//	:b!~qcherel@my.server.name PART #chat
+//	:b!~qcherel@13-20h.IRC PART #c
 
 void	Server::cmd_PART(std::string& cmd, Client& client)
 {
@@ -243,7 +251,7 @@ void	Server::cmd_PART(std::string& cmd, Client& client)
 	if (args.size() <= 2 && !args.empty())
 	{
 		std::vector<std::string>		chans = strToVec(args[0], ",");
-		std::string						reason = "no reason";
+		std::string						reason;
 		if (args.begin() + 1 != args.end())
 			reason = args[1];
 		for(size_t i = 0; i < chans.size(); i++)

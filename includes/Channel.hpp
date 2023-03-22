@@ -25,7 +25,7 @@ class Channel
 
 	public:
 		Channel();
-		Channel(Client& client, const std::string& name, const std::string& key,
+		Channel(Client client, const std::string& name, const std::string& key,
 				std::vector<Client>* exceptionlist);
 		~Channel(void);
 
@@ -55,7 +55,8 @@ class Channel
 		bool					isMember(Client &client);
 		
 		void					addMember(Client client);
-		void					removeMember(Client& client);
+		void					removeMember(Client client);
 		void					SendToAll(Client& client, const std::string& str);
 };
 
+bool	operator==(const Channel& lhs,const Channel& rhs);

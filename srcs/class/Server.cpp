@@ -248,6 +248,10 @@ void						Server::removeClient(Client &client)
 	_network.removeSocket(index);
 }
 
+void						Server::removeChannel(Channel channel)
+{
+	_chans.erase(std::find(_chans.begin(), _chans.end(), channel));
+}
 
 
 

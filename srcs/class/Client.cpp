@@ -1,12 +1,19 @@
 #include "Client.hpp"
 
+Client::Client(const Client& client)
+{
+	*this = client;
+}
+
 Client::Client(int socket)	:
 		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _mode_r(false),
 		_mode_O(false), _mode_i(false), _nickname("*")	{}
 
+
 Client::Client(void)		:
 		_socket(0), _isIrssi(false), _passOK(false), _mode_r(false),
 		_mode_O(false), _mode_i(false), _nickname("*")	{}
+
 
 Client::~Client(void)	{ /* close(_socket); */ }
 

@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 
-Channel::Channel(Client& founder, const std::string& name, const std::string& key,
+Channel::Channel(Client founder, const std::string& name, const std::string& key,
 				std::vector<Client>* exceptionlist) :
 	_name(name), _topic("No Topic"), _key(key), _exceptionlist(exceptionlist),
 	_mode_i(false), _mode_m(false), _mode_s(false), _mode_t(true)
@@ -36,6 +36,12 @@ Client&						Channel::operator[](size_t index)
 {
 	return (_members[index]);
 }
+
+bool						operator==(const Channel& lhs,const Channel& rhs)
+{
+	return (lhs.getName() == rhs.getName());
+}
+
 
 const std::string&			Channel::getName() const
 {
@@ -119,11 +125,11 @@ void						Channel::addMember(Client client)
 	_members.push_back(client);
 }
 
-void						Channel::removeMember(Client& client)
+void						Channel::removeMember(Client client)
 {
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
-		if (it->getNickname() == client.getNickname())
+		if (*it == client)
 		{
 			_members.erase(it);
 			return ;

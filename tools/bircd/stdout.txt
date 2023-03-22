@@ -1,4 +1,4 @@
-Tuesday March 21 2023 -- 18:34:26 +01:00
+Wednesday March 22 2023 -- 17:01:54 +01:00
    server started successfully
-Tuesday March 21 2023 -- 20:37:35 +01:00
+Wednesday March 22 2023 -- 17:12:03 +01:00
    server shutdown: received signal SIGTERM

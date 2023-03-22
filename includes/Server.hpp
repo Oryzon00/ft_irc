@@ -105,10 +105,11 @@ class Server
 		void							join_channel(Client& client, std::string name, std::string key);
 		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
 		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
-		void							part_channel(Client& client, std::string name, std::string reason);
+		void							part_channel(Client client, std::string name, std::string reason);
+		
 
 
-	void							cmd_MODE_user(std::string& cmd, Client& client,
+		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
@@ -195,6 +196,7 @@ class Server
 		void							addClient(void);
 		void							removeClient(size_t index);
 		void							removeClient(Client &client);
+		void							removeChannel(Channel channel);
 
 		
 		int								readQuery(size_t index, char* buffer);
