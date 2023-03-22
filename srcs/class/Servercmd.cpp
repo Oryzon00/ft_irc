@@ -148,13 +148,19 @@ void	Server::cmd_MODE_channel(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
 	(void)	cmd;
-	std::string	channel = args[0];
-	Chanel*		target = findChannel
+	std::string		channel = args[0];
+	Channel*		target = findChannel(channel);
 
-	if (!channel)
-		er
+	if (!target)
+		error_handler(ERR_NOSUCHCHANNEL, client, channel);
+	else if (args.size() == 1)
+		reply_handler(client, )
 }
 
+/*
+=============== read 83 bytes from SERVER (5) ===================
+:my.server.name 324 adrian #chat +nt
+*/
 
 void	Server::cmd_MODE(std::string& cmd, Client & client)
 {
