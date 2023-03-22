@@ -192,7 +192,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		error_handler(ERR_BANNEDFROMCHAN, client, name);
 	else if (!channel->isInvited(client))
 		error_handler(ERR_INVITEONLYCHAN, client, name);
-	else
+	else if (!channel->isMember(client))
 	{
 		channel->addMember(client);
 		channel->SendToAll(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
