@@ -143,6 +143,7 @@ class Server
 		void							cmd_RESTART(std::string& cmd, Client& client);
 		void							cmd_TOPIC(std::string& cmd, Client& client);
 		void							cmd_PART(std::string& cmd, Client& client);
+		void							cmd_INVITE(std::string& cmd, Client& client);
 
 
 		/* ERR */

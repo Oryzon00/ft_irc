@@ -329,7 +329,19 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 	else if (checkValidNick(args[0]) == false)
 		error_handler(ERR_ERRONEUSNICKNAME, client);
 	else
+	{
+		std::string	str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+							+ " NICK " + args[0] + "\n";
+		client.sendToClient(str);
 		client.setNickname(args[0]);
+		for (std::vector<Channel>::iterator it = _chans.begin(); it != _chans.end(); it++)
+		{
+			if (true)
+			{
+				
+			}
+		}
+	}
 }
 
 void	Server::cmd_PING(std::string& cmd, Client& client)
@@ -419,7 +431,6 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
-	client.clearCmd();
 }
 
 void	Server::part_channel(Client client, std::string name, std::string reason)
@@ -461,8 +472,24 @@ void	Server::cmd_PART(std::string& cmd, Client& client)
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
-	client.clearCmd();
 }
+
+void							Server::cmd_INVITE(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "INVITE");
+	if (args.size() != 2)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		Channel*	channel = findChannel(args[1]);
+		Client*		target  = find_client_by_nick(args[0]);
+		if (!channel)
+			error_handler(ERR_NOSUCHCHANNEL, client, args[1]);
+		else if(!target)
+			error_handler(ERR_NOSUCHNICK, client, args[0]);
+	}
+}
+
 
 void	Server::cmd_OPER(std::string& cmd, Client& client)
 {
