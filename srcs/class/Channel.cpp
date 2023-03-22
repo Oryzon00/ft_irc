@@ -59,18 +59,53 @@ int							Channel::size() const
 
 bool						Channel::isChanOp(Client& client)
 {
-	return (_members[0].getNickname() == client.getNickname());
+	return (_members[0] == client);
 }
 
-void						Channel::addMember(Client& client)
+bool						Channel::isBanned(Client& client)
+{
+	for(std::vector<Client>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
+	{
+		if (client == *it)
+			return (true);
+	}
+	return (false);
+}
+
+bool						Channel::isInvited(Client& client)
+{
+	if (_mode_i == false)
+		return (true);
+	for (std::vector<Client>::iterator it = _exceptionlist->begin(); it != _exceptionlist->end(); it++)
+	{
+		if (client == *it)
+			return (true);
+	}
+	for (std::vector<Client>::iterator it = _invitelist.begin(); it != _invitelist.end(); it++)
+	{
+		if (client == *it)
+			return (true);
+	}
+	return (false);
+}
+
+bool                        Channel::isMember(Client &client)
+{
+    for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
+    {
+        if (*it == client)
+            return (true);
+    }
+    return (false);
+}
+
+void						Channel::addMember(Client client)
 {
 	_members.push_back(client);
-//	SendToAll(client.getNickname() + " JOIN :" + getName() + "\n");
 }
 
 void						Channel::removeMember(Client& client)
 {
-	//SendToAll(client.getNickname() + " PART " + getName() + "\n");
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
 		if (it->getNickname() == client.getNickname())
