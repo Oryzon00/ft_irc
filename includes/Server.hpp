@@ -123,7 +123,9 @@ class Server
 											std::vector<std::string>& args);
 
 		void							cmd_MODE_answer(Client & client, std::string& target,
-										std::string flag);
+											std::string flag);
+		void							cmd_MODE_answer_channel(Client & client,
+											std::string& target, std::string flag);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
@@ -185,9 +187,11 @@ class Server
 		void							f_RPL_ISUPPORT(Client &client);
 		void							f_RPL_YOUREOPER(Client &client);
 		void							f_RPL_UMODEIS(Client &client);
+		void							f_RPL_CHANNELMODEIS(Client &client, Channel& channel);
 		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
 											Client &killer, std::string &comment);
 		void							f_RPL_NOTOPIC(Client &client, std::string channel_name);
+
 
 	public:
 

@@ -1,0 +1,3 @@
+Wednesday March 22 2023 -- 18:36:49 +01:00
+   Listen failed, :: 4400, unable to bind on address ::#4400, error 98
+   server started successfully

@@ -53,6 +53,7 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 			break;
 		case ERR_NORIGHT:
 			f_ERR_NORIGHT(client);
+			break;
 		case ERR_CANNOTSENDTOCHAN:
 			f_ERR_CANNOTSENDTOCHAN(client, str);
 			break;

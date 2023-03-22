@@ -32,52 +32,90 @@ Channel&				Channel::operator=(const Channel& rhs)
 	return (*this);
 }
 
-Client&						Channel::operator[](size_t index)
+Client&					Channel::operator[](size_t index)
 {
 	return (_members[index]);
 }
 
-const std::string&			Channel::getName() const
+/* --------------------------------------------------------------------------------- */
+
+const std::string&		Channel::getName() const
 {
 	return (_name);
 }
 
-const std::string&			Channel::getTopic() const
+const std::string&		Channel::getTopic() const
 {
 	return (_topic);
 }
 
-const std::string&			Channel::getKey() const
+const std::string&		Channel::getKey() const
 {
 	return (_key);
 }
 
-const bool&			Channel::getModeT() const
+const bool&				Channel::getModeT() const
 {
 	return (_mode_t);
 }
 
-const bool&			Channel::getModeM() const
+const bool&				Channel::getModeM() const
 {
 	return(_mode_m);
 }
 
-void	Channel::setTopic(const std::string &str)
+const bool&				Channel::getModeI(void) const
+{
+	return _mode_i;
+}
+
+const bool&				Channel::getModeS(void) const
+{
+	return _mode_m;
+}
+
+/* --------------------------------------------------------------------------------- */
+
+
+void					Channel::setTopic(const std::string &str)
 {
 	_topic = str;
 }
 
-int							Channel::size() const
+void					Channel::setModeI(const bool& boolean)
+{
+	_mode_i = boolean;
+}
+
+void					Channel::setModeM(const bool& boolean)
+{
+	_mode_m = boolean;
+}
+
+void					Channel::setModeS(const bool& boolean)
+{
+	_mode_s = boolean;
+}
+
+void					Channel::setModeT(const bool& boolean)
+{
+	_mode_t = boolean;
+}
+
+/* --------------------------------------------------------------------------------- */
+
+
+int						Channel::size() const
 {
 	return (_members.size());
 }
 
-bool						Channel::isChanOp(Client& client)
+bool					Channel::isChanOp(Client& client)
 {
 	return (_members[0] == client);
 }
 
-bool						Channel::isBanned(Client& client)
+bool					Channel::isBanned(Client& client)
 {
 	for(std::vector<Client>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
 	{
@@ -87,7 +125,7 @@ bool						Channel::isBanned(Client& client)
 	return (false);
 }
 
-bool						Channel::isInvited(Client& client)
+bool					Channel::isInvited(Client& client)
 {
 	if (_mode_i == false)
 		return (true);
@@ -104,7 +142,7 @@ bool						Channel::isInvited(Client& client)
 	return (false);
 }
 
-bool                        Channel::isMember(Client &client)
+bool					Channel::isMember(Client &client)
 {
     for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
     {
@@ -114,12 +152,12 @@ bool                        Channel::isMember(Client &client)
     return (false);
 }
 
-void						Channel::addMember(Client client)
+void					Channel::addMember(Client client)
 {
 	_members.push_back(client);
 }
 
-void						Channel::removeMember(Client& client)
+void					Channel::removeMember(Client& client)
 {
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
@@ -131,7 +169,7 @@ void						Channel::removeMember(Client& client)
 	}
 }
 
-void 						Channel::SendToAll(Client& client, const std::string& str)
+void 					Channel::SendToAll(Client& client, const std::string& str)
 {
 	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
@@ -139,4 +177,3 @@ void 						Channel::SendToAll(Client& client, const std::string& str)
 			it->sendToClient(str);
 	}
 }
-
