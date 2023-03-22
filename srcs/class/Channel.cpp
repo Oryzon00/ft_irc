@@ -1,7 +1,5 @@
 #include "Channel.hpp"
 
-#include "../../includes/Channel.hpp"
-
 Channel::Channel(Client& founder, const std::string& name, const std::string& key,
 				std::vector<Client>* exceptionlist) :
 	_name(name), _topic("No Topic"), _key(key), _exceptionlist(exceptionlist),
