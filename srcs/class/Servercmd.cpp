@@ -22,6 +22,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("restart"), &Server::cmd_RESTART));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PRIVMSG"), &Server::cmd_PRIVMSG));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("TOPIC"), &Server::cmd_TOPIC));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("INVITE"), &Server::cmd_INVITE));
 }
 
 /* --------------------------------------------------------------------------------- */
@@ -334,13 +335,6 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 							+ " NICK " + args[0] + "\n";
 		client.sendToClient(str);
 		client.setNickname(args[0]);
-		for (std::vector<Channel>::iterator it = _chans.begin(); it != _chans.end(); it++)
-		{
-			if (true)
-			{
-				
-			}
-		}
 	}
 }
 
@@ -393,7 +387,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	Channel* channel = findChannel(name);
 	if (!channel && validChannelName(name))
 	{
-		_chans.push_back(Channel(client, name, key, &_exceptionlist));
+		_chans.push_back(Channel(&client, name, key));
 		client.sendToClient(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
@@ -409,7 +403,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		error_handler(ERR_INVITEONLYCHAN, client, name);
 	else if (!channel->isMember(client))
 	{
-		channel->addMember(client);
+		channel->addMember(&client);
 		channel->SendToAll(client, ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
@@ -433,7 +427,7 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 		error_handler(ERR_WRONGNBPARAMS, client);
 }
 
-void	Server::part_channel(Client client, std::string name, std::string reason)
+void	Server::part_channel(Client& client, std::string name, std::string reason)
 {
 	Channel* channel = findChannel(name);
 	if (!channel)
@@ -485,8 +479,23 @@ void							Server::cmd_INVITE(std::string& cmd, Client& client)
 		Client*		target  = find_client_by_nick(args[0]);
 		if (!channel)
 			error_handler(ERR_NOSUCHCHANNEL, client, args[1]);
-		else if(!target)
+		else if (!target)
 			error_handler(ERR_NOSUCHNICK, client, args[0]);
+		else if (!channel->isMember(client))
+			error_handler(ERR_NOTONCHANNEL, client, args[1]);
+		else if (!checkOP(client, *channel))
+			error_handler(ERR_CHANOPRIVSNEEDED, client, args[1]);
+		else if (channel->isMember(*target))
+			error_handler(ERR_USERONCHANNEL, *target, args[1]);
+		else
+		{
+			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+							+ " INVITE " + args[0] + " :" + channel->getName() + "\n";
+			reply_handler(RPL_INVITING, client,
+						target->getNickname() + " " + channel->getName());
+			target->sendToClient(str);
+			channel->invite(target);
+		}	
 	}
 }
 

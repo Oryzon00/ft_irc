@@ -105,7 +105,7 @@ class Server
 		void							join_channel(Client& client, std::string name, std::string key);
 		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
 		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
-		void							part_channel(Client client, std::string name, std::string reason);
+		void							part_channel(Client& client, std::string name, std::string reason);
 		
 
 
@@ -193,6 +193,8 @@ class Server
 		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
 											Client &killer, std::string &comment);
 		void							f_RPL_NOTOPIC(Client &client, std::string channel_name);
+		void							f_RPL_INVITING(Client &client, std::string s);
+
 
 
 	public:

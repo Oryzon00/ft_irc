@@ -9,10 +9,9 @@ class Channel
 		std::string				_name;
 		std::string				_topic;
 		std::string				_key;			//mode k
-		std::vector<Client>		_members;
-		std::vector<Client>		_banlist;		//mode b
-		std::vector<Client>		_invitelist;	//mode i
-		std::vector<Client>*	_exceptionlist;	//mode e
+		std::vector<Client*>		_members;
+		std::vector<Client*>		_banlist;		//mode b
+		std::vector<Client*>		_invitelist;	//mode i
 
 		bool					_mode_i;		//invite --> false
 		bool					_mode_m;		//moderated	--> false
@@ -25,11 +24,10 @@ class Channel
 
 	public:
 		Channel();
-		Channel(Client client, const std::string& name, const std::string& key,
-				std::vector<Client>* exceptionlist);
+		Channel(Client* client, const std::string& name, const std::string& key);
 		~Channel(void);
 
-		Client&					operator[](size_t index);
+		Client*					operator[](size_t index);
 		Channel&				operator=(const Channel& rhs);
 
 		const std::string&		getName() const;
@@ -54,8 +52,9 @@ class Channel
 		bool					isInvited(Client& client);
 		bool					isMember(Client &client);
 		
-		void					addMember(Client client);
-		void					removeMember(Client client);
+		void					invite(Client* client);
+		void					addMember(Client* client);
+		void					removeMember(Client& client);
 		void					SendToAll(Client& client, const std::string& str);
 };
 

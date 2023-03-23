@@ -104,7 +104,7 @@ bool						Server::validChannelName(const std::string& name)
 
 bool						Server::checkOP(Client& client, Channel& channel)
 {
-	return(client.getModeO() || channel[0] == client);
+	return(client.getModeO() || channel[0] == &client);
 }
 
 

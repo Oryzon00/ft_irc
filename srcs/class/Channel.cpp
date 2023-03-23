@@ -1,8 +1,7 @@
 #include "Channel.hpp"
 
-Channel::Channel(Client founder, const std::string& name, const std::string& key,
-				std::vector<Client>* exceptionlist) :
-	_name(name), _topic("No Topic"), _key(key), _exceptionlist(exceptionlist),
+Channel::Channel(Client* founder, const std::string& name, const std::string& key) :
+	_name(name), _topic("No Topic"), _key(key),
 	_mode_i(false), _mode_m(false), _mode_s(false), _mode_t(true)
 {
 	_members.push_back(founder);
@@ -22,7 +21,6 @@ Channel&				Channel::operator=(const Channel& rhs)
 		_members = rhs._members;
 		_banlist = rhs._banlist;
 		_invitelist = rhs._invitelist;
-		_exceptionlist = rhs._exceptionlist;
 		_mode_i = rhs._mode_i;
 		_mode_m = rhs._mode_m;
 		_mode_s = rhs._mode_s;
@@ -32,7 +30,7 @@ Channel&				Channel::operator=(const Channel& rhs)
 	return (*this);
 }
 
-Client&					Channel::operator[](size_t index)
+Client*					Channel::operator[](size_t index)
 {
 	return (_members[index]);
 }
@@ -116,14 +114,14 @@ int						Channel::size() const
 
 bool					Channel::isChanOp(Client& client)
 {
-	return (_members[0] == client);
+	return (_members[0] == &client);
 }
 
 bool					Channel::isBanned(Client& client)
 {
-	for(std::vector<Client>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
+	for(std::vector<Client*>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
 	{
-		if (client == *it)
+		if (&client == *it)
 			return (true);
 	}
 	return (false);
@@ -133,14 +131,9 @@ bool					Channel::isInvited(Client& client)
 {
 	if (_mode_i == false)
 		return (true);
-	for (std::vector<Client>::iterator it = _exceptionlist->begin(); it != _exceptionlist->end(); it++)
+	for (std::vector<Client*>::iterator it = _invitelist.begin(); it != _invitelist.end(); it++)
 	{
-		if (client == *it)
-			return (true);
-	}
-	for (std::vector<Client>::iterator it = _invitelist.begin(); it != _invitelist.end(); it++)
-	{
-		if (client == *it)
+		if (&client == *it)
 			return (true);
 	}
 	return (false);
@@ -148,24 +141,30 @@ bool					Channel::isInvited(Client& client)
 
 bool					Channel::isMember(Client &client)
 {
-    for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
+    for(std::vector<Client*>::iterator it = _members.begin(); it != _members.end(); it++)
     {
-        if (*it == client)
+        if (*it == &client)
             return (true);
     }
     return (false);
 }
 
-void					Channel::addMember(Client client)
+void					Channel::invite(Client* client)
+{
+	_invitelist.push_back(client);
+}
+
+
+void					Channel::addMember(Client* client)
 {
 	_members.push_back(client);
 }
 
-void						Channel::removeMember(Client client)
+void						Channel::removeMember(Client& client)
 {
-	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
+	for(std::vector<Client*>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
-		if (*it == client)
+		if (*it == &client)
 		{
 			_members.erase(it);
 			return ;
@@ -175,9 +174,12 @@ void						Channel::removeMember(Client client)
 
 void 					Channel::SendToAll(Client& client, const std::string& str)
 {
-	for(std::vector<Client>::iterator it = _members.begin(); it != _members.end(); it++)
+	for(std::vector<Client*>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
-		if (*it != client)
-			it->sendToClient(str);
+		if (*it != &client)
+		{
+			Client tmp = *(*it);
+			tmp.sendToClient(str);
+		}
 	}
 }

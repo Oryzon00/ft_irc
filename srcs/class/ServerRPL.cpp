@@ -40,6 +40,9 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 		case RPL_NOTOPIC:
 			f_RPL_NOTOPIC(client, str);
 			break;
+		case RPL_INVITING:
+			f_RPL_INVITING(client, str);
+			break;
 		default:
 			break;
 	}
@@ -173,7 +176,7 @@ void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 	{
 		if (i == 0)
 			str += "@";
-		str += ((*chan)[i].getNickname() + " ");
+		str += ((*chan)[i]->getNickname() + " ");
 	}
 	str += "\n";
 	client.sendToClient(str);
@@ -193,5 +196,13 @@ void	Server::f_RPL_NOTOPIC(Client &client, std::string channel_name)
 	std::string	code = " 331 ";
 
 	std::string str = prefixServer() + code + client.getNickname() + " " + channel_name + " :No topic is set\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_INVITING(Client &client, std::string s)
+{
+	std::string	code = " 341 ";
+
+	std::string str = prefixServer() + code + client.getNickname() + " " + s + "\n";
 	client.sendToClient(str);
 }
