@@ -486,7 +486,7 @@ void							Server::cmd_INVITE(std::string& cmd, Client& client)
 		else if (!checkOP(client, *channel))
 			error_handler(ERR_CHANOPRIVSNEEDED, client, args[1]);
 		else if (channel->isMember(*target))
-			error_handler(ERR_USERONCHANNEL, *target, args[1]);
+			error_handler(ERR_USERONCHANNEL, client, args[0] + " " + args[1]);
 		else
 		{
 			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 

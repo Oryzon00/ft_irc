@@ -72,6 +72,9 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_NOSUCHCHANNEL:
 			f_ERR_NOSUCHCHANNEL(client, str);
 			break;
+		case ERR_USERONCHANNEL:
+			f_ERR_USERONCHANNEL(client, str);
+			break;
 		default:
 			break;
 	}
@@ -259,4 +262,10 @@ void							Server::f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channe
     client.sendToClient(str);
 }
 
+void							Server::f_ERR_USERONCHANNEL(Client &client, const std::string& channel_name)
+{
+	std::string code = " 403 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Is already on channel\n";
+    client.sendToClient(str);
+}
 /* --------------------------------------------------------------------------------- */

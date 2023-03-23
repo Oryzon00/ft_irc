@@ -173,6 +173,8 @@ class Server
 		void							f_ERR_CHANOPRIVSNEEDED(Client& client, const std::string& channel_name);
 		void							f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_USERONCHANNEL(Client &client, const std::string& channel_name);
+
 
 		
 
