@@ -24,6 +24,11 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("restart"), &Server::cmd_RESTART));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PRIVMSG"), &Server::cmd_PRIVMSG));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("TOPIC"), &Server::cmd_TOPIC));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("MOTD"), &Server::cmd_MOTD));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("WHO"), &Server::cmd_WHO));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("WHOIS"), &Server::cmd_WHOIS));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NAMES"), &Server::cmd_NAMES));
+
 }
 
 void	Server::welcomeClient(Client &client)
@@ -35,8 +40,8 @@ void	Server::welcomeClient(Client &client)
 	reply_handler(RPL_ISUPPORT, client); // a finir en fin de projet
 
 	//RPL_UMODEIS or cmd_MODE on user
-
-	error_handler(ERR_NOMOTD, client);
+	std::string motd("MOTD");
+	cmd_MOTD(motd, client);
 }
 
 /* --------------------------------------------------------------------------------- */
@@ -94,8 +99,8 @@ void	Server::cmd_CAP(std::string& cmd, Client& client)
 	std::vector<std::string>	args = findArgsCmd(cmd, "CAP");
 	if (args.size() != 1 || args[0] != "LS")
 	{
-		removeClient(client);
-		std::cout << "!! -- Client CAP is not LS -- !!" << std::endl;
+		error_handler(ERR_NOLS, client);
+		quitClientCmd(client);
 	}
 	client.setIsIrssi(true);
 }
@@ -103,7 +108,12 @@ void	Server::cmd_CAP(std::string& cmd, Client& client)
 void	Server::cmd_PASS(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "PASS");
-	if (args.empty())
+	if (!client.getIsIrssi())
+	{
+		error_handler(ERR_NOCAP, client);
+		quitClientCmd(client);
+	}
+	else if (args.empty())
 		error_handler(ERR_WRONGNBPARAMS, client);
 	else if (client.getPassOk())
 		error_handler(ERR_ALREADYREGISTERED, client);
@@ -121,7 +131,10 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "NICK");
 	if (!client.getPassOk())
-		error_handler(ERR_PASSWDMISMATCH, client);
+	{
+		error_handler(ERR_NOPASS, client);
+		quitClientCmd(client);
+	}
 	else if (args.size() != 1)
 		error_handler(ERR_WRONGNBPARAMS, client);
 	else if (checkAvailNick(args[0]) == false)
@@ -168,8 +181,11 @@ void							Server::cmd_QUIT(std::string& cmd, Client& client)
 void	Server::cmd_USER(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "USER");
-	if (!client.getPassOk())
-		error_handler(ERR_PASSWDMISMATCH, client);
+	if (client.getNickname() == "*")
+	{
+		error_handler(ERR_NONICK, client);
+		quitClientCmd(client);
+	}
 	else if (client.getModeR())
 		error_handler(ERR_ALREADYREGISTERED, client);
 	else if (args.size() != 4)
@@ -281,6 +297,12 @@ void	Server::cmd_PART(std::string& cmd, Client& client)
 	client.clearCmd();
 }
 
+void	Server::cmd_WHO(std::string &cmd, Client &client)
+{
+	(void)cmd;
+	(void)client;
+}
+
 void	Server::cmd_OPER(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "OPER");
@@ -362,6 +384,12 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 	}
 }
 
+void	Server::cmd_WHOIS(std::string &cmd, Client &client)
+{
+	(void)cmd;
+	(void)client;
+}
+
 void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "PRIVMSG");
@@ -414,6 +442,49 @@ void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 				reply_handler(RPL_NOTOPIC, client, args[0]);
 			else
 				reply_handler(RPL_TOPIC, client, args[0]);
+		}
+	}
+}
+
+void	Server::cmd_MOTD(std::string &cmd, Client &client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "MOTD");
+
+	if (!args.empty())
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		if (_MOTD.empty())
+			error_handler(ERR_NOMOTD, client);
+		else
+		{
+			reply_handler(RPL_MOTDSTART, client);
+			reply_handler(RPL_MOTD, client);
+			reply_handler(RPL_ENDOFMOTD, client);
+		}
+	}
+}
+
+void	Server::cmd_NAMES(std::string &cmd, Client &client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "NAMES");
+
+	if (args.empty())
+	{
+		for (size_t i = 0; i < _chans.size(); i++)
+		{
+			reply_handler(RPL_NAMREPLY, client, _chans[i].getName());
+			reply_handler(RPL_ENDOFNAMES, client, _chans[i].getName());
+		}
+	}
+	else
+	{
+		std::vector <std::string> chans = strToVec(args[0], ",");
+		for (size_t i = 0; i < chans.size(); i++)
+		{
+			if (findChannel(chans[i]))
+				reply_handler(RPL_NAMREPLY, client, chans[i]);
+			reply_handler(RPL_ENDOFNAMES, client, chans[i]);
 		}
 	}
 }

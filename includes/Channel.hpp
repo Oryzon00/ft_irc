@@ -18,11 +18,7 @@ class Channel
 		bool					_mode_m;		//moderated	--> false
 		bool					_mode_s;		//secret --> false
 		bool					_mode_t;		//topic --> true
-
-
-
-
-
+		
 	public:
 		Channel();
 		Channel(Client& client, const std::string& name, const std::string& key,

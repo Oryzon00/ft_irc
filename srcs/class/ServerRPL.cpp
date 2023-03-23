@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+#include "../../includes/Server.hpp" // A SUPPRIMER
+
 /* RPL */
 
 
@@ -39,6 +41,15 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 			break;
 		case RPL_NOTOPIC:
 			f_RPL_NOTOPIC(client, str);
+			break;
+		case RPL_MOTDSTART:
+			f_RPL_MOTDSTART(client);
+			break;
+		case RPL_MOTD:
+			f_RPL_MOTD(client);
+			break;
+		case RPL_ENDOFMOTD:
+			f_RPL_ENDOFMOTD(client);
 			break;
 		default:
 			break;
@@ -145,9 +156,12 @@ void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 	Channel *chan = findChannel(channel_name);
 	for(int i = 0; i < chan->size(); i++)
 	{
-		if (i == 0)
-			str += "@";
-		str += ((*chan)[i].getNickname() + " ");
+		if (chan->isMember(client) || !(*chan)[i].getModeI())
+		{
+			if (i == 0)
+				str += "@";
+			str += ((*chan)[i].getNickname() + " ");
+		}
 	}
 	str += "\n";
 	client.sendToClient(str);
@@ -167,5 +181,29 @@ void	Server::f_RPL_NOTOPIC(Client &client, std::string channel_name)
 	std::string	code = " 331 ";
 
 	std::string str = prefixServer() + code + client.getNickname() + " " + channel_name + " :No topic is set\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_MOTDSTART(Client &client)
+{
+	std::string code = " 375 ";
+
+	std::string str = prefixServer() + code + client.getNickname() + " :-" + _name + " Message of the day - \n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_MOTD(Client &client)
+{
+	std::string code = " 372 ";
+
+	std::string str = prefixServer() + code + client.getNickname() + " :" + _MOTD + "\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_ENDOFMOTD(Client &client)
+{
+	std::string code = " 376 ";
+
+	std::string str = prefixServer() + code + client.getNickname() + " :End of /MOTD command.\n";
 	client.sendToClient(str);
 }

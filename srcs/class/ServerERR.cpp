@@ -65,6 +65,18 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_NOSUCHCHANNEL:
 			f_ERR_NOSUCHCHANNEL(client, str);
 			break;
+		case ERR_NOLS:
+			f_ERR_NOLS(client);
+			break;
+		case ERR_NOCAP:
+			f_ERR_NOCAP(client);
+			break;
+		case ERR_NOPASS:
+			f_ERR_NOPASS(client);
+			break;
+		case ERR_NONICK:
+			f_ERR_NONICK(client);
+			break;
 		default:
 			break;
 	}
@@ -150,7 +162,7 @@ void	Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 void	Server::f_ERR_NOMOTD(Client &client)
 {
 	std::string code = " 422 ";
-	std::string	str = prefixServer() + code + client.getNickname() + " :MOTD is not supported\n";
+	std::string	str = prefixServer() + code + client.getNickname() + " :MOTD File is missing\n";
 	client.sendToClient(str);
 }
 
@@ -226,6 +238,34 @@ void							Server::f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channe
 	std::string code = " 403 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :No such channel\n";
     client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOLS(Client &client)
+{
+	std::string code = " 1003 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :CAP parameter must be 'LS'\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOCAP(Client &client)
+{
+	std::string code = " 1004 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :Client type is undefined\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOPASS(Client &client)
+{
+	std::string code = " 1005 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :Server password must be given\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NONICK(Client &client)
+{
+	std::string code = " 1006 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :Nickname is not set\n";
+	client.sendToClient(str);
 }
 
 /* --------------------------------------------------------------------------------- */

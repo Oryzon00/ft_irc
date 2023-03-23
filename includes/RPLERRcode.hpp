@@ -41,6 +41,10 @@
 
 # define RPL_KILLREPLY			1001
 # define ERR_NOTREGISTERED		1002
+# define ERR_NOLS				1003
+# define ERR_NOCAP				1004
+# define ERR_NOPASS				1005
+# define ERR_NONICK				1006
 
 # define ERR_NOSUCHNICK			401
 # define ERR_NOSUCHCHANNEL		403
