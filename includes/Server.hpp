@@ -114,6 +114,8 @@ class Server
 		void							join_channel(Client& client, std::string name, std::string key);
 		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
 		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
+		void							notice_to_channel(std::string channelTargetName, Client& client, std::string message);
+		void							notice_to_client(std::string clientTargetName, Client& client, std::string message);
 		void							part_channel(Client& client, std::string name, std::string reason);
 		void							quit_channel(Client& client, std::string name, std::string reason);
 		void							leaveAllChannels(Client& client, std::string reason);
@@ -162,6 +164,7 @@ class Server
 		void							cmd_WHO(std::string& cmd, Client& client);
 		void							cmd_WHOIS(std::string& cmd, Client& client);
 		void							cmd_INVITE(std::string& cmd, Client& client);
+		void							cmd_KICK(std::string& cmd, Client& client);
 		void							cmd_NOTICE(std::string& cmd, Client& client);
 
 		/* ERR */
@@ -192,6 +195,7 @@ class Server
 		void							f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_USERONCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_USERNOTINCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_NOLS(Client& client);
 		void							f_ERR_NOCAP(Client& client);
 		void							f_ERR_NOPASS(Client& client);

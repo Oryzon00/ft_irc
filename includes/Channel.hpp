@@ -51,6 +51,7 @@ class Channel
 		void					invite(Client* client);
 		void					addMember(Client* client);
 		void					removeMember(Client& client);
+		void					removeMember(Client* client);
 		void					SendToAll(Client& client, const std::string& str);
 };
 

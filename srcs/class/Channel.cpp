@@ -172,6 +172,18 @@ void						Channel::removeMember(Client& client)
 	}
 }
 
+void						Channel::removeMember(Client* client)
+{
+	for(std::vector<Client*>::iterator it = _members.begin(); it != _members.end(); it++)
+	{
+		if (*it == client)
+		{
+			_members.erase(it);
+			return ;
+		}
+	}
+}
+
 void 					Channel::SendToAll(Client& client, const std::string& str)
 {
 	for(std::vector<Client*>::iterator it = _members.begin(); it != _members.end(); it++)

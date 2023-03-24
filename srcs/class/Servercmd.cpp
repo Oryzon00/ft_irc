@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+#include "../../includes/Server.hpp"
+
 void	Server::quitClientCmd(Client &client)
 {
 	removeClient(client);
@@ -28,7 +30,8 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NAMES"), &Server::cmd_NAMES));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("LIST"), &Server::cmd_LIST));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("INVITE"), &Server::cmd_INVITE));
-	//_dico.insert(std::pair<std::string, cmdFunction>(std::string("NOTICE"), &Server::cmd_NOTICE));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("KICK"), &Server::cmd_KICK));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NOTICE"), &Server::cmd_NOTICE));
 }
 
 /* --------------------------------------------------------------------------------- */
@@ -215,7 +218,7 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 		if (args.begin() + 1 != args.end())
 			keys = strToVec(args[1], ",");
 		for(size_t i = 0; i < chans.size(); i++)
-			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "x");
+			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "");
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
@@ -314,6 +317,37 @@ void							Server::cmd_INVITE(std::string& cmd, Client& client)
 	}
 }
 
+void	Server::cmd_KICK(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "KICK");
+	if (args.size() != 2 && args.size() != 3)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		Channel*	channel = findChannel(args[0]);
+		Client*		target  = find_client_by_nick(args[1]);
+		std::string reason	= ": Ratio ";
+		if (args.size() == 3)
+			reason = args[2];
+		if (!channel)
+			error_handler(ERR_NOSUCHCHANNEL, client, args[0]);
+		else if (!channel->isMember(client))
+			error_handler(ERR_NOTONCHANNEL, client, args[0]);
+		else if (!checkOP(client, *channel))
+			error_handler(ERR_CHANOPRIVSNEEDED, client, args[0]);
+		else if (!target || !channel->isMember(*target))
+			error_handler(ERR_USERNOTINCHANNEL, client, args[0] + " " + args[1]);
+		else
+		{
+			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+							+ " KICK " + args[0] + " " + args[1] + " " + reason + "\n";
+			client.sendToClient(str);
+			channel->SendToAll(client, str);
+			channel->removeMember(target);
+		}	
+	}
+}
+
 
 void	Server::cmd_OPER(std::string& cmd, Client& client)
 {
@@ -398,6 +432,33 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 	}
 }
 
+void	Server::notice_to_client(std::string clientTargetName, Client &client, std::string message)
+{
+	Client *target = find_client_by_nick(clientTargetName);
+	std::string str;
+
+	if (target)
+	{
+		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " NOTICE "
+			  + clientTargetName + " " + message + "\n";
+		target->sendToClient(str);
+	}
+}
+
+void	Server::notice_to_channel(std::string channelTargetName, Client &client, std::string message)
+{
+	Channel *target = findChannel(channelTargetName);
+	std::string str;
+
+	if (target && target->isMember(client) && (!target->getModeM() || checkOP(client, *target)))
+	{
+		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " NOTICE "
+			  + channelTargetName + " " + message + "\n";
+		target->SendToAll(client, str);
+	}
+}
+
+
 void	Server::cmd_WHOIS(std::string &cmd, Client &client)
 {
 	(void)cmd;
@@ -422,21 +483,21 @@ void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
 	}
 }
 
-//void	Server::cmd_NOTICE(std::string& cmd, Client& client)
-//{
-//	std::vector<std::string>	args = findArgsCmd(cmd, "PRIVMSG");
-//
-//	if (args.size() == 2 && args[1].at(0) == ':')
-//	{
-//		std::vector <std::string> targets = strToVec(args[0], ",");
-//		for (size_t i = 0; i < targets.size(); i++) {
-//			if (targets[i].at(0) == '#')
-//				message_to_channel(targets[i], client, args[1]);
-//			else
-//				message_to_client(targets[i], client, args[1]);
-//		}
-//	}
-//}
+void	Server::cmd_NOTICE(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "PRIVMSG");
+
+	if (args.size() == 2 && args[1].at(0) == ':')
+	{
+		std::vector <std::string> targets = strToVec(args[0], ",");
+		for (size_t i = 0; i < targets.size(); i++) {
+			if (targets[i].at(0) == '#')
+				notice_to_channel(targets[i], client, args[1]);
+			else
+				notice_to_client(targets[i], client, args[1]);
+		}
+	}
+}
 
 void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 {
