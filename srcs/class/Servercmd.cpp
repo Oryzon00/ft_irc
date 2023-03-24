@@ -427,8 +427,8 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
 			  + channelTargetName + " " + message + "\n";
 		target->SendToAll(client, str);
-		// if (channel_name == "#bot" && message.size() > 1 && message[1] == '!')
-			// bot process
+		if (channelTargetName == "#bot" && message.size() > 1 && message[1] == '!')
+			std::cout << "Bot detected" << std::endl;
 	}
 }
 
