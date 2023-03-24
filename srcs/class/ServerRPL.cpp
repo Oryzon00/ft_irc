@@ -159,7 +159,7 @@ void	Server::f_RPL_MYINFO(Client &client)
 	std::string code = " 004 ";
 	std::string str;
 
-	str = prefixServer() + code + client.getNickname() + " " + _name + " 1.0.42 " + "r\n";
+	str = prefixServer() + code + client.getNickname() + " " + _name + " 1.0.42 " + "iOR imstk\n";
 	client.sendToClient(str);
 }
 void	Server::f_RPL_ISUPPORT(Client &client)
@@ -170,7 +170,7 @@ void	Server::f_RPL_ISUPPORT(Client &client)
 	std::string code = " 005 ";
 	std::string str;
 
-	str = prefixServer() + code + client.getNickname() + " CHANMODES=# NICKLEN=20 :are supported by this server\n";
+	str = prefixServer() + code + client.getNickname() + " CHANMODES=#@ NICKLEN=20 :are supported by this server\n";
 	client.sendToClient(str);
 }
 
