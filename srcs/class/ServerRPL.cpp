@@ -66,14 +66,6 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 	}
 }
 
-/*
-=============== read 12 bytes from CLIENT (4) ==================
-MODE #chat
-
-=============== read 83 bytes from SERVER (5) ===================
-:my.server.name 324 adrian #chat +nt
-*/
-
 void	Server::f_RPL_CHANNELMODEIS(Client& client, Channel& channel)
 {
 	std::string code = " 324 ";

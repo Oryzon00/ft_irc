@@ -91,7 +91,8 @@ class Server
 		std::vector<Channel>				_chans;
 		std::vector<Client>					_exceptionlist;
 		std::string 						_MOTD;
-
+		Client								_bot;
+	
 	/* ------------------------------------------------------------------ */
 
 		std::string						findKey(std::string cmd);
@@ -103,6 +104,7 @@ class Server
 		bool							checkRegistered(cmdFunction f, Client & client);
 		bool							checkOP(Client& client, Channel& channel);
 		void							initDico(void);
+		void							initBot(void);
 		void							callFunCmd(cmdFunction f, Client & client);
 		const std::string				prefixServer(void) const;
 		void							quitClientCmd(Client &client);

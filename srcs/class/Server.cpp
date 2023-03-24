@@ -6,6 +6,17 @@ Server::Server(int port, std::string password)
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
 	initDico();
+	initBot();
+}
+
+void	Server::initBot()
+{
+	_bot.setNickname("Mr.Bot");
+	_bot.setUsername("Mr.Bot");
+	_bot.setRealname("Mister Bot");
+
+	Channel	chan_bot(&_bot, "#bot", "");
+	_chans.push_back(chan_bot);
 }
 
 Server::~Server(void)
@@ -203,8 +214,6 @@ void						Server::processQuery(int index)
 	std::string 									key = findKey(client.getCmd());
 	std::map<std::string, cmdFunction>::iterator	it = _dico.find(key);
 
-	// if (!checkCAP(client, key)) // aremetre
-	// 	return ;
 	try
 	{
 		if (it == _dico.end())

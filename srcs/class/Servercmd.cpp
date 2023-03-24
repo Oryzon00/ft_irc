@@ -193,8 +193,6 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		error_handler(ERR_BADCHANMASK, client, name);
 	else if (key != channel->getKey())
 		error_handler(ERR_BADCHANNELKEY, client, name);
-	// else if (channel->isBanned(client))
-	// 	error_handler(ERR_BANNEDFROMCHAN, client, name);
 	else if (!channel->isInvited(client))
 		error_handler(ERR_INVITEONLYCHAN, client, name);
 	else if (!channel->isMember(client))
@@ -262,8 +260,6 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 	}
 }
 
-//	:b!~qcherel@my.server.name PART #chat
-//	:b!~qcherel@13-20h.IRC PART #c
 
 void	Server::cmd_PART(std::string& cmd, Client& client)
 {
@@ -397,6 +393,8 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
 			  + channelTargetName + " " + message + "\n";
 		target->SendToAll(client, str);
+		// if (channel_name == "#bot" && message.size() > 1 && message[1] == '!')
+			// bot process
 	}
 }
 
