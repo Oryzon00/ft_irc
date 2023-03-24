@@ -47,89 +47,22 @@ void	Server::cmd_MODE_answer(Client & client, std::string& target, std::string f
 }
 
 
-void	Server::cmd_MODE_answer_channel(Client & client, std::string& target, std::string flag)
+void	Server::cmd_MODE_answer_channel(Client & client, std::string& target, std::string flag,
+										Channel* channel)
 {
 	std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
 		+ " MODE " + target + " " + flag + "\n";
 	client.sendToClient(str);
+	channel->SendToAll(client, str);
 }
 
 /* --------------------------------------------------------------------------------- */
 
 /* CMD */
 
-void	Server::cmd_MODE_user_add(std::string& cmd, Client& client,
-								std::vector<std::string>& args)
-{
-	(void) cmd;
-	std::string target = args[0];
-	std::string	flag = args[1];
-	std::string::iterator it = flag.begin();
-	it++;
-	for(; it != flag.end(); it++)
-	{
-		if (*it == 'i')
-		{
-			client.setModeI(true);
-			cmd_MODE_answer(client, target, "+i");
-		}
-		else if (*it == 'O')
-			error_handler(ERR_NORIGHT, client);
-		else if (*it == 'r')
-			error_handler(ERR_NORIGHT, client);
-		else
-			error_handler(ERR_UMODEUNKNOWNFLAG, client);
-	}
-}
 
-void	Server::cmd_MODE_user_remove(std::string& cmd, Client& client,
-								std::vector<std::string>& args)
-{
-	(void) cmd;
-	std::string target = args[0];
-	std::string	flag = args[1];
-	std::string::iterator it = flag.begin();
-	it++;
-	for(; it != flag.end(); it++)
-	{
-		if (*it == 'i')
-		{
-			client.setModeI(false);
-			cmd_MODE_answer(client, target, "-i");
-		}
-		else if (*it == 'O')
-			error_handler(ERR_NORIGHT, client);
-		else if (*it == 'r')
-			error_handler(ERR_NORIGHT, client);
-		else
-			error_handler(ERR_UMODEUNKNOWNFLAG, client);
-	}
-}
 
-void	Server::cmd_MODE_user(std::string& cmd, Client& client,
-								std::vector<std::string>& args)
-{
-	std::string	nick = args[0];
-	Client*		target = find_client_by_nick(nick);
-
-	if (!target)
-		error_handler(ERR_NOSUCHNICK, client, "MODE");
-	else if (nick != client.getNickname())
-		error_handler(ERR_USERSDONTMATCH, client);
-	else if (args.size() == 1)
-		reply_handler(RPL_UMODEIS, client);
-	else
-	{
-		if (args[1][0] == '+')
-			cmd_MODE_user_add(cmd, client, args);
-		else if (args[1][0] == '-')
-			cmd_MODE_user_remove(cmd, client, args);
-		else
-			error_handler(ERR_UMODEUNKNOWNFLAG, client);
-	}
-}
-
-void	Server::cmd_MODE_channel_remove(std::string& cmd, Client& client,
+/* void	Server::cmd_MODE_channel_remove(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
 	(void) cmd;
@@ -185,9 +118,9 @@ void	Server::cmd_MODE_channel_remove(std::string& cmd, Client& client,
 		else
 			error_handler(ERR_UNKNOWNMODE, client, &(*it));
 	}
-}			
+}		 */	
 
-void	Server::cmd_MODE_channel_add(std::string& cmd, Client& client,
+/* void	Server::cmd_MODE_channel_add(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
 	(void) cmd;
@@ -243,32 +176,11 @@ void	Server::cmd_MODE_channel_add(std::string& cmd, Client& client,
 		else
 			error_handler(ERR_UNKNOWNMODE, client, &(*it));
 	}
-}
+} */
 
-void	Server::cmd_MODE_channel(std::string& cmd, Client& client,
-								std::vector<std::string>& args)
-{
-	std::string		channel = args[0];
-	Channel*		target = findChannel(channel);
 
-	if (!target)
-		error_handler(ERR_NOSUCHCHANNEL, client, channel);
-	else if (args.size() == 1)
-		f_RPL_CHANNELMODEIS(client, *target);
-	else
-	{
-		if (args[1][0] == '+')
-			cmd_MODE_channel_add(cmd, client, args);
-		else if (args[1][0] == '-')
-			cmd_MODE_channel_remove(cmd, client, args);
-		else
-			error_handler(ERR_UNKNOWNMODE, client, args[1]);
-	}
-	
-	
-}
 
-void	Server::cmd_MODE(std::string& cmd, Client & client)
+/* void	Server::cmd_MODE(std::string& cmd, Client & client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "MODE");
 	if (args.size() == 0)
@@ -278,7 +190,7 @@ void	Server::cmd_MODE(std::string& cmd, Client & client)
 	else if (args[0][0] == '#')
 		cmd_MODE_channel(cmd, client, args);
 	
-}
+} */
 
 void	Server::cmd_RESTART(std::string& cmd, Client& client)
 {

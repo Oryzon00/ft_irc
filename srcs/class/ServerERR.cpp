@@ -93,6 +93,18 @@ void	Server::f_ERR_UMODEUNKNOWNFLAG(Client & client)
 	client.sendToClient(str);
 }
 
+/* =============== read 58 bytes from SERVER (5) ===================
+:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
+
+=============== read 40 bytes from SERVER (5) ===================
+:adrian!~ajung@13-20h.IRC MODE #room -i
+
+=============== read 156 bytes from SERVER (5) ===================
+:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
+:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
+:adrian!~ajung@13-20h.IRC MODE #room -i
+ */
+
 void	Server::f_ERR_UNKNOWNMODE(Client &client, std::string modechar)
 {
 	std::string code = " 472 ";
