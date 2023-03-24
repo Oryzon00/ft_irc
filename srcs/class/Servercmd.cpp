@@ -28,6 +28,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("WHO"), &Server::cmd_WHO));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("WHOIS"), &Server::cmd_WHOIS));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NAMES"), &Server::cmd_NAMES));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("LIST"), &Server::cmd_LIST));
 
 }
 
@@ -486,5 +487,28 @@ void	Server::cmd_NAMES(std::string &cmd, Client &client)
 				reply_handler(RPL_NAMREPLY, client, chans[i]);
 			reply_handler(RPL_ENDOFNAMES, client, chans[i]);
 		}
+	}
+}
+
+void	Server::cmd_LIST(std::string &cmd, Client &client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "LIST");
+	if (args.empty())
+	{
+		reply_handler(RPL_LISTSTART, client);
+		for (size_t i = 0; i < _chans.size(); i++)
+			reply_handler(RPL_LIST, client, _chans[i].getName());
+		reply_handler(RPL_LISTEND, client);
+	}
+	else
+	{
+		std::vector <std::string> chans = strToVec(args[0], ",");
+		reply_handler(RPL_LISTSTART, client);
+		for (size_t i = 0; i < chans.size(); i++)
+		{
+			if (findChannel(chans[i]))
+				reply_handler(RPL_LIST, client, chans[i]);
+		}
+		reply_handler(RPL_LISTEND, client);
 	}
 }

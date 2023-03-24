@@ -7,6 +7,7 @@
 # include <iostream>
 # include <algorithm>
 # include <utility>
+# include <sstream>
 # include <errno.h>
 
 # include "RPLERRcode.hpp"
@@ -191,6 +192,9 @@ class Server
 		void							f_RPL_MOTDSTART(Client& client);
 		void							f_RPL_MOTD(Client& client);
 		void							f_RPL_ENDOFMOTD(Client& client);
+		void							f_RPL_LISTSTART(Client& client);
+		void							f_RPL_LIST(Client& client, std::string channel_name);
+		void							f_RPL_LISTEND(Client& client);
 
 	public:
 

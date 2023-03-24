@@ -51,11 +51,19 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 		case RPL_ENDOFMOTD:
 			f_RPL_ENDOFMOTD(client);
 			break;
+		case RPL_LISTSTART:
+			f_RPL_LISTSTART(client);
+			break;
+		case RPL_LIST:
+			f_RPL_LIST(client, str);
+			break;
+		case RPL_LISTEND:
+			f_RPL_LISTEND(client);
+			break;
 		default:
 			break;
 	}
 }
-
 
 void	Server::f_RPL_UMODEIS(Client &client)
 {
@@ -150,10 +158,14 @@ void	Server::f_RPL_TOPIC(Client &client, const std::string& channel_name)
 void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 {
 	std::string					code = " 353 ";
+	std::string 				channel_type = " = ";
 
-	std::string	str = prefixServer() + code + client.getNickname() + " = " + channel_name
-		+ " :";
+
 	Channel *chan = findChannel(channel_name);
+	if (chan->getModeS())
+		channel_type = " @ ";
+	std::string	str = prefixServer() + code + client.getNickname() + channel_type + channel_name
+						 + " :";
 	for(int i = 0; i < chan->size(); i++)
 	{
 		if (chan->isMember(client) || !(*chan)[i].getModeI())
@@ -205,5 +217,33 @@ void	Server::f_RPL_ENDOFMOTD(Client &client)
 	std::string code = " 376 ";
 
 	std::string str = prefixServer() + code + client.getNickname() + " :End of /MOTD command.\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_LISTSTART(Client &client)
+{
+	std::string code = " 321 ";
+
+	std::string str = prefixServer() + code + client.getNickname() + " Channel :Users Name\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_LIST(Client &client, std::string channel_name)
+{
+	std::string code = " 322 ";
+
+	Channel *channel = findChannel(channel_name);
+	if (channel && !channel->getModeS())
+	{
+		std::string result = static_cast<std::ostringstream*>( &(std::ostringstream() << channel->size()) )->str();
+		std::string str = prefixServer() + code + client.getNickname() + " " + channel_name + " " + result + " :" + channel->getTopic() + "\n";
+		client.sendToClient(str);
+	}
+}
+
+void	Server::f_RPL_LISTEND(Client &client)
+{
+	std::string code = " 323 ";
+	std::string str = prefixServer() + code + client.getNickname() + " :End of /LIST\n";
 	client.sendToClient(str);
 }

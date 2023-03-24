@@ -62,6 +62,11 @@ const bool&			Channel::getModeM() const
 	return(_mode_m);
 }
 
+const bool&			Channel::getModeS() const
+{
+	return(_mode_s);
+}
+
 void	Channel::setTopic(const std::string &str)
 {
 	_topic = str;
