@@ -6,22 +6,18 @@
 class Channel
 {
 	private:
-		std::string				_name;
-		std::string				_topic;
-		std::string				_key;			//mode k
+		std::string					_name;
+		std::string					_topic;
+		std::string					_key;
 		std::vector<Client*>		_members;
-		std::vector<Client*>		_banlist;		//mode b
+		// std::vector<Client*>		_banlist;
 		std::vector<Client*>		_invitelist;	//mode i
 
-		bool					_mode_i;		//invite --> false
-		bool					_mode_m;		//moderated	--> false
-		bool					_mode_s;		//secret --> false
-		bool					_mode_t;		//topic --> true
-
-
-
-
-
+		bool						_mode_i;
+		bool						_mode_m;
+		bool						_mode_s;
+		bool						_mode_t;
+		
 	public:
 		Channel();
 		Channel(Client* client, const std::string& name, const std::string& key);
@@ -48,7 +44,7 @@ class Channel
 		int						size() const;
 
 		bool					isChanOp(Client& client);
-		bool					isBanned(Client& client);
+		// bool					isBanned(Client& client);
 		bool					isInvited(Client& client);
 		bool					isMember(Client &client);
 		

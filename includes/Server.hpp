@@ -7,6 +7,7 @@
 # include <iostream>
 # include <algorithm>
 # include <utility>
+# include <sstream>
 # include <errno.h>
 
 # include "RPLERRcode.hpp"
@@ -32,7 +33,8 @@ CONNECTION
 	USER	DONE
 	PING	DONE
 	OPER	DONE
-	QUIT	--> A FINIR (channel)
+	QUIT	DONE
+	ERROR
 
 class CHANNEL --> QUENTIN
 check registration --> DONE
@@ -55,7 +57,7 @@ Operator Messages
 
 Server Queries and Commands
 	MODE
-	MOTD
+	MOTD	DONE
 
 TO DO
 --> merge channel main
@@ -66,6 +68,10 @@ TO DO
 # define SUCCESS			0
 # define DISCONNECT			0
 # define OPER_PASSWD		"operpass"
+
+# define SIGN_NONE			0
+# define SIGN_PLUS			1
+# define SIGN_MINUS			2
 
 int	initServerSocket(unsigned short port);
 
@@ -84,6 +90,7 @@ class Server
 		std::vector<Client>					_clients;
 		std::vector<Channel>				_chans;
 		std::vector<Client>					_exceptionlist;
+		std::string 						_MOTD;
 
 	/* ------------------------------------------------------------------ */
 
@@ -105,28 +112,34 @@ class Server
 		void							join_channel(Client& client, std::string name, std::string key);
 		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
 		void							message_to_client(std::string clientTargetName, Client& client, std::string message);
+		void							notice_to_channel(std::string channelTargetName, Client& client, std::string message);
+		void							notice_to_client(std::string clientTargetName, Client& client, std::string message);
 		void							part_channel(Client& client, std::string name, std::string reason);
-		
-
+		void							quit_channel(Client& client, std::string name, std::string reason);
+		void							leaveAllChannels(Client& client, std::string reason);
 
 		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_user_add(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_user_remove(std::string& cmd, Client& client,
-											std::vector<std::string>& args);									
-		
+											std::vector<std::string>& args);
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
+											std::vector<std::string>& args);;
+		void							cmd_MODE_channel_parse(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
-		void							cmd_MODE_channel_add(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
-		void							cmd_MODE_channel_remove(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
-
+		void							cmd_MODE_channel_i(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_m(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_s(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_t(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
 		void							cmd_MODE_answer(Client & client, std::string& target,
 											std::string flag);
 		void							cmd_MODE_answer_channel(Client & client,
-											std::string& target, std::string flag);
+											std::string& target, std::string flag, Channel* channel);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
@@ -143,10 +156,14 @@ class Server
 		void							cmd_RESTART(std::string& cmd, Client& client);
 		void							cmd_TOPIC(std::string& cmd, Client& client);
 		void							cmd_PART(std::string& cmd, Client& client);
+		void							cmd_MOTD(std::string& cmd, Client& client);
+		void							cmd_NAMES(std::string& cmd, Client& client);
+		void							cmd_LIST(std::string& cmd, Client& client);
+		void							cmd_WHO(std::string& cmd, Client& client);
+		void							cmd_WHOIS(std::string& cmd, Client& client);
 		void							cmd_INVITE(std::string& cmd, Client& client);
 		void							cmd_KICK(std::string& cmd, Client& client);
-
-
+		void							cmd_NOTICE(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");
@@ -158,14 +175,14 @@ class Server
 		void							f_ERR_NICKNAMEINUSE(Client &client);
 		void							f_ERR_ERRONEUSNICKNAME(Client &client);
 		void							f_ERR_NONICKNAMEGIVEN(Client &client);
-		void							f_ERR_BADCHANMASK(Client &client, const std::string& channel_name);
-		void							f_ERR_BADCHANNELKEY(Client &client, const std::string& channel_name);
-		void							f_ERR_BANNEDFROMCHAN(Client &client, const std::string& channel_name);
-		void							f_ERR_INVITEONLYCHAN(Client &client, const std::string& channel_name);
-		void							f_ERR_NOMOTD(Client &client);
-		void							f_ERR_NOOPERHOST(Client &client);
-		void							f_ERR_NOPRIVILEGES(Client &client);
-		void							f_ERR_NOSUCHNICK(Client & client, std::string cmd_str);
+		void							f_ERR_BADCHANMASK(Client& client, const std::string& channel_name);
+		void							f_ERR_BADCHANNELKEY(Client& client, const std::string& channel_name);
+		void							f_ERR_BANNEDFROMCHAN(Client& client, const std::string& channel_name);
+		void							f_ERR_INVITEONLYCHAN(Client& client, const std::string& channel_name);
+		void							f_ERR_NOMOTD(Client& client);
+		void							f_ERR_NOOPERHOST(Client& client);
+		void							f_ERR_NOPRIVILEGES(Client& client);
+		void							f_ERR_NOSUCHNICK(Client& client, std::string cmd_str);
 		void							f_ERR_NOTREGISTERED(Client& client);
 		void							f_ERR_USERSDONTMATCH(Client& client);
 		void							f_ERR_UNKNOWNMODE(Client& client, std::string modechar);
@@ -177,28 +194,35 @@ class Server
 		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_USERONCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_USERNOTINCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_NOLS(Client& client);
+		void							f_ERR_NOCAP(Client& client);
+		void							f_ERR_NOPASS(Client& client);
 
 
 
-		
-
-		/* RPL */
+	/* RPL */
 		void							reply_handler(int RPL_CODE, Client &client, const std::string& str = "");
 
-		void							f_RPL_TOPIC(Client &client, const std::string& channel_name);
-		void							f_RPL_NAMREPLY(Client &client, const std::string& channel_name);
+		void							f_RPL_TOPIC(Client& client, const std::string& channel_name);
+		void							f_RPL_NAMREPLY(Client& client, const std::string& channel_name);
 		void							f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name);
-		void							f_RPL_WELCOME(Client &client);
-		void							f_RPL_YOURHOST(Client &client);
-		void							f_RPL_CREATED(Client &client);
-		void							f_RPL_MYINFO(Client &client);
-		void							f_RPL_ISUPPORT(Client &client);
-		void							f_RPL_YOUREOPER(Client &client);
-		void							f_RPL_UMODEIS(Client &client);
+		void							f_RPL_WELCOME(Client& client);
+		void							f_RPL_YOURHOST(Client& client);
+		void							f_RPL_CREATED(Client& client);
+		void							f_RPL_MYINFO(Client& client);
+		void							f_RPL_ISUPPORT(Client& client);
+		void							f_RPL_YOUREOPER(Client& client);
+		void							f_RPL_UMODEIS(Client& client);
 		void							f_RPL_CHANNELMODEIS(Client &client, Channel& channel);
 		void							f_RPL_KILLREPLY(Client &client, std::string cible_name,
 											Client &killer, std::string &comment);
-		void							f_RPL_NOTOPIC(Client &client, std::string channel_name);
+		void							f_RPL_NOTOPIC(Client& client, std::string channel_name);
+		void							f_RPL_MOTDSTART(Client& client);
+		void							f_RPL_MOTD(Client& client);
+		void							f_RPL_ENDOFMOTD(Client& client);
+		void							f_RPL_LISTSTART(Client& client);
+		void							f_RPL_LIST(Client& client, std::string channel_name);
+		void							f_RPL_LISTEND(Client& client);
 		void							f_RPL_INVITING(Client &client, std::string s);
 
 

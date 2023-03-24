@@ -72,6 +72,15 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_NOSUCHCHANNEL:
 			f_ERR_NOSUCHCHANNEL(client, str);
 			break;
+		case ERR_NOLS:
+			f_ERR_NOLS(client);
+			break;
+		case ERR_NOCAP:
+			f_ERR_NOCAP(client);
+			break;
+		case ERR_NOPASS:
+			f_ERR_NOPASS(client);
+			break;
 		case ERR_USERONCHANNEL:
 			f_ERR_USERONCHANNEL(client, str);
 			break;
@@ -85,7 +94,7 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 
 void	Server::f_ERR_NORIGHT(Client & client)
 {
-	std::string code = " 1003 ";
+	std::string code = " 1007 ";
 	std::string str = prefixServer() + code + client.getNickname() + " "
 		":You don't have the rights to do this\n";
 	client.sendToClient(str);
@@ -98,6 +107,18 @@ void	Server::f_ERR_UMODEUNKNOWNFLAG(Client & client)
 		":Unknown MODE flag\n";
 	client.sendToClient(str);
 }
+
+/* =============== read 58 bytes from SERVER (5) ===================
+:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
+
+=============== read 40 bytes from SERVER (5) ===================
+:adrian!~ajung@13-20h.IRC MODE #room -i
+
+=============== read 156 bytes from SERVER (5) ===================
+:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
+:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
+:adrian!~ajung@13-20h.IRC MODE #room -i
+ */
 
 void	Server::f_ERR_UNKNOWNMODE(Client &client, std::string modechar)
 {
@@ -187,7 +208,7 @@ void	Server::f_ERR_ERRONEUSNICKNAME(Client &client)
 void	Server::f_ERR_NOMOTD(Client &client)
 {
 	std::string code = " 422 ";
-	std::string	str = prefixServer() + code + client.getNickname() + " :MOTD is not supported\n";
+	std::string	str = prefixServer() + code + client.getNickname() + " :MOTD File is missing\n";
 	client.sendToClient(str);
 }
 
@@ -263,6 +284,27 @@ void							Server::f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channe
 	std::string code = " 403 ";
 	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :No such channel\n";
     client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOLS(Client &client)
+{
+	std::string code = " 1003 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :CAP parameter must be 'LS'\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOCAP(Client &client)
+{
+	std::string code = " 1004 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :Client type is undefined\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_NOPASS(Client &client)
+{
+	std::string code = " 1005 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " :Server password must be given\n";
+	client.sendToClient(str);
 }
 
 void							Server::f_ERR_USERONCHANNEL(Client &client, const std::string& channel_name)
