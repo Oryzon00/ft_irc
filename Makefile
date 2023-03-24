@@ -1,18 +1,19 @@
 NAME		=	ircserv
 
-SRCS		=	srcs/main.cpp				\
-				srcs/parsing.cpp			\
-				srcs/initSocket.cpp			\
-				srcs/class/Client.cpp		\
-				srcs/class/Server.cpp		\
-				srcs/class/Servercmd.cpp	\
-				srcs/class/ServerERR.cpp	\
-				srcs/class/ServerRPL.cpp	\
-				srcs/class/Network.cpp		\
-				srcs/class/Channel.cpp		\
-				srcs/execLoop.cpp			\
-				srcs/signal.cpp				\
-				srcs/tools.cpp				\
+SRCS		=	srcs/main.cpp					\
+				srcs/parsing.cpp				\
+				srcs/initSocket.cpp				\
+				srcs/class/Client.cpp			\
+				srcs/class/Server.cpp			\
+				srcs/class/Servercmd.cpp		\
+				srcs/class/ServerCmdMode.cpp	\
+				srcs/class/ServerERR.cpp		\
+				srcs/class/ServerRPL.cpp		\
+				srcs/class/Network.cpp			\
+				srcs/class/Channel.cpp			\
+				srcs/execLoop.cpp				\
+				srcs/signal.cpp					\
+				srcs/tools.cpp					\
 
 
 INC_DIR		=	includes
