@@ -121,6 +121,12 @@ void	Server::cmd_MODE_channel_parse(std::string& cmd, Client& client,
 			sign = SIGN_MINUS;
 		else if (*it == 'i')
 			cmd_MODE_channel_i(client, channel, channel_name, sign, *it);
+		else if (*it == 'm')
+			cmd_MODE_channel_m(client, channel, channel_name, sign, *it);
+		else if (*it == 's')
+			cmd_MODE_channel_s(client, channel, channel_name, sign, *it);
+		else if (*it == 't')
+			cmd_MODE_channel_t(client, channel, channel_name, sign, *it);
 		else if (*it == 'k')
 			error_handler(ERR_NORIGHT, client);
 		else

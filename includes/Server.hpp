@@ -121,13 +121,11 @@ class Server
 		void							cmd_MODE_user_add(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_user_remove(std::string& cmd, Client& client,
-											std::vector<std::string>& args);									
-		
+											std::vector<std::string>& args);
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
 											std::vector<std::string>& args);;
 		void							cmd_MODE_channel_parse(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
-
 		void							cmd_MODE_channel_i(Client& client, Channel* channel,
 											std::string& channel_name, char& sign, char mode);
 		void							cmd_MODE_channel_m(Client& client, Channel* channel,
@@ -136,7 +134,6 @@ class Server
 											std::string& channel_name, char& sign, char mode);
 		void							cmd_MODE_channel_t(Client& client, Channel* channel,
 											std::string& channel_name, char& sign, char mode);
-
 		void							cmd_MODE_answer(Client & client, std::string& target,
 											std::string flag);
 		void							cmd_MODE_answer_channel(Client & client,
@@ -163,7 +160,7 @@ class Server
 		void							cmd_WHO(std::string& cmd, Client& client);
 		void							cmd_WHOIS(std::string& cmd, Client& client);
 		void							cmd_INVITE(std::string& cmd, Client& client);
-
+		void							cmd_NOTICE(std::string& cmd, Client& client);
 
 		/* ERR */
 		void							error_handler(int ERR_CODE, Client &client, const std::string& str = "");

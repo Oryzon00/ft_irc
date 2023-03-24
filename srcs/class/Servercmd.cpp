@@ -28,6 +28,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NAMES"), &Server::cmd_NAMES));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("LIST"), &Server::cmd_LIST));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("INVITE"), &Server::cmd_INVITE));
+	//_dico.insert(std::pair<std::string, cmdFunction>(std::string("NOTICE"), &Server::cmd_NOTICE));
 }
 
 /* --------------------------------------------------------------------------------- */
@@ -389,8 +390,8 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 	Channel *target = findChannel(channelTargetName);
 	std::string str;
 
-	if (!target || !target->isMember(client) || target->getModeM())
-		error_handler(ERR_CANNOTSENDTOCHAN, client);
+	if (!target || !target->isMember(client) || (target->getModeM() && !checkOP(client, *target)))
+		error_handler(ERR_CANNOTSENDTOCHAN, client, channelTargetName);
 	else
 	{
 		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
@@ -422,6 +423,22 @@ void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
 		}
 	}
 }
+
+//void	Server::cmd_NOTICE(std::string& cmd, Client& client)
+//{
+//	std::vector<std::string>	args = findArgsCmd(cmd, "PRIVMSG");
+//
+//	if (args.size() == 2 && args[1].at(0) == ':')
+//	{
+//		std::vector <std::string> targets = strToVec(args[0], ",");
+//		for (size_t i = 0; i < targets.size(); i++) {
+//			if (targets[i].at(0) == '#')
+//				message_to_channel(targets[i], client, args[1]);
+//			else
+//				message_to_client(targets[i], client, args[1]);
+//		}
+//	}
+//}
 
 void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 {
