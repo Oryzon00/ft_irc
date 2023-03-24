@@ -106,7 +106,7 @@ bool						Server::validChannelName(const std::string& name)
 
 bool						Server::checkOP(Client& client, Channel& channel)
 {
-	return(client.getModeO() || channel[0] == client);
+	return(client.getModeO() || channel[0] == &client);
 }
 
 
@@ -250,6 +250,10 @@ void						Server::removeClient(Client &client)
 	_network.removeSocket(index);
 }
 
+void						Server::removeChannel(Channel channel)
+{
+	_chans.erase(std::find(_chans.begin(), _chans.end(), channel));
+}
 
 
 

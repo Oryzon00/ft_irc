@@ -29,8 +29,10 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("WHOIS"), &Server::cmd_WHOIS));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("NAMES"), &Server::cmd_NAMES));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("LIST"), &Server::cmd_LIST));
-
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("INVITE"), &Server::cmd_INVITE));
 }
+
+/* --------------------------------------------------------------------------------- */
 
 void	Server::welcomeClient(Client &client)
 {
@@ -45,14 +47,76 @@ void	Server::welcomeClient(Client &client)
 	cmd_MOTD(motd, client);
 }
 
+void	Server::cmd_MODE_answer(Client & client, std::string& target, std::string flag)
+{
+	std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
+		+ " MODE " + target + " :" + flag + "\n";
+	client.sendToClient(str);
+}
+
+
+void	Server::cmd_MODE_answer_channel(Client & client, std::string& target, std::string flag)
+{
+	std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
+		+ " MODE " + target + " " + flag + "\n";
+	client.sendToClient(str);
+}
+
 /* --------------------------------------------------------------------------------- */
 
 /* CMD */
 
+void	Server::cmd_MODE_user_add(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+	(void) cmd;
+	std::string target = args[0];
+	std::string	flag = args[1];
+	std::string::iterator it = flag.begin();
+	it++;
+	for(; it != flag.end(); it++)
+	{
+		if (*it == 'i')
+		{
+			client.setModeI(true);
+			cmd_MODE_answer(client, target, "+i");
+		}
+		else if (*it == 'O')
+			error_handler(ERR_NORIGHT, client);
+		else if (*it == 'r')
+			error_handler(ERR_NORIGHT, client);
+		else
+			error_handler(ERR_UMODEUNKNOWNFLAG, client);
+	}
+}
+
+void	Server::cmd_MODE_user_remove(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+	(void) cmd;
+	std::string target = args[0];
+	std::string	flag = args[1];
+	std::string::iterator it = flag.begin();
+	it++;
+	for(; it != flag.end(); it++)
+	{
+		if (*it == 'i')
+		{
+			client.setModeI(false);
+			cmd_MODE_answer(client, target, "-i");
+		}
+		else if (*it == 'O')
+			error_handler(ERR_NORIGHT, client);
+		else if (*it == 'r')
+			error_handler(ERR_NORIGHT, client);
+		else
+			error_handler(ERR_UMODEUNKNOWNFLAG, client);
+	}
+}
+
 void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
-	(void)  cmd;
 	std::string	nick = args[0];
 	Client*		target = find_client_by_nick(nick);
 
@@ -62,17 +126,155 @@ void	Server::cmd_MODE_user(std::string& cmd, Client& client,
 		error_handler(ERR_USERSDONTMATCH, client);
 	else if (args.size() == 1)
 		reply_handler(RPL_UMODEIS, client);
+	else
+	{
+		if (args[1][0] == '+')
+			cmd_MODE_user_add(cmd, client, args);
+		else if (args[1][0] == '-')
+			cmd_MODE_user_remove(cmd, client, args);
+		else
+			error_handler(ERR_UMODEUNKNOWNFLAG, client);
+	}
+}
 
+void	Server::cmd_MODE_channel_remove(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+	(void) cmd;
+	std::string 			channel_name = args[0];
+	Channel					*channel = findChannel(channel_name);
+	std::string				flag = args[1];
+	std::string::iterator	it = flag.begin();
+	it++;
+	for(; it != flag.end(); it++)
+	{
+		if (*it == 'i')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeI(false);
+				cmd_MODE_answer_channel(client, channel_name, "-i");
+			}
+		}
+		else if (*it == 'm')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeM(false);
+				cmd_MODE_answer_channel(client, channel_name, "-m");
+			}
+		}
+		else if (*it == 's')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeS(false);
+				cmd_MODE_answer_channel(client, channel_name, "-s");
+			}
+		}
+		else if (*it == 't')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeT(false);
+				cmd_MODE_answer_channel(client, channel_name, "-t");
+			}
+		}
+		else if (*it == 'k')
+			error_handler(ERR_NORIGHT, client);
+		else
+			error_handler(ERR_UNKNOWNMODE, client, &(*it));
+	}
+}			
+
+void	Server::cmd_MODE_channel_add(std::string& cmd, Client& client,
+								std::vector<std::string>& args)
+{
+	(void) cmd;
+	std::string 			channel_name = args[0];
+	Channel					*channel = findChannel(channel_name);
+	std::string				flag = args[1];
+	std::string::iterator	it = flag.begin();
+	it++;
+	for(; it != flag.end(); it++)
+	{
+		if (*it == 'i')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeI(true);
+				cmd_MODE_answer_channel(client, channel_name, "+i");
+			}
+		}
+		else if (*it == 'm')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeM(true);
+				cmd_MODE_answer_channel(client, channel_name, "+m");
+			}
+		}
+		else if (*it == 's')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeS(true);
+				cmd_MODE_answer_channel(client, channel_name, "+s");
+			}
+		}
+		else if (*it == 't')
+		{
+			if (!checkOP(client, *channel))
+				error_handler(ERR_CHANOPRIVSNEEDED, client, channel_name);
+			else
+			{
+				channel->setModeT(true);
+				cmd_MODE_answer_channel(client, channel_name, "+t");
+			}
+		}
+		else if (*it == 'k')
+			error_handler(ERR_NORIGHT, client);
+		else
+			error_handler(ERR_UNKNOWNMODE, client, &(*it));
+	}
 }
 
 void	Server::cmd_MODE_channel(std::string& cmd, Client& client,
 								std::vector<std::string>& args)
 {
-	(void) cmd;
-	(void) client;
-	(void)args;
-}
+	std::string		channel = args[0];
+	Channel*		target = findChannel(channel);
 
+	if (!target)
+		error_handler(ERR_NOSUCHCHANNEL, client, channel);
+	else if (args.size() == 1)
+		f_RPL_CHANNELMODEIS(client, *target);
+	else
+	{
+		if (args[1][0] == '+')
+			cmd_MODE_channel_add(cmd, client, args);
+		else if (args[1][0] == '-')
+			cmd_MODE_channel_remove(cmd, client, args);
+		else
+			error_handler(ERR_UNKNOWNMODE, client, args[1]);
+	}
+	
+	
+}
 
 void	Server::cmd_MODE(std::string& cmd, Client & client)
 {
@@ -143,7 +345,17 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 	else if (checkValidNick(args[0]) == false)
 		error_handler(ERR_ERRONEUSNICKNAME, client);
 	else
+	{
+		std::string	str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+							+ " NICK " + args[0] + "\n";
+		client.sendToClient(str);
 		client.setNickname(args[0]);
+		if (!client.getUsername().empty() && !client.getModeR())
+		{
+			client.setModeR(true);
+			welcomeClient(client);
+		}
+	}
 }
 
 void	Server::cmd_PING(std::string& cmd, Client& client)
@@ -165,7 +377,7 @@ void	Server::leaveAllChannels(Client &client, std::string reason)
 	}
 }
 
-void							Server::cmd_QUIT(std::string& cmd, Client& client)
+void	Server::cmd_QUIT(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "QUIT");
 
@@ -182,12 +394,12 @@ void							Server::cmd_QUIT(std::string& cmd, Client& client)
 void	Server::cmd_USER(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "USER");
-	if (client.getNickname() == "*")
+	if (!client.getPassOk())
 	{
-		error_handler(ERR_NONICK, client);
+		error_handler(ERR_NOPASS, client);
 		quitClientCmd(client);
 	}
-	else if (client.getModeR())
+	if (client.getModeR())
 		error_handler(ERR_ALREADYREGISTERED, client);
 	else if (args.size() != 4)
 		error_handler(ERR_WRONGNBPARAMS, client);
@@ -195,8 +407,11 @@ void	Server::cmd_USER(std::string& cmd, Client& client)
 	{
 		client.setUsername(args[0]);
 		client.setRealname(args[3].substr(1, std::string::npos));
-		client.setModeR(true);
-		welcomeClient(client);
+		if (client.getNickname() != "*")
+		{
+			client.setModeR(true);
+			welcomeClient(client);
+		}
 	}
 	client.clearCmd();
 }
@@ -206,7 +421,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	Channel* channel = findChannel(name);
 	if (!channel && validChannelName(name))
 	{
-		_chans.push_back(Channel(client, name, key, &_exceptionlist));
+		_chans.push_back(Channel(&client, name, key));
 		client.sendToClient(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
@@ -222,7 +437,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 		error_handler(ERR_INVITEONLYCHAN, client, name);
 	else if (!channel->isMember(client))
 	{
-		channel->addMember(client);
+		channel->addMember(&client);
 		channel->SendToAll(client, ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
@@ -244,7 +459,6 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
-	client.clearCmd();
 }
 
 void	Server::quit_channel(Client& client, std::string name, std::string reason)
@@ -274,12 +488,20 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 	else
 	{
 		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
-							+ " PART " + name + " " + reason + "\n";
+							+ " PART " + name;
+		if (!reason.empty())
+			str += " " + reason;
+		str += "\r\n";
 		client.sendToClient(str);
 		channel->SendToAll(client, str);
 		channel->removeMember(client);
+		if (!channel->size())
+			removeChannel(*channel);
 	}
 }
+
+//	:b!~qcherel@my.server.name PART #chat
+//	:b!~qcherel@13-20h.IRC PART #c
 
 void	Server::cmd_PART(std::string& cmd, Client& client)
 {
@@ -287,7 +509,7 @@ void	Server::cmd_PART(std::string& cmd, Client& client)
 	if (args.size() <= 2 && !args.empty())
 	{
 		std::vector<std::string>		chans = strToVec(args[0], ",");
-		std::string						reason = "no reason";
+		std::string						reason;
 		if (args.begin() + 1 != args.end())
 			reason = args[1];
 		for(size_t i = 0; i < chans.size(); i++)
@@ -295,7 +517,6 @@ void	Server::cmd_PART(std::string& cmd, Client& client)
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
-	client.clearCmd();
 }
 
 void	Server::cmd_WHO(std::string &cmd, Client &client)
@@ -303,6 +524,38 @@ void	Server::cmd_WHO(std::string &cmd, Client &client)
 	(void)cmd;
 	(void)client;
 }
+
+void							Server::cmd_INVITE(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "INVITE");
+	if (args.size() != 2)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		Channel*	channel = findChannel(args[1]);
+		Client*		target  = find_client_by_nick(args[0]);
+		if (!channel)
+			error_handler(ERR_NOSUCHCHANNEL, client, args[1]);
+		else if (!target)
+			error_handler(ERR_NOSUCHNICK, client, args[0]);
+		else if (!channel->isMember(client))
+			error_handler(ERR_NOTONCHANNEL, client, args[1]);
+		else if (!checkOP(client, *channel))
+			error_handler(ERR_CHANOPRIVSNEEDED, client, args[1]);
+		else if (channel->isMember(*target))
+			error_handler(ERR_USERONCHANNEL, client, args[0] + " " + args[1]);
+		else
+		{
+			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+							+ " INVITE " + args[0] + " :" + channel->getName() + "\n";
+			reply_handler(RPL_INVITING, client,
+						target->getNickname() + " " + channel->getName());
+			target->sendToClient(str);
+			channel->invite(target);
+		}	
+	}
+}
+
 
 void	Server::cmd_OPER(std::string& cmd, Client& client)
 {

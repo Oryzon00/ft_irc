@@ -60,9 +60,39 @@ void	Server::reply_handler(int RPL_CODE, Client &client, const std::string& str)
 		case RPL_LISTEND:
 			f_RPL_LISTEND(client);
 			break;
+		case RPL_INVITING:
+			f_RPL_INVITING(client, str);
+			break;
 		default:
 			break;
 	}
+}
+
+/*
+=============== read 12 bytes from CLIENT (4) ==================
+MODE #chat
+
+=============== read 83 bytes from SERVER (5) ===================
+:my.server.name 324 adrian #chat +nt
+*/
+
+void	Server::f_RPL_CHANNELMODEIS(Client& client, Channel& channel)
+{
+	std::string code = " 324 ";
+	std::string	modes = ":";
+	if (channel.getModeI())
+		modes += "i";
+	if (channel.getKey() != "")
+		modes += "k";
+	if (channel.getModeM())
+		modes += "m";
+	if (channel.getModeS())
+		modes += "s";
+	if(channel.getModeT())
+		modes += "t";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel.getName() + " "
+		+ modes + "\n";
+	client.sendToClient(str);
 }
 
 void	Server::f_RPL_UMODEIS(Client &client)
@@ -168,11 +198,11 @@ void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 						 + " :";
 	for(int i = 0; i < chan->size(); i++)
 	{
-		if (chan->isMember(client) || !(*chan)[i].getModeI())
+		if (chan->isMember(client) || !(*chan)[i]->getModeI())
 		{
 			if (i == 0)
 				str += "@";
-			str += ((*chan)[i].getNickname() + " ");
+			str += ((*chan)[i]->getNickname() + " ");
 		}
 	}
 	str += "\n";
@@ -245,5 +275,13 @@ void	Server::f_RPL_LISTEND(Client &client)
 {
 	std::string code = " 323 ";
 	std::string str = prefixServer() + code + client.getNickname() + " :End of /LIST\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_RPL_INVITING(Client &client, std::string s)
+{
+	std::string	code = " 341 ";
+
+	std::string str = prefixServer() + code + client.getNickname() + " " + s + "\n";
 	client.sendToClient(str);
 }

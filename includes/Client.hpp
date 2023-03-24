@@ -29,6 +29,7 @@ class Client
 		std::string					_cmd;
 
 	public:
+		Client(const Client& client);
 		Client(int socket);
 		Client(void);
 		~Client(void);

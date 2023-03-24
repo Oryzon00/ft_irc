@@ -47,6 +47,15 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_BADCHANMASK:
 			f_ERR_BADCHANMASK(client, str);
 			break;
+		case ERR_UNKNOWNMODE:
+			f_ERR_UNKNOWNMODE(client, str);
+			break;
+		case ERR_UMODEUNKNOWNFLAG:
+			f_ERR_UMODEUNKNOWNFLAG(client);
+			break;
+		case ERR_NORIGHT:
+			f_ERR_NORIGHT(client);
+			break;
 		case ERR_CANNOTSENDTOCHAN:
 			f_ERR_CANNOTSENDTOCHAN(client, str);
 			break;
@@ -74,12 +83,36 @@ void	Server::error_handler(int ERR_CODE, Client &client, const std::string& str)
 		case ERR_NOPASS:
 			f_ERR_NOPASS(client);
 			break;
-		case ERR_NONICK:
-			f_ERR_NONICK(client);
+		case ERR_USERONCHANNEL:
+			f_ERR_USERONCHANNEL(client, str);
 			break;
 		default:
 			break;
 	}
+}
+
+void	Server::f_ERR_NORIGHT(Client & client)
+{
+	std::string code = " 1007 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		":You don't have the rights to do this\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_UMODEUNKNOWNFLAG(Client & client)
+{
+	std::string code = " 501 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		":Unknown MODE flag\n";
+	client.sendToClient(str);
+}
+
+void	Server::f_ERR_UNKNOWNMODE(Client &client, std::string modechar)
+{
+	std::string code = " 472 ";
+	std::string str = prefixServer() + code + client.getNickname() + " "
+		+ modechar + " :is unknown mode char to me\n";
+	client.sendToClient(str);
 }
 
 void	Server::f_ERR_USERSDONTMATCH(Client &client)
@@ -261,11 +294,10 @@ void	Server::f_ERR_NOPASS(Client &client)
 	client.sendToClient(str);
 }
 
-void	Server::f_ERR_NONICK(Client &client)
+void							Server::f_ERR_USERONCHANNEL(Client &client, const std::string& channel_name)
 {
-	std::string code = " 1006 ";
-	std::string	str = prefixServer() + code + client.getNickname() + " :Nickname is not set\n";
-	client.sendToClient(str);
+	std::string code = " 403 ";
+	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name + " :Is already on channel\n";
+    client.sendToClient(str);
 }
-
 /* --------------------------------------------------------------------------------- */
