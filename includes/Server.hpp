@@ -113,25 +113,25 @@ class Server
 		void							part_channel(Client& client, std::string name, std::string reason);
 
 
-	void							cmd_MODE_user(std::string& cmd, Client& client,
+	void								cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_user_add(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_user_remove(std::string& cmd, Client& client,
 											std::vector<std::string>& args);									
 		
-		//to delete
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
-		void							cmd_MODE_channel_add(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
-		void							cmd_MODE_channel_remove(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
-		
+											std::vector<std::string>& args);;
 		void							cmd_MODE_channel_parse(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 
 		void							cmd_MODE_channel_i(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_m(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_s(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_t(Client& client, Channel* channel,
 											std::string& channel_name, char& sign, char mode);
 
 		void							cmd_MODE_answer(Client & client, std::string& target,
