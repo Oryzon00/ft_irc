@@ -144,6 +144,8 @@ class Server
 		void							cmd_TOPIC(std::string& cmd, Client& client);
 		void							cmd_PART(std::string& cmd, Client& client);
 		void							cmd_INVITE(std::string& cmd, Client& client);
+		void							cmd_KICK(std::string& cmd, Client& client);
+
 
 
 		/* ERR */
@@ -174,6 +176,8 @@ class Server
 		void							f_ERR_NOTONCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_NOSUCHCHANNEL(Client &client, const std::string& channel_name);
 		void							f_ERR_USERONCHANNEL(Client &client, const std::string& channel_name);
+		void							f_ERR_USERNOTINCHANNEL(Client &client, const std::string& channel_name);
+
 
 
 		

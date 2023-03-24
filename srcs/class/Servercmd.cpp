@@ -23,6 +23,7 @@ void	Server::initDico(void)
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("PRIVMSG"), &Server::cmd_PRIVMSG));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("TOPIC"), &Server::cmd_TOPIC));
 	_dico.insert(std::pair<std::string, cmdFunction>(std::string("INVITE"), &Server::cmd_INVITE));
+	_dico.insert(std::pair<std::string, cmdFunction>(std::string("KICK"), &Server::cmd_KICK));
 }
 
 /* --------------------------------------------------------------------------------- */
@@ -421,7 +422,7 @@ void	Server::cmd_JOIN(std::string& cmd, Client& client)
 		if (args.begin() + 1 != args.end())
 			keys = strToVec(args[1], ",");
 		for(size_t i = 0; i < chans.size(); i++)
-			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "x");
+			join_channel(client, chans[i], (i < keys.size()) ? keys[i] : "");
 	}
 	else
 		error_handler(ERR_WRONGNBPARAMS, client);
@@ -495,6 +496,37 @@ void							Server::cmd_INVITE(std::string& cmd, Client& client)
 						target->getNickname() + " " + channel->getName());
 			target->sendToClient(str);
 			channel->invite(target);
+		}	
+	}
+}
+
+void	Server::cmd_KICK(std::string& cmd, Client& client)
+{
+	std::vector<std::string>	args = findArgsCmd(cmd, "KICK");
+	if (args.size() != 2 && args.size() != 3)
+		error_handler(ERR_WRONGNBPARAMS, client);
+	else
+	{
+		Channel*	channel = findChannel(args[0]);
+		Client*		target  = find_client_by_nick(args[1]);
+		std::string reason	= ": Ratio ";
+		if (args.size() == 3)
+			reason = args[2];
+		if (!channel)
+			error_handler(ERR_NOSUCHCHANNEL, client, args[0]);
+		else if (!channel->isMember(client))
+			error_handler(ERR_NOTONCHANNEL, client, args[0]);
+		else if (!checkOP(client, *channel))
+			error_handler(ERR_CHANOPRIVSNEEDED, client, args[0]);
+		else if (!target || !channel->isMember(*target))
+			error_handler(ERR_USERNOTINCHANNEL, client, args[0] + " " + args[1]);
+		else
+		{
+			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+							+ " KICK " + args[0] + " " + args[1] + " " + reason + "\n";
+			client.sendToClient(str);
+			channel->SendToAll(client, str);
+			channel->removeMember(target);
 		}	
 	}
 }
