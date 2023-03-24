@@ -19,7 +19,7 @@ Channel&				Channel::operator=(const Channel& rhs)
 		_topic = rhs._topic;
 		_key = rhs._key;
 		_members = rhs._members;
-		_banlist = rhs._banlist;
+		// _banlist = rhs._banlist;
 		_invitelist = rhs._invitelist;
 		_mode_i = rhs._mode_i;
 		_mode_m = rhs._mode_m;
@@ -117,15 +117,15 @@ bool					Channel::isChanOp(Client& client)
 	return (_members[0] == &client);
 }
 
-bool					Channel::isBanned(Client& client)
-{
-	for(std::vector<Client*>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
-	{
-		if (&client == *it)
-			return (true);
-	}
-	return (false);
-}
+// bool					Channel::isBanned(Client& client)
+// {
+// 	for(std::vector<Client*>::iterator it = _banlist.begin(); it != _banlist.end(); it++)
+// 	{
+// 		if (&client == *it)
+// 			return (true);
+// 	}
+// 	return (false);
+// }
 
 bool					Channel::isInvited(Client& client)
 {

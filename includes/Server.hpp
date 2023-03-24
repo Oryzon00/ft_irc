@@ -34,6 +34,7 @@ CONNECTION
 	PING	DONE
 	OPER	DONE
 	QUIT	DONE
+	ERROR
 
 class CHANNEL --> QUENTIN
 check registration --> DONE
@@ -67,6 +68,10 @@ TO DO
 # define SUCCESS			0
 # define DISCONNECT			0
 # define OPER_PASSWD		"operpass"
+
+# define SIGN_NONE			0
+# define SIGN_PLUS			1
+# define SIGN_MINUS			2
 
 int	initServerSocket(unsigned short port);
 
@@ -111,7 +116,6 @@ class Server
 		void							quit_channel(Client& client, std::string name, std::string reason);
 		void							leaveAllChannels(Client& client, std::string reason);
 
-
 		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
 		void							cmd_MODE_user_add(std::string& cmd, Client& client,
@@ -120,16 +124,23 @@ class Server
 											std::vector<std::string>& args);									
 		
 		void							cmd_MODE_channel(std::string& cmd, Client& client,
+											std::vector<std::string>& args);;
+		void							cmd_MODE_channel_parse(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
-		void							cmd_MODE_channel_add(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
-		void							cmd_MODE_channel_remove(std::string& cmd, Client& client,
-											std::vector<std::string>& args);
+
+		void							cmd_MODE_channel_i(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_m(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_s(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
+		void							cmd_MODE_channel_t(Client& client, Channel* channel,
+											std::string& channel_name, char& sign, char mode);
 
 		void							cmd_MODE_answer(Client & client, std::string& target,
 											std::string flag);
 		void							cmd_MODE_answer_channel(Client & client,
-											std::string& target, std::string flag);
+											std::string& target, std::string flag, Channel* channel);
 
 		/* CMD */
 		void							cmd_CAP(std::string& str, Client& client);
