@@ -120,7 +120,7 @@ class Server
 		void							quit_channel(Client& client, std::string name, std::string reason);
 		void							leaveAllChannels(Client& client, std::string reason);
 
-		void							BotProcess(Client& client);
+		void							BotProcess(Client& client, const std::string& message);
 
 		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);

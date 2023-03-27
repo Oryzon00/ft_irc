@@ -428,7 +428,7 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 			  + channelTargetName + " " + message + "\n";
 		target->SendToAll(client, str);
 		if (channelTargetName == "#bot" && message.size() > 1 && message[1] == '!')
-			std::cout << "Bot detected" << std::endl;
+			BotProcess(client, message);
 	}
 }
 
