@@ -1,10 +1,19 @@
 #include "Server.hpp"
 
-void	Server::BotCmdHelp(Client& client, Channel* channel)
+void	Server::BotCmdHelp(Channel* channel)
 {
-	(void) client;
-	(void) channel;
-	
+	std::string str = ":" + _bot.getNickname() + "!~" + _bot.getUsername() + "@" + _name + " PRIVMSG #bot " + 
+					":List of commands available:\n"
+					+ "!ping\n"
+					+ "!help\n";
+	channel->SendToAll(_bot, str);
+}
+
+void	Server::BotCmdUnknown(Channel* channel)
+{
+	std::string str = ":" + _bot.getNickname() + "!~" + _bot.getUsername() + "@" + _name + " PRIVMSG #bot " + 
+					":Sorry, i did not understand your command. Use !help" + "\n";
+	channel->SendToAll(_bot, str);
 }
 
 void	Server::BotCmdPing(Channel* channel)
@@ -13,11 +22,7 @@ void	Server::BotCmdPing(Channel* channel)
 	channel->SendToAll(_bot, str);
 }
 
-void	Server::BotCmdUnknown(Client& client, Channel* channel)
-{
-	(void) client;
-	(void) channel;
-}
+
 
 void	Server::BotCmdBunny(Channel* channel)
 {
@@ -28,15 +33,16 @@ void	Server::BotCmdBunny(Channel* channel)
 
 void	Server::BotProcess(Client& client, const std::string& message)
 {
+	(void) client;
 	Channel *channel = findChannel("#bot");
 	std::cout << "Bot detected" << std::endl;
 	if (message == ":!help")
-		BotCmdHelp(client, channel);
+		BotCmdHelp(channel);
 	else if (message == ":!ping")
 		BotCmdPing(channel);
 	else if (message == ":!bunny")
 		BotCmdBunny(channel);
 	else
-		BotCmdUnknown(client, channel);
+		BotCmdUnknown(channel);
 
 }

@@ -121,9 +121,9 @@ class Server
 		void							leaveAllChannels(Client& client, std::string reason);
 
 		void							BotProcess(Client& client, const std::string& message);
-		void							BotCmdHelp(Client& client, Channel* channel);
+		void							BotCmdHelp(Channel* channel);
 		void							BotCmdPing(Channel* channel);
-		void							BotCmdUnknown(Client& client, Channel* channel);
+		void							BotCmdUnknown(Channel* channel);
 		void							BotCmdBunny(Channel* channel);
 
 
