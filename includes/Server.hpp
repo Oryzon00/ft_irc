@@ -121,6 +121,8 @@ class Server
 		void							leaveAllChannels(Client& client, std::string reason);
 
 		void							BotProcess(Client& client, const std::string& message);
+		void							BotCmdHelp(Client& client, Channel* channel);
+		void							BotCmdUnknown(Client& client, Channel* channel);
 
 		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);
