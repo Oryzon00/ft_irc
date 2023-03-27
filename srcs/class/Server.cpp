@@ -16,6 +16,7 @@ void	Server::initBot()
 	_bot.setRealname("Mister Bot");
 
 	Channel	chan_bot(&_bot, "#bot", "");
+	chan_bot.setTopic("Come interact with Mister Bot (!help) :)");
 	_chans.push_back(chan_bot);
 }
 
