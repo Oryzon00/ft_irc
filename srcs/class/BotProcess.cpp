@@ -2,16 +2,17 @@
 
 void	Server::BotCmdHelp(Channel* channel)
 {
-	std::string str = ":" + _bot.getNickname() + "!~" + _bot.getUsername() + "@" + _name + " PRIVMSG #bot " + 
-					":List of commands available:\n"
-					+ "!ping\n"
-					+ "!help\n";
-	channel->SendToAll(_bot, str);
+	std::string str = ":" + _bot.getNickname() + "!~" + _bot.getUsername() + "@" + _name + " NOTICE #bot ";
+	channel->SendToAll(_bot, str + ":List of commands available\n");
+	channel->SendToAll(_bot, str + ":!ping\n");
+	channel->SendToAll(_bot, str + ":!help\n");
+	channel->SendToAll(_bot, str + ":!bunny\n");
+	channel->SendToAll(_bot, str + ":!users\n");
 }
 
 void	Server::BotCmdUnknown(Channel* channel)
 {
-	std::string str = ":" + _bot.getNickname() + "!~" + _bot.getUsername() + "@" + _name + " PRIVMSG #bot " + 
+	std::string str = ":" + _bot.getNickname() + "!~" + _bot.getUsername() + "@" + _name + " NOTICE #bot " + 
 					":Sorry, i did not understand your command. Use !help" + "\n";
 	channel->SendToAll(_bot, str);
 }
