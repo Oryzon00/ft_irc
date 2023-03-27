@@ -190,8 +190,7 @@ void 					Channel::SendToAll(Client& client, const std::string& str)
 	{
 		if (*it != &client)
 		{
-			Client tmp = *(*it);
-			tmp.sendToClient(str);
+			(*(*it)).sendToClient(str);
 		}
 	}
 }
