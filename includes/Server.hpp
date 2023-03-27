@@ -125,7 +125,7 @@ class Server
 		void							BotCmdPing(Channel* channel);
 		void							BotCmdUnknown(Client& client, Channel* channel);
 		void							BotCmdBunny(Channel* channel);
-
+		void							BotCmdUsers(Channel* channel);
 
 		void							cmd_MODE_user(std::string& cmd, Client& client,
 											std::vector<std::string>& args);

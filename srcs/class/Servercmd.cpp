@@ -1,7 +1,5 @@
 #include "Server.hpp"
 
-#include "../../includes/Server.hpp"
-
 void	Server::quitClientCmd(Client &client)
 {
 	removeClient(client);
