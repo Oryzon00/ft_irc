@@ -42,7 +42,7 @@ int	initServerSocket(unsigned short port)
 	}
 	
 	struct sockaddr_in sin;
-	sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	sin.sin_port = htons(port);
 	sin.sin_family = AF_INET;
 

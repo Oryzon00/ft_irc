@@ -170,6 +170,11 @@ void							Client::setRealname(const std::string& str)
 	_realname = str;
 }
 
+void							Client::setSocket(const int& socket)
+{
+	_socket = socket;
+}
+
 /* --------------------------------------------------------------------------------- */
 
 /* PRIVATE FUNCTION */
@@ -194,7 +199,7 @@ void				Client::sendToClient(std::string str)
 	
 	// if (send(_socket, str.c_str(), str.size(), 0) < 0) --> protection interdite par le sujet
 	// 	throw SocketException("send()");
-	if (_socket)
+	if (_socket != 0)
 		send(_socket, str.c_str(), str.size(), MSG_NOSIGNAL); //0 --> MSG_NO_SIGNAL
 }
 

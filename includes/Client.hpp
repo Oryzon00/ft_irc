@@ -64,6 +64,7 @@ class Client
 		void							setNickname(const std::string& nick);
 		void							setUsername(const std::string& str);
 		void							setRealname(const std::string& str);
+		void							setSocket(const int& socket);
 		
 		void							clearCmd(void);
 		void							readBuffer(char* buffer);

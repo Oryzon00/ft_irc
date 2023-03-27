@@ -11,6 +11,7 @@ Server::Server(int port, std::string password)
 
 void	Server::initBot()
 {
+	_bot.setSocket(0);
 	_bot.setNickname("Mr.Bot");
 	_bot.setUsername("Mr.Bot");
 	_bot.setRealname("Mister Bot");
