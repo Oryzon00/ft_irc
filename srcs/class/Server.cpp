@@ -1,7 +1,8 @@
 # include "Server.hpp"
 
 Server::Server(int port, std::string password)
-	: _name("13.20h"), _socket(initServerSocket(port)), _password(password), _MOTD(ASCII_COMPUTER)
+	: _name("13.20h"), _socket(initServerSocket(port)), _password(password), _MOTD(ASCII_COMPUTER),
+		_opername(OPER_NAME), _operpass(OPER_PASSWD)
 {
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
