@@ -94,3 +94,14 @@ class RestartException : public std::exception
 			return ("Restarting server . . . ");
 		}
 };
+
+class PasswordEmptyException : public std::exception
+{
+public:
+
+	virtual const char* what(void) const throw()
+	{
+		return ("Error: password must not be empty");
+	}
+};
+
