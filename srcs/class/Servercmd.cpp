@@ -199,7 +199,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	else if (!channel->isMember(client))
 	{
 		channel->addMember(&client);
-		channel->SendToAll(client, ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		sendToChannel(channel, client, ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -234,7 +234,7 @@ void	Server::quit_channel(Client& client, std::string name, std::string reason)
 		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
 						  + " QUIT " + reason + "\n";
 		client.sendToClient(str);
-		channel->SendToAll(client, str);
+		sendToChannel(channel, client, str);
 		channel->removeMember(client);
 	}
 }
@@ -254,7 +254,7 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 			str += " " + reason;
 		str += "\r\n";
 		client.sendToClient(str);
-		channel->SendToAll(client, str);
+		sendToChannel(channel, client, str);
 		channel->removeMember(client);
 		if (!channel->size())
 			removeChannel(*channel);
@@ -340,7 +340,7 @@ void	Server::cmd_KICK(std::string& cmd, Client& client)
 			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
 							+ " KICK " + args[0] + " " + args[1] + " " + reason + "\n";
 			client.sendToClient(str);
-			channel->SendToAll(client, str);
+			sendToChannel(channel, client, str);
 			channel->removeMember(target);
 		}	
 	}
@@ -424,7 +424,7 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 	{
 		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
 			  + channelTargetName + " " + message + "\n";
-		target->SendToAll(client, str);
+		sendToChannel(target, client, str);
 		if (channelTargetName == "#bot" && message.size() > 1 && message[1] == '!')
 			BotProcess(client, message);
 	}
@@ -452,7 +452,7 @@ void	Server::notice_to_channel(std::string channelTargetName, Client &client, st
 	{
 		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " NOTICE "
 			  + channelTargetName + " " + message + "\n";
-		target->SendToAll(client, str);
+		sendToChannel(target, client, str);
 	}
 }
 
@@ -521,7 +521,7 @@ void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 										  + " TOPIC " + args[0] + " " + args[1] + "\n";
 				target->setTopic(args[1]);
 				client.sendToClient(str);
-				target->SendToAll(client, str);
+				sendToChannel(target, client, str);
 
 			}
 		}

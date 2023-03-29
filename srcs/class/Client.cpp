@@ -1,19 +1,19 @@
 #include "Client.hpp"
 
 Client::Client(const Client& client) :
-		_socket(0), _isIrssi(false), _passOK(false), _mode_r(false),
+		_socket(0), _id(0), _isIrssi(false), _passOK(false), _mode_r(false),
 		_mode_O(false), _mode_i(false), _nickname("*")
 {
 	*this = client;
 }
 
-Client::Client(int socket)	:
-		_socket(initClientSocket(socket)), _isIrssi(false), _passOK(false), _mode_r(false),
+Client::Client(int socket, unsigned long id)	:
+		_socket(initClientSocket(socket)), _id(id), _isIrssi(false), _passOK(false), _mode_r(false),
 		_mode_O(false), _mode_i(false), _nickname("*")	{}
 
 
 Client::Client(void)		:
-		_socket(0), _isIrssi(false), _passOK(false), _mode_r(false),
+		_socket(0), _id(0), _isIrssi(false), _passOK(false), _mode_r(false),
 		_mode_O(false), _mode_i(false), _nickname("*")	{}
 
 
@@ -22,6 +22,7 @@ Client::~Client(void)	{ /* close(_socket); */ }
 Client&				Client::operator=(const Client& rhs)
 {
 	_socket = rhs._socket;
+	_id	= rhs._id;
 	_isIrssi = rhs._isIrssi;
 	_passOK = rhs._passOK;
 	_mode_r = rhs._mode_r;
@@ -55,6 +56,11 @@ bool	operator!=(const Client& lhs, const Client& rhs)
 const int&						Client::getSocket(void) const
 {
 	return _socket;
+}
+
+const unsigned long&			Client::getID(void) const
+{
+	return _id;
 }
 
 const bool&						Client::getIsIrssi(void) const

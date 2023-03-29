@@ -17,6 +17,7 @@ class Client
 	private:
 
 		int							_socket;
+		unsigned long				_id;
 		bool						_isIrssi;
 		bool						_passOK;
 		bool						_mode_r;
@@ -30,13 +31,14 @@ class Client
 
 	public:
 		Client(const Client& client);
-		Client(int socket);
+		Client(int socket, unsigned long id);
 		Client(void);
 		~Client(void);
 
 		Client&							operator=(const Client& rhs);							
 
 		const int&						getSocket(void) const;
+		const unsigned long&			getID(void) const;
 		const bool&						getIsIrssi(void) const;
 		const bool&						getPassOk(void) const;
 		const std::string&				getNickname(void) const;

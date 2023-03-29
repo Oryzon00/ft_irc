@@ -9,9 +9,8 @@ class Channel
 		std::string					_name;
 		std::string					_topic;
 		std::string					_key;
-		std::vector<Client*>		_members;
-		// std::vector<Client*>		_banlist;
-		std::vector<Client*>		_invitelist;	//mode i
+		std::vector<unsigned long>	_members;
+		std::vector<unsigned long>	_invitelist;	
 
 		bool						_mode_i;
 		bool						_mode_m;
@@ -20,13 +19,15 @@ class Channel
 		
 	public:
 		Channel();
-		Channel(Client* client, const std::string& name, const std::string& key);
+		Channel(Client* client, const std::string& name, const std::string& key); //garder a modif
 		~Channel(void);
 
-		Client*					operator[](size_t index);
+		unsigned long			operator[](size_t index);// garder  a modif
 		Channel&				operator=(const Channel& rhs);
 
 		const std::string&		getName() const;
+		std::vector<unsigned long>&			getMembers();
+
 		const std::string&		getTopic() const;
 		const std::string&		getKey() const;
 
@@ -43,16 +44,15 @@ class Channel
 
 		int						size() const;
 
-		bool					isChanOp(Client& client);
-		// bool					isBanned(Client& client);
-		bool					isInvited(Client& client);
-		bool					isMember(Client &client);
+		bool					isChanOp(Client& client); // garder  a modif
+		bool					isInvited(Client& client); // garder a modif
+		bool					isMember(Client &client); // garder a modif
 		
-		void					invite(Client* client);
-		void					addMember(Client* client);
-		void					removeMember(Client& client);
-		void					removeMember(Client* client);
-		void					SendToAll(Client& client, const std::string& str);
+		void					invite(Client* client); // garder a modif
+		void					addMember(Client* client); // garder a modif
+		void					removeMember(Client& client); // garder a modif
+		void					removeMember(Client* client); // garder a modif
+		// void					SendToAll(Client& client, const std::string& str);
 };
 
 bool	operator==(const Channel& lhs,const Channel& rhs);

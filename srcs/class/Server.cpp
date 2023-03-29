@@ -1,7 +1,7 @@
 # include "Server.hpp"
 
 Server::Server(int port, std::string password)
-	: _name("13.20h"), _socket(initServerSocket(port)), _password(password), _MOTD(ASCII_COMPUTER)
+	:  _name("13.20h"), _socket(initServerSocket(port)), _id_count(1), _password(password), _MOTD(ASCII_COMPUTER)
 {
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
@@ -36,6 +36,16 @@ Client*							Server::find_client_by_nick(std::string nick)
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
 	{
 		if (it->getNickname() == nick)
+			return (&(*it));
+	}
+	return (NULL);
+}
+
+Client*							Server::find_client_by_id(unsigned long id)
+{
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->getID() == id)
 			return (&(*it));
 	}
 	return (NULL);
@@ -117,7 +127,7 @@ bool						Server::validChannelName(const std::string& name)
 
 bool						Server::checkOP(Client& client, Channel& channel)
 {
-	return(client.getModeO() || channel[0] == &client);
+	return(client.getModeO() || channel[0] == client.getID());
 }
 
 
@@ -241,7 +251,7 @@ bool						Server::checkSocket(size_t index, short event)
 
 void						Server::addClient(void)
 {
-	_clients.push_back(Client(_socket));
+	_clients.push_back(Client(_socket, _id_count++));
 	_network.addSocket(_clients.back().getSocket());
 }
 
@@ -273,5 +283,14 @@ bool						Server::checkAnswerQuery(size_t index)
 	return (checkSocket(index, POLLOUT) && client.checkCmdReady());
 }
 
+void						Server::sendToChannel(Channel* channel, Client& sender, const std::string& str)
+{
 
+	for(std::vector<unsigned long>::iterator it = channel->getMembers().begin(); it != channel->getMembers().end(); it++)
+	{
+		Client* client = find_client_by_id(*it);
+		if (client && *client != sender)
+			client->sendToClient(str);
+	}
+}
 /* --------------------------------------------------------------------------------- */

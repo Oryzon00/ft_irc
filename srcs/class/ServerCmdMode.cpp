@@ -224,7 +224,7 @@ void	Server::cmd_MODE_answer_channel(Client & client, std::string& target, std::
 	std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
 		+ " MODE " + target + " " + flag + "\n";
 	client.sendToClient(str);
-	channel->SendToAll(client, str);
+	sendToChannel(channel, client, str);
 }
 
 /* void	Server::cmd_MODE_channel(std::string& cmd, Client& client,

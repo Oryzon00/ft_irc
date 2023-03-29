@@ -84,6 +84,7 @@ class Server
 
 		const std::string					_name;
 		int 								_socket;
+		unsigned long						_id_count;
 		std::string							_password;
 		std::map<std::string, cmdFunction>	_dico;
 		Network								_network;
@@ -109,6 +110,10 @@ class Server
 		void							quitClientCmd(Client &client);
 		void							welcomeClient (Client &client);
 		Client*							find_client_by_nick(std::string nick);
+
+/*NOUVEAU*/		Client*							find_client_by_id(unsigned long id);
+/*NOUVEAU*/		void							sendToChannel(Channel* channel, Client& sender, const std::string& str);
+		
 		Channel*						findChannel(std::string name);
 		void							join_channel(Client& client, std::string name, std::string key);
 		void							message_to_channel(std::string channelTargetName, Client& client, std::string message);
