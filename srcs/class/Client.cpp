@@ -1,6 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(const Client& client)
+Client::Client(const Client& client) :
+		_socket(0), _isIrssi(false), _passOK(false), _mode_r(false),
+		_mode_O(false), _mode_i(false), _nickname("*")
 {
 	*this = client;
 }
@@ -19,20 +21,17 @@ Client::~Client(void)	{ /* close(_socket); */ }
 
 Client&				Client::operator=(const Client& rhs)
 {
-	if (this != &rhs)
-	{
-		_socket = rhs._socket;
-		_isIrssi = rhs._isIrssi;
-		_passOK = rhs._passOK;
-		_mode_r = rhs._mode_r;
-		_mode_O = rhs._mode_O;
-		_mode_i = rhs._mode_i;
-		_nickname = rhs._nickname;
-		_username = rhs._username;
-		_realname = rhs._realname;
-		_package = rhs._package;
-		_cmd = rhs._cmd;
-	}
+	_socket = rhs._socket;
+	_isIrssi = rhs._isIrssi;
+	_passOK = rhs._passOK;
+	_mode_r = rhs._mode_r;
+	_mode_O = rhs._mode_O;
+	_mode_i = rhs._mode_i;
+	_nickname = rhs._nickname;
+	_username = rhs._username;
+	_realname = rhs._realname;
+	_package = rhs._package;
+	_cmd = rhs._cmd;
 	return (*this);
 }
 
@@ -199,7 +198,7 @@ void				Client::sendToClient(std::string str)
 	
 	// if (send(_socket, str.c_str(), str.size(), 0) < 0) --> protection interdite par le sujet
 	// 	throw SocketException("send()");
-	if (_socket != 0)
+	if (_socket > 0)
 		send(_socket, str.c_str(), str.size(), MSG_NOSIGNAL); //0 --> MSG_NO_SIGNAL
 }
 

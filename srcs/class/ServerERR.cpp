@@ -108,23 +108,11 @@ void	Server::f_ERR_UMODEUNKNOWNFLAG(Client & client)
 	client.sendToClient(str);
 }
 
-/* =============== read 58 bytes from SERVER (5) ===================
-:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
-
-=============== read 40 bytes from SERVER (5) ===================
-:adrian!~ajung@13-20h.IRC MODE #room -i
-
-=============== read 156 bytes from SERVER (5) ===================
-:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
-:13-20h.IRC 472 adrian i�e�� :is unknown mode char to me
-:adrian!~ajung@13-20h.IRC MODE #room -i
- */
-
 void	Server::f_ERR_UNKNOWNMODE(Client &client, std::string modechar)
 {
 	std::string code = " 472 ";
-	std::string str = prefixServer() + code + client.getNickname() + " "
-		+ modechar + " :is unknown mode char to me\n";
+	std::string str = prefixServer() + code
+		+ modechar + " " + ":" + modechar + "\n";
 	client.sendToClient(str);
 }
 
@@ -254,7 +242,7 @@ void	Server::f_ERR_CANNOTSENDTOCHAN(Client &client, const std::string& channel_n
 void	Server::f_ERR_CHANOPRIVSNEEDED(Client &client, const std::string &channel_name)
 {
 	std::string code = " 482 ";
-	std::string str = prefixServer() + code + client.getNickname() + " " + channel_name + " :You're not channel operator\n";
+	std::string str = prefixServer() + code + channel_name + " :You're not channel operator\n";
 	client.sendToClient(str);
 }
 

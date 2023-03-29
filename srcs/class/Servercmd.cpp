@@ -248,7 +248,7 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 		error_handler(ERR_NOTONCHANNEL, client, name);
 	else
 	{
-		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
 							+ " PART " + name;
 		if (!reason.empty())
 			str += " " + reason;

@@ -1,7 +1,7 @@
 # include "Server.hpp"
 
 Server::Server(int port, std::string password)
-	: _name("13-20h.IRC"), _socket(initServerSocket(port)), _password(password), _MOTD(ASCII_COMPUTER)
+	: _name("13.20h"), _socket(initServerSocket(port)), _password(password), _MOTD(ASCII_COMPUTER)
 {
 	_network.addSocket(_socket);
 	_clients.push_back(Client());
@@ -11,7 +11,7 @@ Server::Server(int port, std::string password)
 
 void	Server::initBot()
 {
-	_bot.setSocket(0);
+	_bot.setSocket(-1);
 	_bot.setNickname("Mr.Bot");
 	_bot.setUsername("Mr.Bot");
 	_bot.setRealname("Mister Bot");
