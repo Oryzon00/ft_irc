@@ -15,10 +15,19 @@ void	check_port(char *port)
 			throw PortDigitException();
 		i++;
 	}
+	if (i == 0)
+		throw PortDigitException();
 	int port_nb = atoi(port);
-	if (port_nb > USHRT_MAX)
+	std::cout << "port nb pars : " << port_nb << std::endl;
+	if (port_nb < 0 || port_nb > USHRT_MAX)
 		throw PortNumberException();
 
+}
+
+void	check_password(char* password)
+{
+	if (!strlen(password))
+		throw PasswordEmptyException();
 }
 
 void	init_arg(char **av, t_arg & arg)
@@ -38,6 +47,7 @@ void	parsing(int ac, char **av, t_arg & arg)
 {
 	check_nb_args(ac);
 	check_port(av[1]);
+	check_password(av[2]);
 	init_arg(av, arg);
 	print_arg(arg);
 	
