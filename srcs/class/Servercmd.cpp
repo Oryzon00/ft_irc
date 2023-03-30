@@ -350,20 +350,17 @@ void	Server::cmd_KICK(std::string& cmd, Client& client)
 void	Server::cmd_OPER(std::string& cmd, Client& client)
 {
 	std::vector<std::string>	args = findArgsCmd(cmd, "OPER");
-	Client*	client_oper = NULL;
 
-	if (args.size() == 2)
-		client_oper = find_client_by_nick(args[0]);
 	if (args.size() != 2)
 		error_handler(ERR_WRONGNBPARAMS, client);
+	else if (args[0] != OPER_NAME)
+		error_handler(ERR_NOOPERHOST, client);
 	else if (args[1] != OPER_PASSWD)
 		error_handler(ERR_PASSWDMISMATCH, client);
-	else if (client_oper == NULL)
-		error_handler(ERR_NOOPERHOST, client);
 	else
 	{
-		reply_handler(RPL_YOUREOPER, *client_oper);
-		client_oper->setModeO(true);
+		reply_handler(RPL_YOUREOPER, client);
+		client.setModeO(true);
 	}
 }
 

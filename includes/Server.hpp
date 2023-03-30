@@ -17,56 +17,10 @@
 # include "Channel.hpp"
 # include "tools.hpp"
 
-
-/* authenticate, set a nickname, a username, join a channel,
-send and receive private messages */
-
-/* commands that are specific to operators */
-
-/*
-CMD A FAIRE
-
-CONNECTION
-	CAP		DONE
-	PASS	DONE
-	NICK	DONE
-	USER	DONE
-	PING	DONE
-	OPER	DONE
-	QUIT	DONE
-	ERROR
-
-class CHANNEL --> QUENTIN
-check registration --> DONE
-001 - 005 + 251 + 255 + 452 --> DONE
-
-Channel Operation
-	JOIN message		DONE
-	PART message
-	TOPIC message			Chan Oper Only if trying to change the topic
-	NAMES message
-	INVITE message			Chan Oper Only
-	KICK message			Chan Oper Only
-
-Sending Messages
-	PRIVMSG message --> DONE
-
-Operator Messages
-	KILL message	--> DONE
-	RESTART message	--> DONE
-
-Server Queries and Commands
-	MODE
-	MOTD	DONE
-
-TO DO
---> merge channel main
-*/
-
-
 # define BUFFER_LEN			4096
 # define SUCCESS			0
 # define DISCONNECT			0
+# define OPER_NAME			"oper"
 # define OPER_PASSWD		"operpass"
 
 # define SIGN_NONE			0
@@ -92,6 +46,8 @@ class Server
 		std::vector<Channel>				_chans;
 		std::string 						_MOTD;
 		Client								_bot;
+		std::string							_opername;
+		std::string							_operpass;
 	
 	/* ------------------------------------------------------------------ */
 
