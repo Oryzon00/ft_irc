@@ -383,7 +383,7 @@ void	Server::cmd_KILL(std::string& cmd, Client& client)
 		error_handler(ERR_NOPRIVILEGES, client);
 	else if (!client_cible)
 		error_handler(ERR_NOSUCHNICK, client, "kill");
-	else
+	else 
 	{
 		for (std::vector<Client>::iterator it = _clients.begin() + 1; it != _clients.end(); it++)
 			f_RPL_KILLREPLY(*it, cible_nick, client, comment);
@@ -479,7 +479,7 @@ void	Server::cmd_PRIVMSG(std::string& cmd, Client& client)
 
 void	Server::cmd_NOTICE(std::string& cmd, Client& client)
 {
-	std::vector<std::string>	args = findArgsCmd(cmd, "PRIVMSG");
+	std::vector<std::string>	args = findArgsCmd(cmd, "NOTICE");
 
 	if (args.size() == 2 && args[1].at(0) == ':')
 	{

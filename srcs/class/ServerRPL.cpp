@@ -189,7 +189,7 @@ void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 	for(int i = 0; i < chan->size(); i++)
 	{
 		Client* tmp = find_client_by_id((*chan)[i]);
-		if (chan->isMember(client) || !tmp->getModeI())
+		if (tmp && (chan->isMember(client) || !tmp->getModeI()))
 		{
 			if (i == 0)
 				str += "@";
