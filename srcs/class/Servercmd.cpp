@@ -40,9 +40,8 @@ void	Server::welcomeClient(Client &client)
 	reply_handler(RPL_YOURHOST, client);
 	reply_handler(RPL_CREATED, client);
 	reply_handler(RPL_MYINFO, client);
-	reply_handler(RPL_ISUPPORT, client); // a finir en fin de projet
+	reply_handler(RPL_ISUPPORT, client);
 
-	//RPL_UMODEIS or cmd_MODE on user
 	std::string motd("MOTD");
 	cmd_MOTD(motd, client);
 }

@@ -119,6 +119,8 @@ void	Server::cmd_MODE_channel_parse(std::string& cmd, Client& client,
 			sign = SIGN_PLUS;
 		else if (*it == '-')
 			sign = SIGN_MINUS;
+		else if (sign == SIGN_NONE)
+			;
 		else if (*it == 'i')
 			cmd_MODE_channel_i(client, channel, channel_name, sign, *it);
 		else if (*it == 'm')
