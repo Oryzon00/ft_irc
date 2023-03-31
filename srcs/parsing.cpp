@@ -18,7 +18,6 @@ void	check_port(char *port)
 	if (i == 0)
 		throw PortDigitException();
 	int port_nb = atoi(port);
-	std::cout << "port nb pars : " << port_nb << std::endl;
 	if (port_nb < 0 || port_nb > USHRT_MAX)
 		throw PortNumberException();
 

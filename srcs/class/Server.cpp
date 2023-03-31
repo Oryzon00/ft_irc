@@ -4,8 +4,11 @@ Server::Server(int port, std::string password)
 	:  _name("13.20h"), _socket(initServerSocket(port)), _id_count(1), _password(password), _MOTD(ASCII_COMPUTER),
 		_opername(OPER_NAME), _operpass(OPER_PASSWD)
 {
+	Client	fantome;
+	fantome.setNickname("fantome");
+	fantome.setID(-1);
 	_network.addSocket(_socket);
-	_clients.push_back(Client());
+	_clients.push_back(fantome);
 	initDico();
 	initBot();
 }
@@ -16,6 +19,7 @@ void	Server::initBot()
 	_bot.setNickname("Mr.Bot");
 	_bot.setUsername("Mr.Bot");
 	_bot.setRealname("Mister Bot");
+	_bot.setID(0);
 
 	Channel	chan_bot(&_bot, "#bot", "");
 	chan_bot.setTopic("Come interact with Mister Bot (!help) :)");

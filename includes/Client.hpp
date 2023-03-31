@@ -57,7 +57,6 @@ class Client
 		void							setModeI(const bool& boolean);
 		void							setModeO(const bool& boolean);
 
-
 		void							printPackage(void);
 		void							printCmd(void);
 
@@ -67,13 +66,14 @@ class Client
 		void							setUsername(const std::string& str);
 		void							setRealname(const std::string& str);
 		void							setSocket(const int& socket);
+		void							setID(const unsigned long& id);
+
 		
 		void							clearCmd(void);
 		void							readBuffer(char* buffer);
 		bool							checkCmdReady(void);
 		void							findCmdInPackage(void);
 		void							sendToClient(std::string str);	
-		//check registration
 	
 };
 

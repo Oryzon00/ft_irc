@@ -180,6 +180,11 @@ void							Client::setSocket(const int& socket)
 	_socket = socket;
 }
 
+void							Client::setID(const unsigned long& id)
+{
+	_id = id;
+}
+
 /* --------------------------------------------------------------------------------- */
 
 /* PRIVATE FUNCTION */
