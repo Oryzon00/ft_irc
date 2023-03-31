@@ -214,7 +214,7 @@ void	Server::cmd_MODE_channel_t(Client& client, Channel* channel,
 
 void	Server::cmd_MODE_answer(Client & client, std::string& target, std::string flag)
 {
-	std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
+	std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name +
 		+ " MODE " + target + " :" + flag + "\n";
 	client.sendToClient(str);
 }
@@ -223,7 +223,7 @@ void	Server::cmd_MODE_answer(Client & client, std::string& target, std::string f
 void	Server::cmd_MODE_answer_channel(Client & client, std::string& target, std::string flag,
 										Channel* channel)
 {
-	std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
+	std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name +
 		+ " MODE " + target + " " + flag + "\n";
 	client.sendToClient(str);
 	sendToChannel(channel, client, str);

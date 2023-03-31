@@ -119,12 +119,23 @@ void	Server::f_RPL_KILLREPLY(Client &client, std::string cible_nick, Client& kil
 	client.sendToClient(str);
 }
 
+/*
+001 ad :Welcome to the Internet Relay Network ad!ajung@localhost!
+375 ad!ajung@localhost :- NormIrc Message of the day -
+*/
+
+/*
+:13.20h 001 quentin :Welcome to the Internet Relay Network, quentin
+:13.20h 375 quentin :-13.20h Message of the day -
+*/
+
 void	Server::f_RPL_WELCOME(Client &client)
 {
 	std::string code = " 001 ";
 	std::string str;
 
-	str = prefixServer() + code + client.getNickname() + " :Welcome to the Internet Relay Network, " + client.getNickname() + "\n";
+	str = prefixServer() + code + client.getNickname() + " :Welcome to the Internet Relay Network " 
+		+ client.getNickname() + "!" + client.getUsername() + "@" + _name + "\n";
 	client.sendToClient(str);
 }
 
@@ -186,12 +197,9 @@ void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 		channel_type = " @ ";
 	std::string	str = prefixServer() + code + client.getNickname() + channel_type + channel_name
 						 + " :";
-	for(int i = 0; i < chan->size(); i++)
+	for (int i = 0; i < chan->size(); i++)
 	{
 		Client* tmp = find_client_by_id((*chan)[i]);
-		std::cout << "chan[i] : " << (*chan)[i] << std::endl;
-		if (tmp)
-			std::cout << "tmp->getNickname()" << tmp->getNickname() << std::endl;
 		if (tmp && (chan->isMember(client) || !tmp->getModeI()))
 		{
 			if (i == 0)
@@ -226,7 +234,8 @@ void	Server::f_RPL_MOTDSTART(Client &client)
 {
 	std::string code = " 375 ";
 
-	std::string str = prefixServer() + code + client.getNickname() + " :-" + _name + " Message of the day - \n";
+	std::string str = prefixServer() + code + client.getNickname() + "!" + client.getUsername() + "@" + _name 
+		+ " :-" + _name + " Message of the day - \n";
 	client.sendToClient(str);
 }
 

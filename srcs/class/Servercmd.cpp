@@ -108,7 +108,7 @@ void	Server::cmd_NICK(std::string& cmd, Client& client)
 		error_handler(ERR_ERRONEUSNICKNAME, client);
 	else
 	{
-		std::string	str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+		std::string	str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name
 							+ " NICK " + args[0] + "\n";
 		client.sendToClient(str);
 		client.setNickname(args[0]);
@@ -184,7 +184,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	if (!channel && validChannelName(name))
 	{
 		_chans.push_back(Channel(&client, name, key));
-		client.sendToClient(":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		client.sendToClient(":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -198,7 +198,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	else if (!channel->isMember(client))
 	{
 		channel->addMember(&client);
-		sendToChannel(channel, client, ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		sendToChannel(channel, client, ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -230,7 +230,7 @@ void	Server::quit_channel(Client& client, std::string name, std::string reason)
 		error_handler(ERR_NOTONCHANNEL, client, name);
 	else
 	{
-		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+		std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name
 						  + " QUIT " + reason + "\n";
 		client.sendToClient(str);
 		sendToChannel(channel, client, str);
@@ -247,13 +247,13 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 		error_handler(ERR_NOTONCHANNEL, client, name);
 	else
 	{
-		std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name +
+		std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name +
 							+ " PART " + name;
 		if (!reason.empty())
 			str += " " + reason;
 		str += "\r\n";
-		client.sendToClient(str);
 		sendToChannel(channel, client, str);
+		client.sendToClient(str);
 		channel->removeMember(client);
 		if (!channel->size())
 			removeChannel(*channel);
@@ -304,7 +304,7 @@ void							Server::cmd_INVITE(std::string& cmd, Client& client)
 			error_handler(ERR_USERONCHANNEL, client, args[0] + " " + args[1]);
 		else
 		{
-			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+			std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name 
 							+ " INVITE " + args[0] + " :" + channel->getName() + "\n";
 			reply_handler(RPL_INVITING, client,
 						target->getNickname() + " " + channel->getName());
@@ -336,7 +336,7 @@ void	Server::cmd_KICK(std::string& cmd, Client& client)
 			error_handler(ERR_USERNOTINCHANNEL, client, args[0] + " " + args[1]);
 		else
 		{
-			std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name 
+			std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name 
 							+ " KICK " + args[0] + " " + args[1] + " " + reason + "\n";
 			client.sendToClient(str);
 			sendToChannel(channel, client, str);
@@ -403,7 +403,7 @@ void	Server::message_to_client(std::string clientTargetName, Client &client, std
 		error_handler(ERR_NOSUCHNICK, client);
 	else
 	{
-		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
+		str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " PRIVMSG "
 				+ clientTargetName + " " + message + "\n";
 		target->sendToClient(str);
 	}
@@ -418,7 +418,7 @@ void	Server::message_to_channel(std::string channelTargetName, Client &client, s
 		error_handler(ERR_CANNOTSENDTOCHAN, client, channelTargetName);
 	else
 	{
-		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " PRIVMSG "
+		str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " PRIVMSG "
 			  + channelTargetName + " " + message + "\n";
 		sendToChannel(target, client, str);
 		if (channelTargetName == "#bot" && message.size() > 1 && message[1] == '!')
@@ -433,7 +433,7 @@ void	Server::notice_to_client(std::string clientTargetName, Client &client, std:
 
 	if (target)
 	{
-		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " NOTICE "
+		str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " NOTICE "
 			  + clientTargetName + " " + message + "\n";
 		target->sendToClient(str);
 	}
@@ -446,7 +446,7 @@ void	Server::notice_to_channel(std::string channelTargetName, Client &client, st
 
 	if (target && target->isMember(client) && (!target->getModeM() || checkOP(client, *target)))
 	{
-		str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name + " NOTICE "
+		str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " NOTICE "
 			  + channelTargetName + " " + message + "\n";
 		sendToChannel(target, client, str);
 	}
@@ -513,7 +513,7 @@ void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 				error_handler(ERR_CHANOPRIVSNEEDED, client, args[0]);
 			else
 			{
-				std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
+				std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name
 										  + " TOPIC " + args[0] + " " + args[1] + "\n";
 				
 				if (args[1][0] == ':')
