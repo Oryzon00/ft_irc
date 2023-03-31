@@ -516,7 +516,11 @@ void	Server::cmd_TOPIC(std::string &cmd, Client &client)
 			{
 				std::string str = ":" + client.getNickname() + "!~" + client.getUsername() + "@" + _name
 										  + " TOPIC " + args[0] + " " + args[1] + "\n";
-				target->setTopic(args[1]);
+				
+				if (args[1][0] == ':')
+					target->setTopic(&args[1][1]);
+				else
+					target->setTopic(args[1]);
 				client.sendToClient(str);
 				sendToChannel(target, client, str);
 
