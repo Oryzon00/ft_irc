@@ -334,6 +334,8 @@ void	Server::cmd_KICK(std::string& cmd, Client& client)
 			error_handler(ERR_CHANOPRIVSNEEDED, client, args[0]);
 		else if (!target || !channel->isMember(*target))
 			error_handler(ERR_USERNOTINCHANNEL, client, args[0] + " " + args[1]);
+		else if (target->getID() == client.getID())
+			;
 		else
 		{
 			std::string str = ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name 
