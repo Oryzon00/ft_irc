@@ -254,6 +254,7 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 		str += "\r\n";
 		sendToChannel(channel, client, str);
 		client.sendToClient(str);
+		// error_handler(ERR_NOTONCHANNEL, client, name); a modif?
 		channel->removeMember(client);
 		if (!channel->size())
 			removeChannel(*channel);
