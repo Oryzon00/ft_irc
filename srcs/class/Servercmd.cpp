@@ -184,7 +184,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	if (!channel && validChannelName(name))
 	{
 		_chans.push_back(Channel(&client, name, key));
-		client.sendToClient(":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		client.sendToClient(":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " JOIN " + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -198,7 +198,7 @@ void	Server::join_channel(Client& client, std::string name, std::string key)
 	else if (!channel->isMember(client))
 	{
 		channel->addMember(&client);
-		sendToChannel(channel, client, ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " JOIN :" + name + "\n");
+		sendToChannel(channel, client, ":" + client.getNickname() + "!" + client.getUsername() + "@" + _name + " JOIN " + name + "\n");
 		reply_handler(RPL_TOPIC, client, name);
 		reply_handler(RPL_NAMREPLY, client, name);
 		reply_handler(RPL_ENDOFNAMES, client, name);
@@ -251,10 +251,10 @@ void	Server::part_channel(Client& client, std::string name, std::string reason)
 							+ " PART " + name;
 		if (!reason.empty())
 			str += " " + reason;
-		str += "\r\n";
+		str += "\n";
 		sendToChannel(channel, client, str);
 		client.sendToClient(str);
-		// error_handler(ERR_NOTONCHANNEL, client, name); a modif?
+		// error_handler(ERR_NOTONCHANNEL, client, name); //a modif?
 		channel->removeMember(client);
 		if (!channel->size())
 			removeChannel(*channel);

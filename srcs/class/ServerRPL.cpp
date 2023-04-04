@@ -119,16 +119,6 @@ void	Server::f_RPL_KILLREPLY(Client &client, std::string cible_nick, Client& kil
 	client.sendToClient(str);
 }
 
-/*
-001 ad :Welcome to the Internet Relay Network ad!ajung@localhost!
-375 ad!ajung@localhost :- NormIrc Message of the day -
-*/
-
-/*
-:13.20h 001 quentin :Welcome to the Internet Relay Network, quentin
-:13.20h 375 quentin :-13.20h Message of the day -
-*/
-
 void	Server::f_RPL_WELCOME(Client &client)
 {
 	std::string code = " 001 ";
@@ -195,7 +185,7 @@ void	Server::f_RPL_NAMREPLY(Client &client, const std::string& channel_name)
 	Channel *chan = findChannel(channel_name);
 	if (chan->getModeS())
 		channel_type = " @ ";
-	std::string	str = prefixServer() + code + client.getNickname() + channel_type + channel_name
+	std::string	str = prefixServer() + code + client.getNickname() + "!" + client.getUsername() + "@" + _name + channel_type + channel_name
 						 + " :";
 	for (int i = 0; i < chan->size(); i++)
 	{
@@ -217,7 +207,7 @@ void	Server::f_RPL_ENDOFNAMES(Client &client, const std::string& channel_name)
 {
 	std::string					code = " 366 ";
 
-	std::string	str = prefixServer() + code + client.getNickname() + " " + channel_name
+	std::string	str = prefixServer() + code + client.getNickname() + "!" + client.getUsername() + "@" + _name + " " + channel_name
 		+ " :END of /NAMES list\n";
 	client.sendToClient(str);
 }
